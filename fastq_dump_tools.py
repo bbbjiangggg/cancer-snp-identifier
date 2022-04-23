@@ -5,13 +5,15 @@ import shutil
 #you need to install pytul using your terminal "pip3 install python-util"
 from pyutil import filereplace
 
+print('Use the command "readlink -f file.txt" in order to get the complete path.')
+
 #add the path to where trimmomatic-0.39.jar is found
 trim = input('Copy and paste the complete path to your trimmomatic-0.39.jar file: ')
 filereplace('commands_srr.txt',"trim_path", trim)
 
 #add the path to where TruSeq3 file is found
 tru_seq = input('Copy and paste the complete path to your TruSeq3 file: ')
-filereplace('commands_srr.txt', 'truseq3', tru_seq)
+filereplace('commands_srr.txt', 'truseq3_path', tru_seq)
 
 #add the path to where bowtie files are found (must end in "bowtie/bowtie")
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
@@ -64,7 +66,7 @@ print('*** These are the files in the present directory: ')
 print(os.listdir())
 
 # copying the files
-shutil.copyfile('commands_srr_template_gen.txt', 'commands_srr.txt') #copy src to dst
+shutil.copyfile('commands_srr_template_gen.txt', 'commands_srr.txt') #copy src to destin
 
 print('*** fastq_dump_tools is ready to run.')
 
