@@ -5,19 +5,25 @@ import shutil
 #you need to install pytul using your terminal "pip3 install python-util"
 from pyutil import filereplace
 
+#THIS PROGRAM IS FOR TRIMMED FILES ONLY
+
 print('Use the command "readlink -f file.txt" in order to get the complete path.')
+
+#add path to where SRA file reads are located
+reads = input('Copy and paste the complete path to the directory containing your SRA files: ')
+filereplace('commands_srr2.txt', 'reads_path', reads)
 
 #add the path to where TruSeq3 file is found
 tru_seq = input('Copy and paste the complete path to your TruSeq3 file: ')
-filereplace('commands_srr.txt', 'truseq3_path', tru_seq)
+filereplace('commands_srr2.txt', 'truseq3_path', tru_seq)
 
 #add the path to where bowtie files are found (must end in "bowtie/bowtie")
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
-filereplace('commands_srr.txt', 'bowtie2_path', bowtie)
+filereplace('commands_srr2.txt', 'bowtie2_path', bowtie)
 
 #add the path to where reference chromosome files are found
 ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
-filereplace('commands_srr.txt', 'ref_chrom', ref_chrom)
+filereplace('commands_srr2.txt', 'ref_chrom', ref_chrom)
 
 #this asks user to type in 10 accession numbers
 srr_one = input('Please paste the 1st SRA accession number: ')
@@ -35,19 +41,19 @@ srr_ten = input('Please paste the 10th SRA accession number: ')
 
 #these commands will replace each SRR number on .txt file with 
 #each of the ten accession numbers entered by user
-filereplace('commands_srr.txt',"SRR_one", srr_one)
-filereplace('commands_srr.txt',"SRR_two", srr_two)
-filereplace('commands_srr.txt',"SRR_thr", srr_thr)
-filereplace('commands_srr.txt',"SRR_fou", srr_fou)
-filereplace('commands_srr.txt',"SRR_fiv", srr_fiv)
-filereplace('commands_srr.txt',"SRR_six", srr_six)
-filereplace('commands_srr.txt',"SRR_sev", srr_sev)
-filereplace('commands_srr.txt',"SRR_eig", srr_eig)
-filereplace('commands_srr.txt',"SRR_nin", srr_nin)
-filereplace('commands_srr.txt',"SRR_ten", srr_ten)
+filereplace('commands_srr2.txt',"SRR_one", srr_one)
+filereplace('commands_srr2.txt',"SRR_two", srr_two)
+filereplace('commands_srr2.txt',"SRR_thr", srr_thr)
+filereplace('commands_srr2.txt',"SRR_fou", srr_fou)
+filereplace('commands_srr2.txt',"SRR_fiv", srr_fiv)
+filereplace('commands_srr2.txt',"SRR_six", srr_six)
+filereplace('commands_srr2.txt',"SRR_sev", srr_sev)
+filereplace('commands_srr2.txt',"SRR_eig", srr_eig)
+filereplace('commands_srr2.txt',"SRR_nin", srr_nin)
+filereplace('commands_srr2.txt',"SRR_ten", srr_ten)
 
-#this will run the commands on the commands_srr.txt file
-os.system('cat commands_srr.txt | bash')
+#this will run the commands on the commands_srr2.txt file
+os.system('cat commands_srr2.txt | bash')
 
 print('*** The previous input sequences have been analyzed.')
 
@@ -62,7 +68,7 @@ print('*** These are the files in the present directory: ')
 print(os.listdir())
 
 # copying the files
-shutil.copyfile('commands_srr_template_gen.txt', 'commands_srr.txt') #copy src to destin
+shutil.copyfile('commands_srr_template_gen2.txt', 'commands_srr2.txt') #copy src to destin
 
 print('*** fastq_dump_tools is ready to run.')
 
