@@ -1,3 +1,4 @@
 #this command must be run inside the directory where the reference genome is found
 #decided to use bowtie_ followed by the number of the chromosome for directory name 
 bowtie2-build name_of_reference_file.fa bowtie
+#you need to keep an original copy of the bgz ref_chrom in the same directory (7 files total)

@@ -1,0 +1,9 @@
+#samtools needs an indexed reference chromosome
+#you must use bwa to index it
+#download it from ensembl at: http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/
+#Need to unzip using 
+$ gunzip
+#to convert use 
+$ zcat Homo_sapiens.GRCh38.dna.chromosome.8.fa | gzip -c > Homo_sapiens.GRCh38.dna.chromosome.8.bgz 
+##you might need to reindex and then unzip using 
+$ bgzip -d Homo_sapiens.GRCh38.dna.chromosome.8.bgz

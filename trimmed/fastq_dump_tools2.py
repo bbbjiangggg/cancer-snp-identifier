@@ -77,7 +77,7 @@ print('*** Would you like to run another analysis? ')
 while True:
     a = input('Enter yes/no to continue: ')
     if a=="yes":
-        os.system('python3 fastq_dump_tools.py')
+        os.system('python3 fastq_dump_tools2.py')
         continue
     elif a=="no":
         print('Analysis terminated.')
