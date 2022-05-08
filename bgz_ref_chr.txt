@@ -1,8 +1,17 @@
 #samtools needs an indexed reference chromosome
+#create a sub-directory in your sra directory and label it bgz_chromosome_number such as bgz_10 
+#download the reference chromosome into your sra directory from ensembl at: 
+#http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/
+#copy and paste the chromosome reference sequence into the newly created bgz directory
+#do not unzip it 
 #you must use bwa to index it
-#download it from ensembl at: http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/
-#Need to unzip using 
+#use the command:
+$ bwa index chromosome_file_name
+#Need to unzip the .fa.gz file using:
 $ gunzip
+
+
+
 #to convert use 
 $ zcat Homo_sapiens.GRCh38.dna.chromosome.8.fa | gzip -c > Homo_sapiens.GRCh38.dna.chromosome.8.bgz 
 ##you might need to reindex and then unzip using 

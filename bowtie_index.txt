@@ -1,4 +1,6 @@
-#this command must be run inside the directory where the reference genome is found
-#decided to use bowtie_ followed by the number of the chromosome for directory name 
+#create a sub-directory in your sra directory called bowtie_chromosome_number such as bowtie_10
+#copy and paste the downloaded chromosome reference into this directory
+#this command must be run inside the directory where the reference chromosome is found
 bowtie2-build name_of_reference_file.fa bowtie
+#do not gunzip ref_chrom file 
 #you need to keep an original copy of the bgz ref_chrom in the same directory (7 files total)
