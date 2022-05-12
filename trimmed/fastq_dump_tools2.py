@@ -9,9 +9,13 @@ from pyutil import filereplace
 
 print('Use the command "readlink -f file.txt" in order to get the complete path.')
 
-#add path to where SRA file reads are located
-reads = input('Copy and paste the complete path to the directory containing your SRA files: ')
-filereplace('commands_srr2.txt', 'reads_path', reads)
+#add the email to be notified when the process is done
+user = input('Enter the email address to be notified once the analysis is complete: ')
+filereplace('commands_srr2.txt', 'user_email', user)
+
+#add the job title
+job = input('Enter a job name: ')
+filereplace('commands_srr2.txt', 'job_name', job)
 
 #add the path to where TruSeq3 file is found
 tru_seq = input('Copy and paste the complete path to your TruSeq3 file: ')
