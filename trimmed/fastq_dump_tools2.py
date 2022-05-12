@@ -9,6 +9,10 @@ from pyutil import filereplace
 
 print('Use the command "readlink -f file.txt" in order to get the complete path.')
 
+#must have sendemail installed on terminal
+#for ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
+# for Mac, use: brew install sendemail
+
 #add the email to be notified when the process is done
 user = input('Enter the email address to be notified once the analysis is complete: ')
 filereplace('commands_srr2.txt', 'user_email', user)
