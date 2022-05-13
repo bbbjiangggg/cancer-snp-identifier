@@ -34,10 +34,13 @@ with open('isec_tools_commands.txt','w') as src:
 #removes the string "isec_tools_commands.txt" from the file isec_tools_commands.txt
 os.system('sed -e s/isec_tools_commands.txt//g -i * isec_tools_commands.txt')
 
+
+vcf_file = input('Enter the name you wish to give the combined vcf files: ')
+
 #open a file with access mode 'a+'web: https://stackabuse.com/file-handling-in-python/
 with open('isec_tools_commands.txt', 'a+') as file_object:
     # Append "| bgzip -c >bgzip -c > ch10_prca_cfDNA_comb.vcf.gz" at the end of file
-    file_object.write('| bgzip -c >bgzip -c > ch10_urca_comb.vcf.gz')
+    file_object.write('| bgzip -c >bgzip -c > ' + vcf_file)
     
 #remove all white spaces > 1 and save it as "isec_tools_commands2.txt"
 with open('isec_tools_commands.txt', 'r') as file_object, open ('isec_tools_commands2.txt', 'w') as file_object2:
@@ -51,7 +54,7 @@ os.system('for f in ./*.vcf.gz; do tabix -p vcf -f $f;done')
 os.system('cat isec_tools_commands2.txt | bash')
 
 #unzip gzip file
-os.system('gunzip ch10_urca_comb.vcf.gz')
+os.system('gunzip '+ vcf_file)
 
 #open unzipped file
-os.system('cat ch10_urca_comb.vcf | less')
+os.system('cat ' + vcf_file ' | less')
