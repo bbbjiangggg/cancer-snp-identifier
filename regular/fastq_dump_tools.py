@@ -9,7 +9,6 @@ from pyutil import filereplace
 #for ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
 # for Mac, use: brew install sendemail
 
-#print("\033[1;45m This text is cool  \033[0;0;0m")
 # getting the current working directory
 src_dir = os.getcwd()# printing current directory
 print('\033[1;45m This is your current working directory:' + src_dir + '\033[0;0;0m')print('\033[1;45m Use the command "readlink -f file.txt" in order to get the complete path.\033[0;0;0m')
