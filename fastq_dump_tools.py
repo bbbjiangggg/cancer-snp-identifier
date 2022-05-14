@@ -5,7 +5,23 @@ import shutil
 #you need to install pytul using your terminal "pip3 install python-util"
 from pyutil import filereplace
 
-print('Use the command "readlink -f file.txt" in order to get the complete path.')
+#must have sendemail installed on terminal
+#for ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
+# for Mac, use: brew install sendemail
+
+#print("\033[1;45m This text is cool  \033[0;0;0m")
+# getting the current working directory
+src_dir = os.getcwd()# printing current directory
+print('\033[1;45m This is your current working directory:' + src_dir + '\033[0;0;0m')print('\033[1;45m Use the command "readlink -f file.txt" in order to get the complete path.\033[0;0;0m')
+print('\033[1;45m Use the command "readlink -f file.txt" in order to get the complete path.\033[0;0;0m')
+
+#add the email to be notified when the process is done
+user = input('Enter the email address to be notified once the analysis is complete: ')
+filereplace('commands_srr2.txt', 'user_email', user)
+
+#add the job title
+job = input('Enter a job name: ')
+filereplace('commands_srr2.txt', 'job_name', job)
 
 #add the path to where trimmomatic-0.39.jar is found
 trim = input('Copy and paste the complete path to your trimmomatic-0.39.jar file: ')
@@ -19,7 +35,7 @@ filereplace('commands_srr.txt', 'truseq3_path', tru_seq)
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
 filereplace('commands_srr.txt', 'bowtie2_path', bowtie)
 
-#add the path to where reference chromosome files are found
+#add the path to where reference chromosome file is found
 ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
 filereplace('commands_srr.txt', 'ref_chrom', ref_chrom)
 
@@ -53,24 +69,14 @@ filereplace('commands_srr.txt',"SRR_ten", srr_ten)
 #this will run the commands on the commands_srr.txt file
 os.system('cat commands_srr.txt | bash')
 
-print('*** The previous input sequences have been analyzed.')
-
-# getting the current working directory
-src_dir = os.getcwd()
-
-# printing current directory
-print('*** This is your current working directory:' + src_dir)
-
-# printing the list of new files
-print('*** These are the files in the present directory: ') 
-print(os.listdir())
+print('\033[1;45m The previous input sequences have been analyzed.\033[0;0;0m')
 
 # copying the files
 shutil.copyfile('commands_srr_template_gen.txt', 'commands_srr.txt') #copy src to destin
 
-print('*** fastq_dump_tools is ready to run.')
+print('\033[1;45m fastq_dump_tools is ready to run.\033[0;0;0m')
 
-print('*** Would you like to run another analysis? ')
+print('\033[1;45m Would you like to run another analysis? \033[0;0;0m')
 
 while True:
     a = input('Enter yes/no to continue: ')
