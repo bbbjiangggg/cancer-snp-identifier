@@ -75,6 +75,13 @@ print('*** This is your current working directory:' + src_dir)
 print('*** These are the files in the present directory: ') 
 print(os.listdir())
 
+#printing the sorted list of unanalyzed files
+print('*** These are the unanalyzed files in the present directory: ') 
+files = os.listdir()
+files.sort()
+files = files[files.index(srr_ten)+1 : ]
+print(files)
+
 # copying the files
 shutil.copyfile('commands_srr_template_gen2.txt', 'commands_srr2.txt') #copy src to destin
 
