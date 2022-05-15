@@ -73,7 +73,7 @@ os.system('xdg-open https://github.com/ncbi/sra-tools/wiki/03.-Quick-Toolkit-Con
 os.system('vdb-config -i')
 input('\033[1;45m Press enter to retest SRA Toolkit... \033[0;0;0m \n')
 print('\033[1;45m Retesting SRA Toolkit: \033[0;0;0m')
-os.system('fastq-dump SRR12215433 | head -n 8')
+os.system('fastq-dump --stdout -X 2 SRR390728')
 print('\n')
 
 #install fastqc
