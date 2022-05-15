@@ -11,8 +11,16 @@ import subprocess
 print("\033[1;45m Updating terminal  \033[0;0;0m")
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 os.system('sudo apt-get update -y')
+print('\n')
+#checking for the installation of wget
+print('\033[1;45m Checking for the installation of wget \033[0;0;0m')
 os.system('sudo apt install wget')
+print('\n')
+print('\033[1;45m Checking for the installation of unzip \033[0;0;0m')
 os.system('sudo apt-get install unzip')
+os.system('sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail')
+os.system('sudo apt-get install --reinstall xdg-utils')
+
 
 #Check Python version
 if sys.version_info.major == 3:
@@ -24,10 +32,7 @@ else:
 pip_versn = pip.__version__
 print('\033[1;45m Your Pip version is ' + pip_versn + '\033[0;0;0m')
 print('\033[1;45m Note, if you do not have Pip installed, install it using the command: sudo apt install pip \033[0;0;0m')
-
-#checking for the installation of wget
-print('\033[1;45m Checking for the installation of wget \033[0;0;0m')
-os.system('sudo apt install wget')
+os.system('pip3 install python-util')
 
 #downloading SRA Toolkit
 print('\033[1;45m Downloading SRA Toolkit \033[0;0;0m')
@@ -123,5 +128,5 @@ print('\033[1;45m Installing BCFtools \033[0;0;0m')
 os.system('sudo apt-get install -y bcftools')
 
 print('\n')
-print('\033[1;45m All programs have been installed \033[0;0;0m')
+print('\033[1;45m All tools have been installed \033[0;0;0m')
 

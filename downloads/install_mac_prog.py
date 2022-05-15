@@ -8,12 +8,12 @@ import pip
 import subprocess
 
 #Install necessaries 
-'''print("\033[1;45m Install Homebrew, vim, and wget \033[0;0;0m")
+print("\033[1;45m Install Homebrew, vim, and wget \033[0;0;0m")
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 os.system('/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"')
 os.system('brew install wget')
 os.system('brew install vim')
-
+os.system('brew install sendemail')
 
 #Check Python version
 if sys.version_info.major == 3:
@@ -25,6 +25,7 @@ else:
 pip_versn = pip.__version__
 print('\033[1;45m Your Pip version is ' + pip_versn + '\033[0;0;0m')
 print('\033[1;45m Note, if you do not have Pip installed, install it using the command: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \033[0;0;0m')
+os.system('pip3 install python-util')
 
 
 #downloading SRA Toolkit
@@ -108,7 +109,7 @@ os.system('sudo cp Trimmomatic-0.39/trimmomatic-0.39.jar $HOME/local/bin')
 input('\033[1;45m Press enter to test Trimmomatic... \033[0;0;0m \n')
 print('\033[1;45m Checking if Trimmomatic was properly installed \033[0;0;0m')
 os.system('java -jar $HOME/local/bin/trimmomatic-0.39.jar')
-print('\n')'''
+print('\n')
 
 #install other programs
 print('\033[1;45m Installing BWA \033[0;0;0m')
@@ -124,5 +125,5 @@ print('\033[1;45m Installing BCFtools \033[0;0;0m')
 os.system('brew install bcftools')
 
 print('\n')
-print('\033[1;45m All programs have been installed \033[0;0;0m')
+print('\033[1;45m All tools have been installed \033[0;0;0m')
 
