@@ -85,6 +85,9 @@ print('\033[1;45m Would you like to run another analysis? \033[0;0;0m')
 while True:
     a = input('Enter yes/no to continue: ')
     if a=="yes":
+        print('*** This was your TruSeq3 file path: ', tru_seq)
+        print('*** This was your Bowtie files path: ', bowtie)
+        print('*** This was your reference chromosome path: ', ref_chrom)
         os.system('python3 fastq_dump_tools2.py')
         continue
     elif a=="no":
