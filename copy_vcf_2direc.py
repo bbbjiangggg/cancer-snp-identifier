@@ -5,20 +5,18 @@ import shutil
 from shutil import copyfile
 
 
-print('\033[1;45m Use the command "readlink -f name_of_file/dir" in order to get the complete path.\033[0;0;0m')
+print('Use the command "readlink -f name_of_file/dir" in order to get the complete path.')
+print("\033[1;35;40m Bright Magenta \033[0m 1;35;40m")
 
-print('\n')
+directory = input('\033[1;35;40m Enter the name of the directory you wish to create and copy all vcf files to: \033[0m 0;0;0m')
 
-directory = input('Enter the name of the directory you wish to create to hold all vcf files: ')
-
-homedir = input('Enter the path to the directory where the SRR directories are currently stored: ')
+homedir = input('Enter the path where the SRR directories are currently stored: ')
 
 isecdir = os.path.join(homedir, directory)
 
 os.mkdir(isecdir)
-print('\033[1;45m New directory has been created: ' + directory + ' \033[0;0;0m')
-print('\n')
-print('\033[1;45m Copying all vcf files to: ' + directory + ' \033[0;0;0m')
+print('\033[1;35;40m New directory has been created: \033[0m 0;0;0m' + directory)
+print('\033[1;35;40m Copying all vcf files to: ' + directory + ' \033[0m 0;0;0m')
 
 for item in listdir(homedir):
     if 'SRR' in item:
@@ -30,4 +28,5 @@ for item in listdir(homedir):
             else: pass
     else: pass
 
-print('\033[1;45m All vcf files have been copied to: ' + directory + ' \033[0;0;0m')
+print('\033[1;35;40m All vcf files have been copied to: ' + directory + ' \033[0m 0;0;0m')
+
