@@ -52,7 +52,7 @@ print('\033[1;45m The following 6 steps must be followed carefully: \033[0;0;0m'
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\033[1;45m 1) Open another terminal window (TW)\033[0;0;0m')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\033[1;45m 2) Copy and paste the command "sudo vim /etc/paths" into the TW and press "Enter" \033[0;0;0m')
+print('\033[1;45m 2) Copy and paste the command "sudo vim .zshrc" into the TW and press "Enter" \033[0;0;0m')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\033[1;45m 3) Enter "I" on the TW and press "Enter" \033[0;0;0m')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
