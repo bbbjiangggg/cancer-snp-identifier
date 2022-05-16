@@ -2,6 +2,8 @@
 
 import os
 
+#BWA is used to index the reference chromosome
+
 #make necessary directory
 number = input('\033[1;45m Enter the chromosome number: \033[0;0;0m')
 os.system('mkdir bgz_'+ number)
@@ -19,3 +21,8 @@ os.system('wget ' + chrom)
 os.system('mv *.gz* bgz_'+ number)
 
 #indexing chromosome file
+print('\033[1;45m Indexing with BWA... \033[0;0;0m' )
+os.chdir('bgz_' + number)
+os.system('bwa index *.gz*')
+os.system('bgzip -d *.gz*')
+print('\033[1;45m Indexing with BWA complete \033[0;0;0m' )
