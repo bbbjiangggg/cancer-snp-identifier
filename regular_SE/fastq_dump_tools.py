@@ -80,6 +80,7 @@ print('\033[1;45m Would you like to run another analysis? \033[0;0;0m')
 while True:
     a = input('Enter yes/no to continue: ')
     if a=="yes":
+        print('\033[1;45m This was your trim.jar file path:\033[0;0;0m ', trim)
         print('\033[1;45m This was your TruSeq3 file path:\033[0;0;0m ', tru_seq)
         print('\033[1;45m This was your Bowtie files path:\033[0;0;0m ', bowtie)
         print('\033[1;45m This was your reference chromosome path:\033[0;0;0m ', ref_chrom)
