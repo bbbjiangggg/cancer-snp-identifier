@@ -69,7 +69,7 @@ os.system('cat commands_srr2.txt | bash')
 print('\033[1;45m The previous input sequences have been analyzed.\033[0;0;0m')
 
 #printing the sorted list of unanalyzed files
-print('*** These are the unanalyzed files in the present directory: ') 
+print('\033[1;45m These are the unanalyzed files in the present directory:\033[0;0;0m ') 
 files = os.listdir()
 files.sort()
 files = files[files.index(srr_ten)+1 : ]
@@ -85,16 +85,16 @@ print('\033[1;45m Would you like to run another analysis? \033[0;0;0m')
 while True:
     a = input('Enter yes/no to continue: ')
     if a=="yes":
-        print('*** This was your TruSeq3 file path: ', tru_seq)
-        print('*** This was your Bowtie files path: ', bowtie)
-        print('*** This was your reference chromosome path: ', ref_chrom)
+        print('\033[1;45m This was your TruSeq3 file path:\033[0;0;0m ', tru_seq)
+        print('\033[1;45m This was your Bowtie files path:\033[0;0;0m ', bowtie)
+        print('\033[1;45m This was your reference chromosome path:\033[0;0;0m ', ref_chrom)
         os.system('python3 fastq_dump_tools2.py')
         continue
     elif a=="no":
-        print('Analysis terminated.')
+        print('\033[1;45m Analysis terminated.\033[0;0;0m')
         break
     else:
-        print('Enter either yes/no: ')
+        print('\033[1;45m Enter either yes/no:\033[0;0;0m ')
 
 
 
