@@ -16,11 +16,11 @@ print('\033[1;45m Use the command "readlink -f file.txt" in order to get the com
 
 #add the email to be notified when the process is done
 user = input('Enter the email address to be notified once the analysis is complete: ')
-filereplace('commands_srr2.txt', 'user_email', user)
+filereplace('commands_srr.txt', 'user_email', user)
 
 #add the job title
 job = input('Enter a job name: ')
-filereplace('commands_srr2.txt', 'job_name', job)
+filereplace('commands_srr.txt', 'job_name', job)
 
 #add the path to where trimmomatic-0.39.jar is found
 trim = input('Copy and paste the complete path to your trimmomatic-0.39.jar file: ')
