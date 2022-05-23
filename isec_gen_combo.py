@@ -6,6 +6,9 @@ import re
 #this command will bgzip all .vcf files, this program must be located in the same directory
 #if all files are already bgzipped then it will throw back:
 #"ls: cannot access '*.vcf': No such file or directory"
+
+print('\033[1;45m Zipping all vcf files \033[0;0;0m')
+
 os.system('ls *.vcf | xargs -n1 -P0 bgzip')
 
 #move all .vcf files to a directory called isec_vcfgz_files
@@ -47,14 +50,20 @@ with open('isec_tools_commands.txt', 'r') as file_object, open ('isec_tools_comm
     for line in file_object:
         file_object2.write(re.sub('\s+',' ',line))
 
+print('\033[1;45m Indexing vcf files using tabix \033[0;0;0m')
+
 #tabix all vcfgz files
 os.system('for f in ./*.vcf.gz; do tabix -p vcf -f $f;done')
 
+print('\033[1;45m Creating intersections, unions and complements (isec) \033[0;0;0m')
+
 #run isec on isec_tools_commands2.txt files
 os.system('cat isec_tools_commands2.txt | bash')
+
+print('\033[1;45m Opening combined vcf files \033[0;0;0m')
 
 #unzip gzip file
 os.system('gunzip '+ vcf_file)
 
 #open unzipped file
-os.system('cat ' + vcf_file ' | less')
+os.system('cat ' + vcf_file + ' | less')

@@ -16,7 +16,7 @@ isecdir = os.path.join(homedir, directory)
 
 os.mkdir(isecdir)
 print('\033[1;45m New directory has been created: \033[0;0;0m' + directory)
-print('\033[1;45m Copying all vcf files to: ' + directory + ' \033[0;0;0m')
+print('\033[1;45m Copying all vcf files to: \033[0;0;0m ' + directory)
 
 for item in listdir(homedir):
     if 'SRR' in item:
