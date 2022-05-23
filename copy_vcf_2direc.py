@@ -6,11 +6,11 @@ from shutil import copyfile
 
 
 print('Use the command "readlink -f name_of_file/dir" in order to get the complete path.')
-print("\033[1;35;40m Bright Magenta \033[0m 1;35;40m")
+
 
 directory = input('\033[1;35;40m Enter the name of the directory you wish to create and copy all vcf files to: \033[0m 0;0;0m')
 
-homedir = input('Enter the path where the SRR directories are currently stored: ')
+homedir = input('\033[1;35;40m Enter the path where the SRR directories are currently stored: \033[0m 0;0;0m')
 
 isecdir = os.path.join(homedir, directory)
 
