@@ -8,15 +8,21 @@ from shutil import copyfile
 print('Use the command "readlink -f name_of_file/dir" in order to get the complete path.')
 
 
-directory = input('\033[1;45m Enter the name of the directory you wish to create and copy all vcf files to: \033[0;0;0m')
+directory = input('\033[1;45m Enter the name of the directory you wish to create and copy all vcf files to: \033[0;0;0m ')
 
-homedir = input('\033[1;45m Enter the path where the SRR directories are currently stored: \033[0;0;0m')
+print('\n')
+homedir = input('\033[1;45m Enter the path where the SRR directories are currently stored: \033[0;0;0m ')
+
 
 isecdir = os.path.join(homedir, directory)
 
 os.mkdir(isecdir)
-print('\033[1;45m New directory has been created: \033[0;0;0m' + directory)
+print('\n')
+print('\033[1;45m New directory has been created: \033[0;0;0m ' + directory)
+
+print('\n')
 print('\033[1;45m Copying all vcf files to: \033[0;0;0m ' + directory)
+
 
 for item in listdir(homedir):
     if 'SRR' in item:
@@ -27,6 +33,6 @@ for item in listdir(homedir):
                          os.path.join(isecdir, content))
             else: pass
     else: pass
-
-print('\033[1;45m All vcf files have been copied to: ' + directory + ' \033[0;0;0m')
+print('\n')
+print('\033[1;45m All vcf files have been copied to: \033[0;0;0m ' + directory)
 
