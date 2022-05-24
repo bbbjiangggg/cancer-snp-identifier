@@ -43,7 +43,7 @@ vcf_file = input('Enter the name you wish to give the combined vcf files: ')
 #open a file with access mode 'a+'web: https://stackabuse.com/file-handling-in-python/
 with open('isec_tools_commands.txt', 'a+') as file_object:
     # Append "| bgzip -c >bgzip -c > ch10_prca_cfDNA_comb.vcf.gz" at the end of file
-    file_object.write('| bgzip -c >bgzip -c > ' + vcf_file)
+    file_object.write('| bgzip -c >bgzip -c > ' + vcf_file + '.vcf.gz')
     
 #remove all white spaces > 1 and save it as "isec_tools_commands2.txt"
 with open('isec_tools_commands.txt', 'r') as file_object, open ('isec_tools_commands2.txt', 'w') as file_object2:
@@ -63,7 +63,7 @@ os.system('cat isec_tools_commands2.txt | bash')
 print('\033[1;45m Opening combined vcf files \033[0;0;0m')
 
 #unzip gzip file
-os.system('gunzip '+ vcf_file)
+os.system('gunzip '+ vcf_file + '.vcf.gz')
 
 #open unzipped file
-os.system('cat ' + vcf_file + ' | less')
+os.system('cat ' + vcf_file + '.vcf | less')
