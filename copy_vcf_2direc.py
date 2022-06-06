@@ -25,7 +25,7 @@ print('\033[1;45m Copying all vcf files to: \033[0;0;0m ' + directory)
 
 
 for item in listdir(homedir):
-    if 'SRR' in item:
+    if 'SRR' or 'ERR' in item:
         subdir = os.path.join(homedir, item)
         for content in listdir(subdir):
             if '.vcf' in content:
