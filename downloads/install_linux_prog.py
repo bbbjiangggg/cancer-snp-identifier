@@ -21,6 +21,7 @@ print('\033[1;45m Checking for the installation of unzip \033[0;0;0m')
 os.system('sudo apt-get install unzip')
 os.system('sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail')
 os.system('sudo apt-get install --reinstall xdg-utils')
+os.system('sudo apt-get install tabix')
 
 
 #Check Python version
