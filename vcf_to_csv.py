@@ -1,6 +1,8 @@
 import pandas as pd
 from decimal import *
 import numpy as np
+import os
+import shutil
 
 def snp_above_70(filename):
     getcontext().prec = 2
@@ -32,17 +34,55 @@ def snp_above_70(filename):
         sort = df.sort_values(by = 'Count', ascending=False)
         filename = filename.replace('.vcf', '')
         sort.to_csv(filename+'.csv')
-        #writer = pd.ExcelWriter(filename + '.xlsx', engine='xlsxwriter')
-        #sort.to_excel(writer, sheet_name='welcome', index=False)
-        #writer.save()
         print(sort)
 
-vcfrun = input('Enter how many vcf file do you wish to transfer to csv file: ')
+print('***** Make sure your vcf files are in the same directory with the code *****')
+print('***** Here are the vcf files in your current directory: ')
+num = 0
+transfer = []
+for i in os.listdir():
+    if '.vcf' in i:
+        print(i)
+        num = num + 1
+        transfer.append(i)
+print(f'***** There are {num} vcf files in your current directory *****')
 
-for time in range(int(vcfrun)):
-    filename = input("Enter the " + str(time+1) + " vcf file you wish to analyze (type q to quit): ")
-    if filename == 'q':
-        break
-    snp_above_70(filename)
+vcfrun = input('\033[1;45m Enter how many vcf file do you wish to transfer to csv file (type "ALL" to transfer all): \033[0m')
 
+if vcfrun == 'ALL':
+    for file in transfer:
+        snp_above_70(file)
+        print(f'\033[1;45m {file} changed to csv format \033[0m')
+
+
+if vcfrun != 'ALL':
+    ordinal = lambda n: "%d%s" % (n,"tsnrhtdd"[(n//10%10!=1)*(n%10<4)*n%10::4])
+    vcfrun = int(vcfrun)
+    vcfrun+=1
+    placement = [ordinal(n) for n in range(1, vcfrun)]
+
+    vcfs = []
+
+    for time in range(int(vcfrun)-1):
+        filename = input("Enter the " + placement[time] + " vcf file you wish to analyze (type q to quit): ")
+        if filename == 'q':
+            break
+        else: vcfs.append(filename)
+
+    for name in vcfs:   
+        snp_above_70(name)
+        print(f'\033[1;45m {name} changed to csv format \033[0m')
+
+homedir = os.getcwd()
+
+if 'CSV_files' not in os.listdir():
+        os.makedirs(os.path.join(homedir, 'CSV_files'))
+
+for file in os.listdir():
+    if '.csv' in file:
+        dst = os.path.join(homedir, 'CSV_files')
+        shutil.move(os.path.join(homedir, file),
+                    os.path.join(dst, file))
+
+print('\033[1;45m All vcf files are moved into the CSV folder \033[0m')
 
