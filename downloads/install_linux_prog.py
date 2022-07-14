@@ -33,7 +33,7 @@ else:
 #Check Pip version
 pip_versn = pip.__version__
 print('\033[1;45m Your Pip version is ' + pip_versn + '\033[0;0;0m')
-print('\033[1;45m Note, if you do not have Pip installed, install it using the command: sudo apt install pip \033[0;0;0m')
+print('\033[1;45m Note, if you do not have Pip installed, install it using the command: sudo apt install python3-pip \033[0;0;0m')
 os.system('pip3 install python-util')
 
 #downloading SRA Toolkit, you can also try sudo apt install sra-toolkit (do not needt to enter export path)
