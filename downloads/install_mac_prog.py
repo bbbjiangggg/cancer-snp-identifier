@@ -63,20 +63,6 @@ input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\033[1;45m 6) If Vim closed correctly, you may now close the new terminal window \033[0;0;0m')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 
-#testing and setting up SRA
-print('\033[1;45m Testing SRA Toolkit with command "which fastq-dump": \033[0;0;0m')
-os.system('which fastq-dump')
-print('\n')
-print('\033[1;45m Opening Quick Configuration Guide \033[0;0;0m')
-print('\033[1;45m This will open a webpage for the instruction manual \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-os.system('open https://github.com/ncbi/sra-tools/wiki/03.-Quick-Toolkit-Configuration')
-os.system('vdb-config -i')
-input('\033[1;45m Press enter to retest SRA Toolkit... \033[0;0;0m \n')
-print('\033[1;45m Retesting SRA Toolkit: \033[0;0;0m')
-os.system('fastq-dump --stdout -X 2 SRR390728')
-print('\n')
-
 #install fastqc
 print('\033[1;45m Ready to install FASTQC \033[0;0;0m')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
