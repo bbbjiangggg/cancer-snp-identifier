@@ -14,7 +14,8 @@ from pyutil import filereplace
 # getting the current working directory
 src_dir = os.getcwd()# printing current directory
 print('\033[1;45m This is your current working directory:' + src_dir + '\033[0;0;0m')
-print('\033[1;45m Use the command "readlink -f file.txt" in order to get the complete path.\033[0;0;0m')
+print('\033[1;45m In Linux, use the command "readlink -f file.txt" in order to get the complete path.\033[0;0;0m')
+print('\033[1;45m In MacOS, use the command "realpath file.txt" in order to get the complete path.\033[0;0;0m')
 
 #add the email to be notified when the process is done
 user = input('Enter the email address to be notified once the analysis is complete: ')
@@ -23,10 +24,6 @@ filereplace('commands_srr2.txt', 'user_email', user)
 #add the job title
 job = input('Enter a job name: ')
 filereplace('commands_srr2.txt', 'job_name', job)
-
-#add the path to where TruSeq3 file is found
-tru_seq = input('Copy and paste the complete path to your TruSeq3 file: ')
-filereplace('commands_srr2.txt', 'truseq3_path', tru_seq)
 
 #add the path to where bowtie files are found (must end in "bowtie/bowtie")
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
