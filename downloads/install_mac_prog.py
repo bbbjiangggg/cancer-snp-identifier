@@ -18,6 +18,7 @@ os.system('brew install gzip')
 os.system('brew install python')
 os.system('curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py')
 os.system('python3 get-pip.py')
+os.system('brew install coreutils')
 
 #Check Python version
 if sys.version_info.major == 3:
