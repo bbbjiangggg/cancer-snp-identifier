@@ -1,0 +1,1 @@
+sendemail -f sudoroot1775@outlook.com -t user_email -u job_name_Analysis Done -m "I'm ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC
