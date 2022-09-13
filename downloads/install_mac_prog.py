@@ -14,6 +14,10 @@ os.system('/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew
 os.system('brew install wget')
 os.system('brew install vim')
 os.system('brew install sendemail')
+os.system('brew install gzip')
+os.system('brew install python')
+os.system('curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py')
+os.system('python3 get-pip.py')
 
 #Check Python version
 if sys.version_info.major == 3:
