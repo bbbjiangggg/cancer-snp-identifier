@@ -12,7 +12,8 @@ from pyutil import filereplace
 # getting the current working directory
 src_dir = os.getcwd()# printing current directory
 print('\033[1;45m This is your current working directory:' + src_dir + '\033[0;0;0m')
-print('\033[1;45m Use the command "readlink -f file.txt" in order to get the complete path.\033[0;0;0m')
+print('\033[1;45m In Linux, use the command "readlink -f file.txt" in order to get the complete path.\033[0;0;0m')
+print('\033[1;45m In MacOS, use the command "realpath file.txt" in order to get the complete path.\033[0;0;0m')
 
 #add the email to be notified when the process is done
 user = input('Enter the email address to be notified once the analysis is complete: ')
