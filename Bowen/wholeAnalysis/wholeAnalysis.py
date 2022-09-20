@@ -106,7 +106,7 @@ while True:
     if a=="yes":
         print('\033[1;45m This was your Bowtie files path:\033[0;0;0m ', bowtie)
         print('\033[1;45m This was your reference chromosome path:\033[0;0;0m ', ref_chrom)
-        os.system('python3 analysis4whole.py')
+        os.system('python3 wholeAnalysis.py')
         continue
     elif a=="no":
         print('\033[1;45m Analysis terminated.\033[0;0;0m')
