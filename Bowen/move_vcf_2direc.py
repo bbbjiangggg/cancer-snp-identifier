@@ -3,8 +3,6 @@ from os import listdir
 from os.path import join, isfile
 import shutil
 
-#The program moves all analyzed vcf files to one directory and generates a combined report
-
 #Copying all vcf reports to one directory
 
 print('*** Use the command "readlink -f name_of_file/dir" in order to get the complete path.')
