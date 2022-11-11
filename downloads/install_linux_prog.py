@@ -34,9 +34,32 @@ else:
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
+#checking for the installation of unzip
 print('\033[1;45m Checking for the installation of unzip \033[0;0;0m')
-os.system('sudo apt-get install unzip')
-os.system('sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail')
+if os.system('unzip --version') == 0:
+    print('\033[1;45m unzip is installed \033[0;0;0m')
+else:
+    print('\033[1;45m unzip is not installed \033[0;0;0m')
+    print('\033[1;45m installing unzip \033[0;0;0m')
+    os.system('sudo apt-get install unzip -y')
+    print('\033[1;45m unzip is installed \033[0;0;0m')
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
+
+#checking for the installation of sendemail
+print('\033[1;45m Checking for the installation of sendemail \033[0;0;0m')
+if os.system('sendemail --version') == 0:
+    print('\033[1;45m sendemail is installed \033[0;0;0m')
+else:
+    print('\033[1;45m sendemail is not installed \033[0;0;0m')
+    print('\033[1;45m installing sendemail \033[0;0;0m')
+    os.system('sudo apt-get install sendemail -y')
+    print('\033[1;45m sendemail is installed \033[0;0;0m')
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
+
 os.system('sudo apt-get install --reinstall xdg-utils')
 os.system('sudo apt-get install tabix')
 
