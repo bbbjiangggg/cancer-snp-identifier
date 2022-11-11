@@ -132,19 +132,32 @@ os.system('java -jar $HOME/local/bin/trimmomatic-0.39.jar')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
-#install other programs
+#install bwa
 print('\033[1;45m Installing BWA \033[0;0;0m')
-os.system('sudo apt-get install -y bwa')
+os.system('sudo apt-get install bwa -y')
+print('\033[1;45m BWA is installed \033[0;0;0m')
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
-print('\033[1;45m Installing Bowtie2 \033[0;0;0m')
-os.system('sudo apt-get install -y bowtie2')
-print('\n')
-print('\033[1;45m Installing Samtools \033[0;0;0m')
-os.system('sudo apt-get install -y samtools')
-print('\n')
-print('\033[1;45m Installing BCFtools \033[0;0;0m')
-os.system('sudo apt-get install -y bcftools')
 
+#install Bowtie2
+print('\033[1;45m Installing Bowtie2 \033[0;0;0m')
+os.system('sudo apt-get install bowtie2 -y')
+print('\033[1;45m Bowtie2 is installed \033[0;0;0m')
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
+
+#install samtools
+print('\033[1;45m Installing samtools \033[0;0;0m')
+os.system('sudo apt-get install samtools -y')
+print('\033[1;45m samtools is installed \033[0;0;0m')
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
+
+#install bcftools
+print('\033[1;45m Installing bcftools \033[0;0;0m')
+os.system('sudo apt-get install bcftools -y')
+print('\033[1;45m bcftools is installed \033[0;0;0m')
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 print('\033[1;45m All tools have been installed \033[0;0;0m')
 
