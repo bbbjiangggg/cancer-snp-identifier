@@ -104,18 +104,18 @@ input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 os.system('sudo apt-get install -y fastqc')
 print('\n')
 
-#install java
-print('\033[1;45m Ready to install Java \033[0;0;0m')
+#checking for the installation of java
+print('\033[1;45m Checking for the installation of java \033[0;0;0m')
+if os.system('java -version') == 0:
+    print('\033[1;45m java is installed \033[0;0;0m')
+else:
+    print('\033[1;45m java is not installed \033[0;0;0m')
+    print('\033[1;45m installing java \033[0;0;0m')
+    os.system('sudo apt-get install default-jre -y')
+    os.system('sudo apt-get install default-jdk -y')
+    print('\033[1;45m java is installed \033[0;0;0m')
+
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-os.system('sudo apt install default-jre')
-print('\n')
-print('\033[1;45m Ready to install Java SE Development Kit (JDK) \033[0;0;0m')
-print('\033[1;45m This will open a webpage where you can download the approprite JDK \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-os.system('xdg-open https://www.oracle.com/java/technologies/downloads/')
-input('\033[1;45m Press enter after JDK is installed to test Java... \033[0;0;0m \n')
-print('\033[1;45m Testing Java \033[0;0;0m')
-os.system('java -version')
 print('\n')
 
 #install trimmomatic
@@ -129,6 +129,7 @@ os.system('sudo cp Trimmomatic-0.39/trimmomatic-0.39.jar $HOME/local/bin')
 input('\033[1;45m Press enter to test Trimmomatic... \033[0;0;0m \n')
 print('\033[1;45m Checking if Trimmomatic was properly installed \033[0;0;0m')
 os.system('java -jar $HOME/local/bin/trimmomatic-0.39.jar')
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 #install other programs
