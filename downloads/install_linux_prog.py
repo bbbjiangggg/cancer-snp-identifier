@@ -1,22 +1,39 @@
 #!/usr/bin/env python3
 
-#ONLY RUN THIS PROGRAM IN YOUR HOME DIRECTORY
-#to access home directory use the command: $ explorer.exe . on Ubuntu WSL 
-
 import os
 import sys
-import pip 
+ 
 import subprocess
+
+print("\033[1;45m ONLY RUN THIS PROGRAM IN YOUR HOME DIRECTORY  \033[0;0;0m")
+print("\033[1;45m to access your home directory use the command: '$ explorer.exe .' only on Ubuntu WSL  \033[0;0;0m")
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+
+print("\033[1;45m Installing Python3 and pip3 \033[0;0;0m")
+subprocess.call(['sudo', 'apt', 'install', 'python3', 'python3-pip'])
+
+import pip
 
 #Update terminal and install necessaries 
 print("\033[1;45m Updating terminal  \033[0;0;0m")
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 os.system('sudo apt-get update -y')
+os.system('sudo apt-get upgrade -y')
 print('\n')
+
 #checking for the installation of wget
 print('\033[1;45m Checking for the installation of wget \033[0;0;0m')
-os.system('sudo apt install wget')
+if os.system('wget --version') == 0:
+    print('\033[1;45m wget is installed \033[0;0;0m')
+else:
+    print('\033[1;45m wget is not installed \033[0;0;0m')
+    print('\033[1;45m installing wget \033[0;0;0m')
+    os.system('sudo apt-get install wget -y')
+    print('\033[1;45m wget is installed \033[0;0;0m')
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
+
 print('\033[1;45m Checking for the installation of unzip \033[0;0;0m')
 os.system('sudo apt-get install unzip')
 os.system('sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail')
