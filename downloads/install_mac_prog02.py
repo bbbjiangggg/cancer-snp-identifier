@@ -4,8 +4,12 @@ import os
 import sys
 import subprocess
 
-print('\033[0;101m Only run this program in your home directory \033[0;0;0m')
-print('\n')
+print("\033[1;45m ONLY RUN THIS PROGRAM IN YOUR HOME DIRECTORY  \033[0;0;0m")
+print("\033[1;45m to access your home directory open Finder and then click on Go and Home.  \033[0;0;0m")
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+
+print("\033[1;45m Installing Python3 and pip3 \033[0;0;0m")
+subprocess.call(['sudo', 'apt', 'install', 'python3', 'python3-pip'])
 
 import pip 
 #Install necessaries 
