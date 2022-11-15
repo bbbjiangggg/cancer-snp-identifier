@@ -7,7 +7,7 @@ import shutil
 
 print('*** Use the command "readlink -f name_of_file/dir" in order to get the complete path.')
 
-directory = input('>>> Enter the name of the directory you wish to create and copy all vcf files to (e.g. isec_prca_ch1):\n')
+directory = input('>>> Enter the name of the directory you wish to create and copy all vcf files to (e.g. isec_prca_ch1):')
 
 homedir = input('>>> Enter the path where the SRR directories are currently stored: ')
 
@@ -18,11 +18,11 @@ print('\033[1;45m New directory has been created: \033[0m' + directory)
 print('\033[1;45m Copying all vcf files to: ' + directory + ' \033[0m')
 
 for item in listdir(homedir):
-    if 'SRR' in item:
+    if 'RR' in item:
         subdir = os.path.join(homedir, item)
         for content in listdir(subdir):
             if '.vcf' in content:
-                shutil.copyfile(os.path.join(subdir, content),
+                shutil.move(os.path.join(subdir, content),
                          os.path.join(isecdir, content))
             else: pass
     else: pass
@@ -37,7 +37,7 @@ print('\033[1;35;40m A copy of ' + directory + ' has been made \033[0m')
 
 #Combining the vcf reports
 
-name = input('\033[1;42m Enter the chromosome and cancer name for you analysis with a dash in between (e.g. ch10_prca): \033[0m')
+name = input('\033[1;45m Enter the chromosome and cancer name for you analysis with a dash in between (e.g. ch10_prca): \033[0m')
 
 os.chdir(os.path.join(homedir, isecdir))
 
@@ -54,7 +54,10 @@ print('\n')
 print('\033[1;45m Modifying the text commands \033[0;0;0m')
 with open('isec_commands.txt', 'r+') as f:
     text = f.read()
-    text = text.replace('isec_commands.txt', '| bgzip -c >bgzip -c > ' + name + '_comb.vcf.gz')
+    end = '| bgzip -c >bgzip -c > ' + name + '_comb.vcf.gz'
+    text = text.replace('isec_commands.txt', end)
+    if end not in text:
+        text = text + end
     f.seek(0, 0)
     f.write('bcftools isec -n +2' + ' ' + text) 
     f.close()
