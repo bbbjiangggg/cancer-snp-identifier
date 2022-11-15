@@ -12,7 +12,8 @@ input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print("\033[1;45m Installing Python3 and pip3 \033[0;0;0m")
 subprocess.call(['sudo', 'apt', 'install', 'python3', 'python3-pip'])
 print("\033[1;45m Installing pyutil and pandas \033[0;0;0m")
-subprocess.call(['pip3', 'install', 'pyutil', 'pandas'])
+subprocess.call(['pip3', 'install', 'pandas'])
+os.system('pip3 install python-util')
 
 import pip
 
