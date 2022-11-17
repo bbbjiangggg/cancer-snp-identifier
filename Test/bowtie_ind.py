@@ -29,7 +29,7 @@ def start():
         
         print('\033[1;45m Indexing with Bowtie complete \033[0;0;0m' )
         print('\n')
-        print('\033[1;45m Your path to the bowtie index of chromsome ' + number + ' is: \033[0;0;0m' )
+        print('\033[1;45m Your path to the Bowtie index of chromsome ' + number + ' is: \033[0;0;0m' )
         os.system('realpath bowtie')
         exit()
     else:
