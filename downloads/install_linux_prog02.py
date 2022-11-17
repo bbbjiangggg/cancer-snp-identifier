@@ -165,5 +165,6 @@ os.system('sudo apt-get install bcftools -y')
 print('\033[1;45m bcftools is installed \033[0;0;0m')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
-print('\033[1;45m All tools have been installed \033[0;0;0m')
+print('\033[1;45m All tools have been installed. \033[0;0;0m')
+print('033[1;45m Use the command "vdb-config -i" to configure your SRA Toolkit \033[0;0;0m')
 
