@@ -13,18 +13,15 @@ def start():
     greater = int(number) < 23
 
     while ((isvalid == False) and (greater == True)):
-        os.system('mkdir bowtie_ind_'+ number)
-        os.system('cd bowtie_ind_'+ number)
+        os.system('mkdir ' + number + '_bowtie_ind')
+        os.chdir(number + '_bowtie_ind')
         
+        #download chromosome sequence
         print('\033[1;45m Downloading Chromosome '+ number + '\033[0;0;0m' )
         os.system('wget http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.'+ number +'.fa.gz')
-
-        #download chromosome sequence
-        os.system('mv *.gz* bowtie_ind_'+ number)
-
+      
         #indexing chromosome file
         print('\033[1;45m Indexing with Bowtie... \033[0;0;0m' )
-        os.chdir('bowtie_ind_' + number)
         os.system('bowtie2-build *.gz* bowtie')
         
         print('\033[1;45m Indexing with Bowtie complete \033[0;0;0m' )

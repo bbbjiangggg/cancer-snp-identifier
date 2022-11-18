@@ -15,8 +15,8 @@ def start():
 
     while ((isvalid == True) or (isvalid2 == True)):
         if number.startswith('X'):
-            os.system('mkdir bowtie_ind_'+ number)
-            os.chdir('bowtie_ind_' + number)
+            os.system('mkdir ' + number + '_bowtie_ind')
+            os.chdir(number + '_bowtie_ind')
             print('\033[1;45m Downloading chromosome ' + number + ' sequence \033[0;0;0m' )
             os.system('wget http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.'+ number +'.fa.gz')
             
@@ -30,8 +30,8 @@ def start():
             break
         
         elif number.startswith('Y'):
-            os.system('mkdir bowtie_ind_'+ number)
-            os.chdir('bowtie_ind_' + number)
+            os.system('mkdir ' + number + '_bowtie_ind')
+            os.chdir(number + '_bowtie_ind')
             print('\033[1;45m Downloading chromosome ' + number + ' sequence \033[0;0;0m' )
             os.system('wget http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.'+ number +'.fa.gz')
             

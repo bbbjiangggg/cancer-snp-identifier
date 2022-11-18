@@ -13,18 +13,16 @@ def start():
     greater = int(number) < 23
 
     while ((isvalid == False) and (greater == True)):
-        os.system('mkdir bwa_ind_'+ number)
-        os.system('cd bwa_ind_'+ number)
+        os.system('mkdir ' + number + '_bwa_ind')
+        os.chdir(number + '_bwa_ind')
         
+        #download chromosome sequence
         print('\033[1;45m Downloading Chromosome '+ number + '\033[0;0;0m' )
         os.system('wget http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.'+ number +'.fa.gz')
-
-        #download chromosome sequence
-        os.system('mv *.gz* bwa_ind_'+ number)
-
+              
         #indexing chromosome file
         print('\033[1;45m Indexing with BWA... \033[0;0;0m' )
-        os.chdir('bwa_ind_' + number)
+        
         os.system('bwa index *.gz*')
         os.system('bgzip -d *.gz*')
         print('\033[1;45m Indexing with BWA complete \033[0;0;0m' )
