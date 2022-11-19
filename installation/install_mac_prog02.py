@@ -10,9 +10,8 @@ input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 
 #checking for the installation of xcode
 print("\033[1;45m Checking for the installation of xcode \033[0;0;0m")
-os.system('/usr/bin/xcodebuild -version')
-print("\033[1;45m If you do not have xcode installed, install it from the App Store. \033[0;0;0m")
-
+os.system('xcode-select --install')
+print("\033[1;45m If you do not have xcode installed, you will be prompted to install it. \033[0;0;0m")
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
@@ -169,12 +168,15 @@ os.system('wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/T
 os.system('unzip Trimmomatic-0.39.zip')
 os.system('rm Trimmomatic-0.39.zip')
 os.system('mkdir -p local/bin')
-os.system('sudo cp Trimmomatic-0.39/trimmomatic-0.39.jar $HOME/local/bin')
+os.system('cp Trimmomatic-0.39/trimmomatic-0.39.jar $HOME/local/bin')
 print("\033[1;45m Trimmomatic installed \033[0;0;0m")
 input('\033[1;45m Press enter to test Trimmomatic... \033[0;0;0m \n')
 print('\033[1;45m Checking if Trimmomatic was properly installed \033[0;0;0m')
 os.system('java -jar $HOME/local/bin/trimmomatic-0.39.jar')
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
+
 
 #install bwa
 print("\033[1;45m Installing BWA \033[0;0;0m")
@@ -195,4 +197,4 @@ print("\033[1;45m BCFtools installed \033[0;0;0m")
 print('\n')
 
 print('\033[1;45m All tools have been installed. \033[0;0;0m')
-print('033[1;45m Use the command "vdb-config -i" to configure your SRA Toolkit \033[0;0;0m')
+print('\033[1;45m Use the command "vdb-config -i" to configure your SRA Toolkit \033[0;0;0m')
