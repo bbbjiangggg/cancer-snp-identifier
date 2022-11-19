@@ -157,20 +157,8 @@ else:
     print("\033[1;45m java is not installed \033[0;0;0m")
     print("\033[1;45m installing java \033[0;0;0m")
     os.system("brew cask install java")
-    print("\033[1;45m java is installed \033[0;0;0m")
-
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\n')
-
-#checking for the installation of jdk
-print("\033[1;45m Checking for installation of jdk \033[0;0;0m")
-if os.system("javac -version") == 0:
-    print("\033[1;45m jdk is installed \033[0;0;0m")
-else:
-    print("\033[1;45m jdk is not installed \033[0;0;0m")
-    print("\033[1;45m installing jdk \033[0;0;0m")
     os.system("brew install openjdk")
-    print("\033[1;45m jdk is installed \033[0;0;0m")
+    print("\033[1;45m java is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
@@ -180,6 +168,8 @@ print("\033[1;45m Installing Trimmomatic \033[0;0;0m")
 os.system('wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip')
 os.system('unzip Trimmomatic-0.39.zip')
 os.system('rm Trimmomatic-0.39.zip')
+os.system('mkdir -p local/bin')
+os.system('sudo cp Trimmomatic-0.39/trimmomatic-0.39.jar $HOME/local/bin')
 print("\033[1;45m Trimmomatic installed \033[0;0;0m")
 input('\033[1;45m Press enter to test Trimmomatic... \033[0;0;0m \n')
 print('\033[1;45m Checking if Trimmomatic was properly installed \033[0;0;0m')
