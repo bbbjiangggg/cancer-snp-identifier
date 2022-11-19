@@ -60,6 +60,9 @@ print('\n')
 
 import pip 
 
+os.system('pip3 install python-util')
+os.system('pip3 install pandas')
+
 #checking for the installation of wget
 print("\033[1;45m Checking for installation of wget \033[0;0;0m")
 if os.system("wget --version") == 0:
@@ -73,115 +76,143 @@ else:
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
-#Install necessaries 
-print("\033[1;45m Install Homebrew, vim, and wget \033[0;0;0m")
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-os.system('/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"')
-os.system('brew install wget')
-os.system('brew install vim')
-os.system('brew install sendemail')
-os.system('brew install gzip')
-os.system('brew install python')
-os.system('curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py')
-os.system('python3 get-pip.py')
-os.system('brew install coreutils')
-
-#Check Python version
-if sys.version_info.major == 3:
-    print('\033[1;45m Python3 is installed. \033[0;0;0m')
+#checking for the installation of unzip
+print("\033[1;45m Checking for installation of unzip \033[0;0;0m")
+if os.system("unzip --version") == 0:
+    print("\033[1;45m unzip is installed \033[0;0;0m")
 else:
-    print('\033[0;101m You need to install a current version of Python3 \033[0;0;0m')
+    print("\033[1;45m unzip is not installed \033[0;0;0m")
+    print("\033[1;45m installing unzip \033[0;0;0m")
+    os.system("brew install unzip")
+    print("\033[1;45m unzip is installed \033[0;0;0m")
 
-#Check Pip version
-pip_versn = pip.__version__
-print('\033[1;45m Your Pip version is ' + pip_versn + '\033[0;0;0m')
-print('\033[1;45m Note, if you do not have Pip installed, install it using the command: curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \033[0;0;0m')
-os.system('pip3 install python-util')
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
 
+# checking for the installation of sendemail
+print("\033[1;45m Checking for installation of sendemail \033[0;0;0m")
+if os.system("sendemail --version") == 0:
+    print("\033[1;45m sendemail is installed \033[0;0;0m")
+else:
+    print("\033[1;45m sendemail is not installed \033[0;0;0m")
+    print("\033[1;45m installing sendemail \033[0;0;0m")
+    os.system("brew install sendemail")
+    print("\033[1;45m sendemail is installed \033[0;0;0m")
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
+
+# checking for the installation of tabix
+print("\033[1;45m Checking for installation of tabix \033[0;0;0m")
+if os.system("tabix --version") == 0:
+    print("\033[1;45m tabix is installed \033[0;0;0m")
+else:
+    print("\033[1;45m tabix is not installed \033[0;0;0m")
+    print("\033[1;45m installing tabix \033[0;0;0m")
+    os.system("brew install tabix")
+    print("\033[1;45m tabix is installed \033[0;0;0m")
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
+
+# checking for the installation of gzip
+print("\033[1;45m Checking for installation of gzip \033[0;0;0m")
+if os.system("gzip --version") == 0:
+    print("\033[1;45m gzip is installed \033[0;0;0m")
+else:
+    print("\033[1;45m gzip is not installed \033[0;0;0m")
+    print("\033[1;45m installing gzip \033[0;0;0m")
+    os.system("brew install gzip")
+    print("\033[1;45m gzip is installed \033[0;0;0m")
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
+
+# checking for the installation of coreutils
+print("\033[1;45m Checking for installation of coreutils \033[0;0;0m")
+if os.system("gsha256sum --version") == 0:
+    print("\033[1;45m coreutils is installed \033[0;0;0m")
+else:
+    print("\033[1;45m coreutils is not installed \033[0;0;0m")
+    print("\033[1;45m installing coreutils \033[0;0;0m")
+    os.system("brew install coreutils")
+    print("\033[1;45m coreutils is installed \033[0;0;0m")
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+print('\n')
 
 #downloading SRA Toolkit
-print('\033[1;45m Downloading SRA Toolkit \033[0;0;0m')
-os.system('curl -OL --output sratoolkit.tar.gz http://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-mac64.tar.gz')
+print("\033[1;45m Downloading SRA Toolkit \033[0;0;0m")
+os.system("wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-mac64.tar.gz")
+print("\033[1;45m SRA Toolkit downloaded \033[0;0;0m")
+print('\n')
 
-#extract tar file contents
-os.system('gunzip sratoolkit.current-mac64.tar.gz')
-os.system('tar -vxzf sratoolkit.current-mac64.tar')
-print('\033[1;45m Extracted SRA Toolkit files \033[0;0;0m')
+#extract SRA toolkit tar file contents
+print("\033[1;45m Extracting SRA Toolkit \033[0;0;0m")
+os.system("tar -xvzf sratoolkit.current-mac64.tar.gz")
+print("\033[1;45m SRA Toolkit extracted \033[0;0;0m")
 
 #remove SRA Toolkit tar file
 os.system('rm sratoolkit.current-mac64.tar')
-print('\n')
-
-#show files in the current directory
-print('\033[1;45m These are the files in the current directory: \033[0;0;0m')
-os.system('ls')
-
-#add export path to the $path directory
-sra_tool = input('\033[1;45m Copy and paste the file name of the sratoolkit: \033[0;0;0m \n')
-print('\033[1;45m This is your export path: \033[0;0;0m export PATH=$PATH:$PWD/' + sra_tool + '/bin \n')
-print('\033[1;45m The following 6 steps must be followed carefully: \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\033[1;45m 1) Open another terminal window (TW)\033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\033[1;45m 2) Copy and paste the command "sudo vim .zshrc" into the TW and press "Enter" \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\033[1;45m 3) Enter "I" on the TW and press "Enter" \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\033[1;45m 4) Copy and paste the following path below the last line of the TW: \033[0;0;0m export PATH=$PATH:$PWD/' + sra_tool + '/bin')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\033[1;45m 5) Press the following keys on the TW in the correct order: "Esc", ":", "w", "q", "Enter" \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\033[1;45m 6) If Vim closed correctly, you may now close the new terminal window \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
+os.system('export PATH=$PATH:~/sratoolkit/bin')
 
 #install fastqc
-print('\033[1;45m Ready to install FASTQC \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-os.system('brew install fastqc')
+print("\033[1;45m Installing fastqc \033[0;0;0m")
+os.system("brew install fastqc")
+
+print("\033[1;45m fastqc installed \033[0;0;0m")
 print('\n')
 
-#install java
-print('\033[1;45m Ready to install Java (JRE) \033[0;0;0m')
-print('\033[1;45m This will open a webpage where you can download the approprite JRE \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m')
-os.system('open https://java.com/en/download/')
-input('\033[1;45m Press enter after JRE is installed \033[0;0;0m \n')
-print('\033[1;45m Ready to install Java SE Development Kit (JDK) \033[0;0;0m')
-print('\033[1;45m This will open a webpage where you can download the approprite JDK \033[0;0;0m')
-print('\033[1;45m For older Macbooks use the x64 DMG Installer \033[0;0;0m')
+
+#checking for the installation of java
+print("\033[1;45m Checking for installation of java \033[0;0;0m")
+if os.system("java --version") == 0:
+    print("\033[1;45m java is installed \033[0;0;0m")
+else:
+    print("\033[1;45m java is not installed \033[0;0;0m")
+    print("\033[1;45m installing java \033[0;0;0m")
+    os.system("brew install java")
+    print("\033[1;45m java is installed \033[0;0;0m")
+
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-os.system('open https://www.oracle.com/java/technologies/downloads/')
-input('\033[1;45m Press enter after JDK is installed to test Java... \033[0;0;0m \n')
-print('\033[1;45m Testing Java \033[0;0;0m')
-os.system('java -version')
+print('\n')
+
+#checking for the installation of jdk
+print("\033[1;45m Checking for installation of jdk \033[0;0;0m")
+if os.system("java --version") == 0:
+    print("\033[1;45m jdk is installed \033[0;0;0m")
+else:
+    print("\033[1;45m jdk is not installed \033[0;0;0m")
+    print("\033[1;45m installing jdk \033[0;0;0m")
+    os.system("brew install jdk")
+    print("\033[1;45m jdk is installed \033[0;0;0m")
+
+input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 #install trimmomatic
-print('\033[1;45m Ready to install Trimmomatic \033[0;0;0m')
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-os.system('wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip')
-os.system('unzip Trimmomatic-0.39.zip')
-os.system('rm Trimmomatic-0.39.zip')
-os.system('mkdir -p local/bin')
-os.system('sudo cp Trimmomatic-0.39/trimmomatic-0.39.jar $HOME/local/bin')
-input('\033[1;45m Press enter to test Trimmomatic... \033[0;0;0m \n')
-print('\033[1;45m Checking if Trimmomatic was properly installed \033[0;0;0m')
-os.system('java -jar $HOME/local/bin/trimmomatic-0.39.jar')
+print("\033[1;45m Installing trimmomatic \033[0;0;0m")
+os.system("brew install trimmomatic")
+print("\033[1;45m trimmomatic installed \033[0;0;0m")
 print('\n')
 
-#install other programs
-print('\033[1;45m Installing BWA \033[0;0;0m')
-os.system('brew install bwa')
+#install bwa
+print("\033[1;45m Installing bwa \033[0;0;0m")
+os.system("brew install bwa")
+print("\033[1;45m bwa installed \033[0;0;0m")
 print('\n')
-print('\033[1;45m Installing Bowtie2 \033[0;0;0m')
-os.system('brew install bowtie2')
-print('\n')
-print('\033[1;45m Installing Samtools \033[0;0;0m')
-os.system('brew install samtools')
-print('\n')
-print('\033[1;45m Installing BCFtools \033[0;0;0m')
-os.system('brew install bcftools')
 
+#install samtools
+print("\033[1;45m Installing samtools \033[0;0;0m")
+os.system("brew install samtools")
+print("\033[1;45m samtools installed \033[0;0;0m")
 print('\n')
-print('\033[1;45m All tools have been installed \033[0;0;0m')
 
+#install bcftools
+print("\033[1;45m Installing bcftools \033[0;0;0m")
+os.system("brew install bcftools")
+print("\033[1;45m bcftools installed \033[0;0;0m")
+print('\n')
+
+print('\033[1;45m All tools have been installed. \033[0;0;0m')
+print('033[1;45m Use the command "vdb-config -i" to configure your SRA Toolkit \033[0;0;0m')
