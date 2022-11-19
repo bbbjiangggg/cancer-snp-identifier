@@ -9,47 +9,46 @@ print("\033[1;45m to access your home directory open Finder and then click on Go
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 
 #checking for the installation of xcode
-print("\033[1;45m Checking for the installation of xcode \033[0;0;0m")
+print("\033[1;45m Checking for the installation of Xcode \033[0;0;0m")
 os.system('xcode-select --install')
-print("\033[1;45m If you do not have xcode installed, you will be prompted to install it. \033[0;0;0m")
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 #checking for installation of homebrew
-print("\033[1;45m Checking for installation of homebrew \033[0;0;0m")
+print("\033[1;45m Checking for installation of Homebrew \033[0;0;0m")
 if os.system("brew --version") == 0:
-    print("\033[1;45m homebrew is installed \033[0;0;0m")
+    print("\033[1;45m Homebrew is installed \033[0;0;0m")
 else:
-    print("\033[1;45m homebrew is not installed \033[0;0;0m")
-    print("\033[1;45m installing homebrew \033[0;0;0m")
+    print("\033[1;45m Homebrew is not installed \033[0;0;0m")
+    print("\033[1;45m installing Homebrew \033[0;0;0m")
     os.system("/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"")
-    print("\033[1;45m homebrew is installed \033[0;0;0m")
+    print("\033[1;45m Homebrew is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 #checking for installation of python3
-print("\033[1;45m Checking for installation of python3 \033[0;0;0m")
+print("\033[1;45m Checking for installation of Python3 \033[0;0;0m")
 if os.system("python3 --version") == 0:
-    print("\033[1;45m python3 is installed \033[0;0;0m")
+    print("\033[1;45m Python3 is installed \033[0;0;0m")
 else:
-    print("\033[1;45m python3 is not installed \033[0;0;0m")
-    print("\033[1;45m installing python3 \033[0;0;0m")
+    print("\033[1;45m Python3 is not installed \033[0;0;0m")
+    print("\033[1;45m installing Python3 \033[0;0;0m")
     os.system("brew install python3")
-    print("\033[1;45m python3 is installed \033[0;0;0m")
+    print("\033[1;45m Python3 is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 #checking for installation of pip3
-print("\033[1;45m Checking for installation of pip3 \033[0;0;0m")
+print("\033[1;45m Checking for installation of Pip3 \033[0;0;0m")
 if os.system("pip3 --version") == 0:
-    print("\033[1;45m pip3 is installed \033[0;0;0m")
+    print("\033[1;45m Pip3 is installed \033[0;0;0m")
 else:
-    print("\033[1;45m pip3 is not installed \033[0;0;0m")
-    print("\033[1;45m installing pip3 \033[0;0;0m")
+    print("\033[1;45m Pip3 is not installed \033[0;0;0m")
+    print("\033[1;45m installing Pip3 \033[0;0;0m")
     os.system("brew install pip3")
-    print("\033[1;45m pip3 is installed \033[0;0;0m")
+    print("\033[1;45m Pip3 is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
@@ -60,66 +59,66 @@ os.system('pip3 install python-util')
 os.system('pip3 install pandas')
 
 #checking for the installation of wget
-print("\033[1;45m Checking for installation of wget \033[0;0;0m")
+print("\033[1;45m Checking for installation of Wget \033[0;0;0m")
 if os.system("wget --version") == 0:
-    print("\033[1;45m wget is installed \033[0;0;0m")
+    print("\033[1;45m Wget is installed \033[0;0;0m")
 else:
-    print("\033[1;45m wget is not installed \033[0;0;0m")
-    print("\033[1;45m installing wget \033[0;0;0m")
+    print("\033[1;45m Wget is not installed \033[0;0;0m")
+    print("\033[1;45m installing Wget \033[0;0;0m")
     os.system("brew install wget")
-    print("\033[1;45m wget is installed \033[0;0;0m")
+    print("\033[1;45m Wget is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 # checking for the installation of sendemail
-print("\033[1;45m Checking for installation of sendemail \033[0;0;0m")
+print("\033[1;45m Checking for installation of Sendemail \033[0;0;0m")
 if os.system("sendemail --version") == 0:
-    print("\033[1;45m sendemail is installed \033[0;0;0m")
+    print("\033[1;45m Sendemail is installed \033[0;0;0m")
 else:
-    print("\033[1;45m sendemail is not installed \033[0;0;0m")
-    print("\033[1;45m installing sendemail \033[0;0;0m")
+    print("\033[1;45m Sendemail is not installed \033[0;0;0m")
+    print("\033[1;45m installing Sendemail \033[0;0;0m")
     os.system("brew install sendemail")
-    print("\033[1;45m sendemail is installed \033[0;0;0m")
+    print("\033[1;45m Sendemail is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 # checking for the installation of tabix
-print("\033[1;45m Checking for installation of tabix \033[0;0;0m")
+print("\033[1;45m Checking for installation of Tabix \033[0;0;0m")
 if os.system("tabix --version") == 0:
-    print("\033[1;45m tabix is installed \033[0;0;0m")
+    print("\033[1;45m Tabix is installed \033[0;0;0m")
 else:
-    print("\033[1;45m tabix is not installed \033[0;0;0m")
-    print("\033[1;45m installing tabix \033[0;0;0m")
-    os.system("brew install tabix")
-    print("\033[1;45m tabix is installed \033[0;0;0m")
+    print("\033[1;45m Tabix is not installed \033[0;0;0m")
+    print("\033[1;45m installing Tabix \033[0;0;0m")
+    os.system("brew install Tabix")
+    print("\033[1;45m Tabix is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 # checking for the installation of gzip
-print("\033[1;45m Checking for installation of gzip \033[0;0;0m")
+print("\033[1;45m Checking for installation of Gzip \033[0;0;0m")
 if os.system("gzip --version") == 0:
-    print("\033[1;45m gzip is installed \033[0;0;0m")
+    print("\033[1;45m Gzip is installed \033[0;0;0m")
 else:
-    print("\033[1;45m gzip is not installed \033[0;0;0m")
-    print("\033[1;45m installing gzip \033[0;0;0m")
+    print("\033[1;45m Gzip is not installed \033[0;0;0m")
+    print("\033[1;45m installing Gzip \033[0;0;0m")
     os.system("brew install gzip")
-    print("\033[1;45m gzip is installed \033[0;0;0m")
+    print("\033[1;45m Gzip is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 # checking for the installation of coreutils
-print("\033[1;45m Checking for installation of coreutils \033[0;0;0m")
+print("\033[1;45m Checking for installation of Coreutils \033[0;0;0m")
 if os.system("gsha256sum --version") == 0:
-    print("\033[1;45m coreutils is installed \033[0;0;0m")
+    print("\033[1;45m Coreutils is installed \033[0;0;0m")
 else:
-    print("\033[1;45m coreutils is not installed \033[0;0;0m")
-    print("\033[1;45m installing coreutils \033[0;0;0m")
+    print("\033[1;45m Coreutils is not installed \033[0;0;0m")
+    print("\033[1;45m installing Coreutils \033[0;0;0m")
     os.system("brew install coreutils")
-    print("\033[1;45m coreutils is installed \033[0;0;0m")
+    print("\033[1;45m Coreutils is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
@@ -141,23 +140,23 @@ os.system('rm sratoolkit.current-mac64.tar')
 os.system('export PATH=$PATH:~/sratoolkit/bin')
 
 #install fastqc
-print("\033[1;45m Installing fastqc \033[0;0;0m")
+print("\033[1;45m Installing FastQC \033[0;0;0m")
 os.system("brew install fastqc")
 
-print("\033[1;45m fastqc installed \033[0;0;0m")
+print("\033[1;45m FastQC installed \033[0;0;0m")
 print('\n')
 
 
 #checking for the installation of java
-print("\033[1;45m Checking for installation of java \033[0;0;0m")
+print("\033[1;45m Checking for installation of Java \033[0;0;0m")
 if os.system("java -version") == 0:
-    print("\033[1;45m java is installed \033[0;0;0m")
+    print("\033[1;45m Java is installed \033[0;0;0m")
 else:
-    print("\033[1;45m java is not installed \033[0;0;0m")
-    print("\033[1;45m installing java \033[0;0;0m")
+    print("\033[1;45m Java is not installed \033[0;0;0m")
+    print("\033[1;45m installing Java \033[0;0;0m")
     os.system("brew cask install java")
     os.system("brew install openjdk")
-    print("\033[1;45m java is installed \033[0;0;0m")
+    print("\033[1;45m Java is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
