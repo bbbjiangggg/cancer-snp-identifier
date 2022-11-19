@@ -9,12 +9,9 @@ print("\033[1;45m to access your home directory open Finder and then click on Go
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 
 #checking for the installation of xcode
-if os.path.exists("/Applications/Xcode.app"):
-    print("Xcode is installed")
-else:
-    print("Xcode is not installed")
-    print("Please install Xcode from the App Store")
-    sys.exit()
+print("\033[1;45m Checking for the installation of xcode \033[0;0;0m")
+os.system('/usr/bin/xcodebuild -version')
+print("\033[1;45m If you do not have xcode installed, install it from the App Store. \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
@@ -76,19 +73,6 @@ else:
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
-#checking for the installation of unzip
-print("\033[1;45m Checking for installation of unzip \033[0;0;0m")
-if os.system("unzip --version") == 0:
-    print("\033[1;45m unzip is installed \033[0;0;0m")
-else:
-    print("\033[1;45m unzip is not installed \033[0;0;0m")
-    print("\033[1;45m installing unzip \033[0;0;0m")
-    os.system("brew install unzip")
-    print("\033[1;45m unzip is installed \033[0;0;0m")
-
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\n')
-
 # checking for the installation of sendemail
 print("\033[1;45m Checking for installation of sendemail \033[0;0;0m")
 if os.system("sendemail --version") == 0:
@@ -143,13 +127,14 @@ print('\n')
 
 #downloading SRA Toolkit
 print("\033[1;45m Downloading SRA Toolkit \033[0;0;0m")
-os.system("wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-mac64.tar.gz")
+os.system('curl -OL --output sratoolkit.tar.gz http://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-mac64.tar.gz')
 print("\033[1;45m SRA Toolkit downloaded \033[0;0;0m")
 print('\n')
 
 #extract SRA toolkit tar file contents
 print("\033[1;45m Extracting SRA Toolkit \033[0;0;0m")
-os.system("tar -xvzf sratoolkit.current-mac64.tar.gz")
+os.system('gunzip sratoolkit.current-mac64.tar.gz')
+os.system('tar -vxzf sratoolkit.current-mac64.tar')
 print("\033[1;45m SRA Toolkit extracted \033[0;0;0m")
 
 #remove SRA Toolkit tar file
@@ -166,12 +151,12 @@ print('\n')
 
 #checking for the installation of java
 print("\033[1;45m Checking for installation of java \033[0;0;0m")
-if os.system("java --version") == 0:
+if os.system("java -version") == 0:
     print("\033[1;45m java is installed \033[0;0;0m")
 else:
     print("\033[1;45m java is not installed \033[0;0;0m")
     print("\033[1;45m installing java \033[0;0;0m")
-    os.system("brew install java")
+    os.system("brew cask install java")
     print("\033[1;45m java is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
@@ -179,39 +164,44 @@ print('\n')
 
 #checking for the installation of jdk
 print("\033[1;45m Checking for installation of jdk \033[0;0;0m")
-if os.system("java --version") == 0:
+if os.system("javac -version") == 0:
     print("\033[1;45m jdk is installed \033[0;0;0m")
 else:
     print("\033[1;45m jdk is not installed \033[0;0;0m")
     print("\033[1;45m installing jdk \033[0;0;0m")
-    os.system("brew install jdk")
+    os.system("brew install openjdk")
     print("\033[1;45m jdk is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
 #install trimmomatic
-print("\033[1;45m Installing trimmomatic \033[0;0;0m")
-os.system("brew install trimmomatic")
-print("\033[1;45m trimmomatic installed \033[0;0;0m")
+print("\033[1;45m Installing Trimmomatic \033[0;0;0m")
+os.system('wget http://www.usadellab.org/cms/uploads/supplementary/Trimmomatic/Trimmomatic-0.39.zip')
+os.system('unzip Trimmomatic-0.39.zip')
+os.system('rm Trimmomatic-0.39.zip')
+print("\033[1;45m Trimmomatic installed \033[0;0;0m")
+input('\033[1;45m Press enter to test Trimmomatic... \033[0;0;0m \n')
+print('\033[1;45m Checking if Trimmomatic was properly installed \033[0;0;0m')
+os.system('java -jar $HOME/local/bin/trimmomatic-0.39.jar')
 print('\n')
 
 #install bwa
-print("\033[1;45m Installing bwa \033[0;0;0m")
+print("\033[1;45m Installing BWA \033[0;0;0m")
 os.system("brew install bwa")
-print("\033[1;45m bwa installed \033[0;0;0m")
+print("\033[1;45m BWA installed \033[0;0;0m")
 print('\n')
 
 #install samtools
-print("\033[1;45m Installing samtools \033[0;0;0m")
+print("\033[1;45m Installing SAMtools \033[0;0;0m")
 os.system("brew install samtools")
-print("\033[1;45m samtools installed \033[0;0;0m")
+print("\033[1;45m SAMtools installed \033[0;0;0m")
 print('\n')
 
 #install bcftools
-print("\033[1;45m Installing bcftools \033[0;0;0m")
+print("\033[1;45m Installing BCFtools \033[0;0;0m")
 os.system("brew install bcftools")
-print("\033[1;45m bcftools installed \033[0;0;0m")
+print("\033[1;45m BCFtools installed \033[0;0;0m")
 print('\n')
 
 print('\033[1;45m All tools have been installed. \033[0;0;0m')
