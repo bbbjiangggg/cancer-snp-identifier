@@ -18,11 +18,11 @@ print('\033[1;45m Use the command "realpath file.txt" in order to get the comple
 
 #add the email to be notified when the process is done
 user = input('Enter the email address to be notified once the analysis is complete: ')
-filereplace('sendemail.txt', 'user_email', user)
+
 
 #add the job title
 job = input('Enter a job name: ')
-filereplace('sendemail.txt', 'job_name', job)
+
 
 #add the path to where bowtie files are found (must end in "bowtie/bowtie")
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
@@ -84,21 +84,16 @@ for index in range(len(srr_list)):
     filereplace('trimmed_bash_srr.txt', placement[index], "number")
     filereplace('trimmed_bash_srr.txt', srr_list[index], "now")
 
-#run the commands on the sendemail.txt file
-os.system('cat sendemail.txt | bash')
-
-#reset the sendemail command
-filereplace('sendemail.txt', user, 'user_email')
-filereplace('sendemail.txt', job, 'job_name')
-
 #reset the bowtie2_path and refchrome path
 filereplace('trimmed_bash_srr.txt', bowtie, 'bowtie2_path')
 filereplace('trimmed_bash_srr.txt', ref_chrom, 'ref_chrom')
 
-# copying the files
-#shutil.copyfile('commands_srr_template_gen2.txt', 'trimmed_bash_srr.txt') #copy src to destin
+#run the commands on the sendemail.txt file
+print('Sending email to ' + user + ' ....')
+os.system('sendemail -f sudoroot1775@outlook.com -t ' + user + ' -u ' + job + '_name_Analysis Done -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
+print('\n')
 
-print('\033[1;45m trimmed_analysis_tools is ready to run.\033[0;0;0m')
+print('\033[1;45m trimmed_analysis_tools is ready to run.\033[0;0;0m \n')
 
 print('\033[1;45m Would you like to run another analysis? \033[0;0;0m')
 

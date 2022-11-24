@@ -3,7 +3,7 @@ import os
 import shutil
 
 
-#THIS PROGRAM IS FOR FULL ANALYSIS
+#THIS PROGRAM IS FOR WHOLE ANALYSIS
 
 #you need to install pytul using your terminal "pip3 install python-util"
 from pyutil import filereplace
@@ -13,40 +13,42 @@ from pyutil import filereplace
 # for Mac, use: brew install sendemail
 
 # getting the current working directory
-src_dir = os.getcwd()# printing current directory
-print('\033[1;45m This is your current working directory:' + src_dir + '\033[0m')
-print('\033[1;45m Use the command "realpath filename.txt" in order to get the complete path.\033[0m')
+src_dir = os.getcwd()
+print('\n')
+# printing current directory
+print('\033[1;45m This is your current working directory:\033[0m' + src_dir + '\n')
+print('Use the command "realpath filename.txt" to get the complete path. \n')
 
 #add the email to be notified when the process is done
-user = input('Enter the email address to be notified once the analysis is complete: ')
-filereplace('sendemail.txt', 'user_email', user)
+user = input('\033[1;45m 1) \033[0m Enter the email address to be notified once the analysis is complete: ')
+
 
 #add the job title
-job = input('Enter a job name: ')
-filereplace('sendemail.txt', 'job_name', job)
+job = input('\033[1;45m 2) \033[0m Enter a job name: ')
+
 
 #add the path to where trimmomatic-0.39.jar is found
-trim = input('Copy and paste the complete path to your trimmomatic-0.39.jar file: ')
+trim = input('\033[1;45m 3) \033[0m Copy and paste the complete path to your trimmomatic-0.39.jar file: ')
 filereplace('untrimmed_bash_srr.txt',"trim_path", trim)
 
 #add the path to where TruSeq3 file is found
-tru_seq = input('Copy and paste the complete path to your TruSeq3 file: ')
+tru_seq = input('\033[1;45m 4) \033[0m Copy and paste the complete path to your TruSeq3 file: ')
 filereplace('untrimmed_bash_srr.txt', 'truseq3_path', tru_seq)
 
 #add the path to where bowtie files are found (must end in "bowtie")
-bowtie = input('Copy and paste the complete path to your Bowtie files: ')
+bowtie = input('\033[1;45m 5) \033[0m Copy and paste the complete path to your Bowtie files: ')
 filereplace('untrimmed_bash_srr.txt', 'bowtie2_path', bowtie)
 
 #add the path to where reference chromosome is found
-ref_chrom = input('Copy and paste the complete path to your BWA reference chromosome: ')
+ref_chrom = input('\033[1;45m 6) \033[0m Copy and paste the complete path to your BWA reference chromosome: ')
 filereplace('untrimmed_bash_srr.txt', 'ref_chrom', ref_chrom)
 
-#make a copy of commands_srr
+#make a copy of untrimmed bash srr
 os.system('cp untrimmed_bash_srr.txt copy_untrimmed_bash_srr.txt')
 
 
 #this asks user to type in the path to the accession list
-accession = input('Copy and paste the name of the accesion list file (make sure it is in the same directory): ')
+accession = input('\033[1;45m 7) \033[0m Copy and paste the name of the accesion list file (make sure it is in the same directory): ')
 with open(accession,'r') as file:
     x= file.read()
     line = x.split('\n')
@@ -75,22 +77,13 @@ for index in range(len(srr_list)):
     filereplace('untrimmed_bash_srr.txt',"number", placement[index])
     filereplace('untrimmed_bash_srr.txt',"SRR_one", srr_list[index])
 
-    #run the commands on the commands_srr2.txt file
+    #run the commands on the untrimmed_bash_srr.txt file
     os.system('cat untrimmed_bash_srr.txt | bash')
 
     #replace the changed names back to orginal
     filereplace('untrimmed_bash_srr.txt', placement[index], "number")
     filereplace('untrimmed_bash_srr.txt', srr_list[index], "SRR_one")
 
-#print the command has been down
-print('\033[1;45m The previous input sequences have been analyzed.\033[0m')
-
-#run the commands on the sendemail.txt file
-os.system('cat sendemail.txt | bash')
-
-#reset the sendemail command
-filereplace('sendemail.txt', user, 'user_email')
-filereplace('sendemail.txt', job, 'job_name')
 
 #reset the bowtie2_path, refchrome, trimpath, and truseq path
 filereplace('untrimmed_bash_srr.txt', bowtie, 'bowtie2_path')
@@ -106,18 +99,23 @@ with open(accession,'w') as file:
 
 os.system('rm copy_untrimmed_bash_srr.txt')
 
-print('\033[1;45m untrimmed_analysis_tools is ready to run.\033[0;0;0m')
+#run the commands on the sendemail.txt file
+print('Sending email to ' + user + ' ....')
+os.system('sendemail -f sudoroot1775@outlook.com -t ' + user + ' -u ' + job + '_name_Analysis Done -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
+
+
+print('\033[1;45m untrimmed_analysis_tools is ready to run.\033[0;0;0m \n')
 
 print('\033[1;45m Would you like to run another analysis? \033[0;0;0m')
 
 while True:
     a = input('Enter yes/no to continue: ')
     if a=="yes":
-        print('\033[1;45m This was the email address used:\033[0;0;0m ', user)
-        print('\033[1;45m This was your trim.jar file path:\033[0;0;0m ', trim)
-        print('\033[1;45m This was your TruSeq3 file path:\033[0;0;0m ', tru_seq)
-        print('\033[1;45m This was your Bowtie files path:\033[0;0;0m ', bowtie)
-        print('\033[1;45m This was your BWA reference chromosome path:\033[0;0;0m ', ref_chrom)
+        print('\033[1;45m 1) \033[0m Email address used: ', user)
+        print('\033[1;45m 2) \033[0m trimmomatic-0.39.jar file path: ', trim)
+        print('\033[1;45m 3) \033[0m TruSeq3 file path: ', tru_seq)
+        print('\033[1;45m 4) \033[0m Bowtie files path: ', bowtie)
+        print('\033[1;45m 5) \033[0m BWA reference chromosome path: ', ref_chrom)
         os.system('python3 untrimmed_analysis_tools.py')
         continue
     elif a=="no":
