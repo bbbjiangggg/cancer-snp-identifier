@@ -183,6 +183,12 @@ os.system("brew install bwa")
 print("\033[1;45m BWA installed \033[0;0;0m")
 print('\n')
 
+#install bowtie2
+print("\033[1;45m Installing Bowtie2 \033[0;0;0m")
+os.system("brew install bowtie2")
+print("\033[1;45m Bowtie2 installed \033[0;0;0m")
+print('\n')
+
 #install samtools
 print("\033[1;45m Installing SAMtools \033[0;0;0m")
 os.system("brew install samtools")
