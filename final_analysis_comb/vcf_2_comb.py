@@ -151,14 +151,8 @@ os.system('gunzip '+ vcf_file + '.vcf.gz')
 #open unzipped file
 print('\n')
 print('\033[1;45m Done! Your final combined vcf file is located here:\033[0;0;0m' + directory + '/isec_vcfgz_files/' + vcf_file + '.vcf ') 
-print('Type yes to open the file using less, or no to continue.')
-open_file = input('\033[1;45m Open file? (yes/no): \033[0;0;0m')
-if open_file == 'yes':
-    os.system('cat ' + directory + '/isec_vcfgz_files/' + vcf_file + '.vcf | less')
-else:
-    print('\n')
-    print('\033[1;45m Open the file using the command:\033[0;0;0m cat ' + directory + '/isec_vcfgz_files/' + vcf_file + '.vcf | less')
-#print(' \033[1;45m Open the file using the command:\033[0;0;0m cat ' + directory + '/isec_vcfgz_files/' + vcf_file + '.vcf | less')
+print('\n')
+print(' \033[1;45m Open the file using the command:\033[0;0;0m cat ' + directory + '/isec_vcfgz_files/' + vcf_file + '.vcf | less')
 
 
 os.system('rm bgzip isec_tools_commands.txt isec_tools_commands2.txt isec_tools_commands3.txt')

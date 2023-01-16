@@ -116,6 +116,7 @@ while True:
         print('\033[1;45m 3) \033[0m TruSeq3 file path: ', tru_seq)
         print('\033[1;45m 4) \033[0m Bowtie files path: ', bowtie)
         print('\033[1;45m 5) \033[0m BWA reference chromosome path: ', ref_chrom)
+        print('\033[1;45m 6) \033[0m Accession list file name: ', accession)
         os.system('python3 untrimmed_analysis_tools.py')
         continue
     elif a=="no":
