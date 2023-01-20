@@ -47,6 +47,8 @@ for item in listdir(homedir):
 
 print('\033[1;35;40m All vcf files have been copied to: ' + directory + ' \033[0;0;0m')
 print('\n')
+print('\033[1;35;40m As backup, a copy of ' + directory + ' is being created. \033[0m')
+print('\n')
 
 copyName = 'copy_'+directory
 if copyName in os.listdir():
@@ -57,7 +59,7 @@ else:
     #copydir = os.path.join(homedir, copyName)
     shutil.copytree(isecdir, copyName)
 
-print('\033[1;35;40m As backup, a copy of ' + directory + ' has been created. \033[0m')
+print('\033[1;35;40m A copy of ' + directory + ' has been created. \033[0m')
 input('\033[1;35;40m Press enter to continue...\033[0m')
 print('\n')
 
