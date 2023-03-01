@@ -57,7 +57,7 @@ accession = input("\033[1;45m 7) \033[0m Copy and paste the name of the accessio
 with open(accession, "r") as file:
     srr_list = [line.strip() for line in file if line.strip()]
     print(f"There are {len(srr_list)} unanalyzed sequences")
-os.remove(f"copy_{accession}")
+os.remove("copy_untrimmed_bash_srr.txt")
 
 
 # This asks the user to type in the number of SRA sequences to be analyzed
@@ -93,8 +93,8 @@ with open(accession, "w") as file:
         file.write(sra + "\n")
 
 # This will send an email to the user when the analysis is complete
-print(f'Sending email to {user}....')
-subprocess.run(['mail', '-s', f'{job_title} is complete', f'{user}'], input='Your analysis is complete', encoding='ascii')
+#print(f'Sending email to {user}....')
+#subprocess.run(['mail', '-s', f'{job_title} is complete', f'{user}'], input='Your analysis is complete', encoding='ascii')
 
 
 def send_email(user, job):
@@ -112,10 +112,10 @@ def run_analysis():
             print('\033[1;45m 1) \033[0m Email address used: ', user)
             print('\033[1;45m 2) \033[0m trimmomatic-0.39.jar file path: ', trim_path)
             print('\033[1;45m 3) \033[0m TruSeq3 file path: ', truseq3_path)
-            print('\033[1;45m 4) \033[0m Bowtie files path: ', bowtie2_path)
+            print('\033[1;45m 4) \033[0m Bowtie file path: ', bowtie2_path)
             print('\033[1;45m 5) \033[0m BWA reference chromosome path: ', ref_chrom_path)
             print('\033[1;45m 6) \033[0m Accession list file name: ', accession)
-            os.system('python3 untrimmed_analysis_tools.py')
+            os.system('python3 untrimmed_analysis_tools_v1.1.py')
 
         elif choice.lower() == "no":
             print('\033[1;45m Analysis terminated. Goodbye. \033[0;0;0m')
