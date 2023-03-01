@@ -40,7 +40,7 @@ if final > 1:
     print('\033[1;45m ERROR:\033[0;0;0m You do not have enough cells to seed the wells you have chosen. Please choose a lower seeding density or a lower number of wells.')
     exit()
 else:
-    print('\033[1;45m The number of CLC you will need are: \033[0;0;0m ' + str(final2) + ' ml')
+    print('\033[1;45m The number of live cell count you will need are: \033[0;0;0m ' + str(final2) + ' ml')
 
 print('\n')
 
