@@ -97,10 +97,16 @@ with open(accession, "w") as file:
 #subprocess.run(['mail', '-s', f'{job_title} is complete', f'{user}'], input='Your analysis is complete', encoding='ascii')
 
 
-def send_email(user, job):
+'''def send_email(user, job):
     """Sends email notification to user that analysis is complete."""
     print('Sending email to ' + user + ' ....')
-    os.system(f'sendemail -f sudoroot1775@outlook.com -t {user} -u {job}_name_Analysis Done -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
+    os.system(f'sendemail -f sudoroot1775@outlook.com -t {user} -u {job}_name_Analysis Done -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')'''
+
+#run the commands on the sendemail.txt file
+print('Sending email to ' + user + ' ....')
+os.system('sendemail -f sudoroot1775@outlook.com -t ' + user + ' -u ' + job_title + '_name_Analysis Done -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
+
+
 
 def run_analysis():
     """Runs untrimmed_analysis_tools.py and prompts user to continue or exit."""
