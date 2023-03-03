@@ -57,6 +57,8 @@ import pip
 
 os.system('pip3 install python-util')
 os.system('pip3 install pandas')
+subprocess.run(['pip', 'install', 'biopython'])
+
 
 #checking for the installation of wget
 print("\033[1;45m Checking for installation of Wget \033[0;0;0m")

@@ -15,6 +15,7 @@ subprocess.call(['sudo', 'apt', 'install', 'python3', 'python3-pip'])
 print("\033[1;45m Installing pyutil and pandas \033[0;0;0m")
 subprocess.call(['pip3', 'install', 'pandas'])
 os.system('pip3 install python-util')
+subprocess.run(['pip', 'install', 'biopython'])
 
 
 # Update terminal and install necessaries
