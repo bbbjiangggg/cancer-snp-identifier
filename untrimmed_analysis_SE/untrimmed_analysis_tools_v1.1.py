@@ -16,7 +16,7 @@ def replace_text(file_path, old_text, new_text):
         file.truncate()
 
 def replace_in_untrimmed_bash_srr(old_text, new_text):
-    replace_text('untrimmed_bash_srr_v1.1.txt', old_text, new_text)
+    replace_text('untrimmed_bash_sra_v1.1.txt', old_text, new_text)
 
 
 # Get the current working directory
@@ -85,7 +85,7 @@ ref_chrom_path = input('\033[1;45m 6) \033[0m Copy and paste the complete path t
 replace_in_untrimmed_bash_srr('ref_chrom_path', ref_chrom_path)
 
 # Make a copy of untrimmed bash srr
-shutil.copy("untrimmed_bash_srr_v1.1.txt", "copy_untrimmed_bash_srr_v1.1.txt")
+shutil.copy("untrimmed_bash_sra_v1.1.txt", "copy_untrimmed_bash_sra_v1.1.txt")
 
 
 # This asks the user to type in the path to the accession list
@@ -93,7 +93,7 @@ accession = input("\033[1;45m 7) \033[0m Copy and paste the name of the accessio
 with open(accession, "r") as file:
     srr_list = [line.strip() for line in file if line.strip()]
     print(f"There are {len(srr_list)} unanalyzed sequences")
-os.remove("copy_untrimmed_bash_srr_v1.1.txt")
+os.remove("copy_untrimmed_bash_sra_v1.1.txt")
 
 
 # This asks the user to type in the number of SRA sequences to be analyzed
@@ -110,8 +110,8 @@ sra_list = srr_list[:num_sra_seqs]
 for index, sra in enumerate(sra_list):
     replace_in_untrimmed_bash_srr('number', placement[index])
     replace_in_untrimmed_bash_srr('SRR_one', sra)
-    # Run the commands on the untrimmed_bash_srr_v1.1.txt file
-    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_srr_v1.1.txt'])
+    # Run the commands on the untrimmed_bash_sra_v1.1.txt file
+    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.1.txt'])
 
     # Replace the changed names back to original
     replace_in_untrimmed_bash_srr(placement[index], 'number')
