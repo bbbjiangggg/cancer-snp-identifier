@@ -1,11 +1,0 @@
---2022-11-17 16:50:12--  http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz
-Resolving ftp.ensembl.org (ftp.ensembl.org)... 193.62.193.139
-Connecting to ftp.ensembl.org (ftp.ensembl.org)|193.62.193.139|:80... connected.
-HTTP request sent, awaiting response... 200 OK
-Length: 46167328 (44M) [application/x-gzip]
-Saving to: ‘Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz.4’
-
-Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz.4    95%[===============================================================================================>     ]  42.06M  11.0MB/s    eta 2s     Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz.4   100%[====================================================================================================>]  44.03M  11.3MB/s    in 5.1s    
-
-2022-11-17 16:50:17 (8.70 MB/s) - ‘Homo_sapiens.GRCh38.dna.chromosome.X.fa.gz.4’ saved [46167328/46167328]
-
