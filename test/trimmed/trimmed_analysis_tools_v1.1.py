@@ -2,12 +2,11 @@
 import os
 import subprocess
 from pathlib import Path
-from pyutil import filereplace
 
-#THIS PROGRAM IS FOR TRIMMED FILES ONLY
+# THIS PROGRAM IS FOR TRIMMED FILES ONLY
 
-#must have sendemail installed on terminal
-#for ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
+# must have sendemail installed on terminal
+# for Ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
 # for Mac, use: brew install sendemail
 
 # Getting the current working directory
@@ -25,11 +24,14 @@ job = input('Enter a job name: ')
 
 # Add the path to where bowtie files are found (must end in "bowtie/bowtie")
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
-subprocess.run(['sed', '-i', f's/bowtie2_path/{bowtie}/g', 'trimmed_bash_sra_v1.1.txt'])
+subprocess.run(['sed', '-i', f's|bowtie2_path/{bowtie}/g|{bowtie}|g', 'trimmed_bash_sra_v1.1.txt'])
+
 
 # Add the path to where reference chromosome is found
 ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
-filereplace('trimmed_bash_sra_v1.1.txt', 'ref_chrom', ref_chrom)
+subprocess.run(['sed', '-i', f's|ref_chrom/{ref_chrom}/g', 'trimmed_bash_sra_v1.1.txt'])
+
+
 
 # Get the path to the trimmed bash script
 script_path = Path(__file__).parent / 'trimmed_bash_sra_v1.1.txt'
