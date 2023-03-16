@@ -30,13 +30,25 @@ user = input('Enter the email address to be notified once the analysis is comple
 job = input('Enter a job name: ')
 
 # Add the path to where bowtie files are found (must end in "bowtie/bowtie")
-bowtie = input('Copy and paste the complete path to your bowtie files: ')
+while True:
+    bowtie = input('Copy and paste the complete path to your bowtie files: ')
+    if os.path.isdir(bowtie) and os.path.isfile(os.path.join(bowtie, 'bowtie')):
+        break
+    else:
+        print(f'{RED}Error: "{bowtie}" does not exist or is not a valid Bowtie directory. Please try again.{RESET}')
+
 subprocess.run(['sed', '-i', f's|bowtie2_path/{bowtie}/g|{bowtie}|g', 'trimmed_bash_sra_v1.1.txt'])
 
-
 # Add the path to where reference chromosome is found
-ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
+while True:
+    ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
+    if os.path.isfile(ref_chrom):
+        break
+    else:
+        print(f'{RED}Error: "{ref_chrom}" does not exist or is not a valid file. Please try again.{RESET}')
+
 subprocess.run(['sed', '-i', f's|ref_chrom/{ref_chrom}/g', 'trimmed_bash_sra_v1.1.txt'])
+
 
 
 
@@ -113,7 +125,9 @@ replace_in_file('trimmed_bash_sra_v1.1.txt', ref_chrom, 'ref_chrom')
 
 #send an email to the user to let them know the analysis is done
 email_message = f"Your {job}_name analysis is complete. Please log in to check the results."
-os.system(f'sendemail -f sudoroot1775@outlook.com -t {user} -u {job}_name Analysis Complete -m "{email_message}" -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
+sendemail_args = ['sendemail', '-f', 'sudoroot1775@outlook.com', '-t', user, '-u', f'{job}_name Analysis Complete', '-m', email_message, '-s', 'smtp-mail.outlook.com:587', '-o', 'tls=yes', '-xu', 'sudoroot1775@outlook.com', '-xp', 'ydAEwVVu2s7uENC']
+subprocess.run(sendemail_args, check=True)
+
 print(f'Sent email to {user}.')
 
 print('\n')
