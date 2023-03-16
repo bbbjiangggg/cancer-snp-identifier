@@ -9,12 +9,19 @@ from pathlib import Path
 # for Ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
 # for Mac, use: brew install sendemail
 
+# Define color codes
+RED = '\033[1;31m'
+GREEN = '\033[1;32m'
+MAGENTA = '\033[1;35m'
+BLUE = '\033[1;34m'
+RESET = '\033[0m'
+
 # Getting the current working directory
 src_dir = os.getcwd()
 
 # Printing current directory
-print('\033[1;45mCurrent working directory: ' + src_dir + '\033[0m')
-print('\033[1;45mUse the command "realpath file.txt" to get the complete path.\033[0m')
+print(f'{MAGENTA}\nCurrent working directory:{RESET} ' + src_dir)
+print(f'{MAGENTA}\nUse the command "realpath file.txt" to get the complete path.{RESET}')
 
 # Add the email to be notified when the process is done
 user = input('Enter the email address to be notified once the analysis is complete: ')
@@ -47,7 +54,7 @@ else:
     subprocess.run(['sed', '-i', f's/ref_chrom/{ref_chrom}/g', str(script_path)])
 
 # Printing the sorted list of unanalyzed files
-print('\033[1;45mThese are the unanalyzed files in the current directory:\033[0m')
+print(f'{MAGENTA}\nThese are the unanalyzed files in the current directory:{RESET}')
 
 # This will store the list of unanalyzed files
 files = os.listdir()
@@ -110,30 +117,30 @@ os.system(f'sendemail -f sudoroot1775@outlook.com -t {user} -u {job}_name Analys
 print(f'Sent email to {user}.')
 
 print('\n')
-print('\033[1;45m trimmed_analysis_tools is ready to run.\033[0;0;0m \n')
+print(f'{MAGENTA}\n trimmed_analysis_tools is ready to run.{RESET} \n')
 
 def run_again():
     #runs trimmed_analysis_tools.py again
-    print('\033[1;45mtrimmed_analysis_tools.py is ready to run.\033[0;0;0m')
+    print(f'{MAGENTA}\ntrimmed_analysis_tools.py is ready to run.{RESET} \n')
 
     while True:
-        print('\033[1;45mWould you like to run another analysis?\033[0;0;0m')
+        print(f'{MAGENTA}\nWould you like to run another analysis?\033[0;0;0m')
         choice = input('Enter yes or no to continue: ')
 
         if choice.lower() == 'yes':
-            print('\033[1;45m \033[0m Email address used: ', user)
-            print('\033[1;45m \033[0m Bowtie file path: ', bowtie)
-            print('\033[1;45m \033[0m BWA reference chromosome path: ', ref_chrom)
+            print(f'{MAGENTA}\n \033[0m Email address used:{RESET} ', user)
+            print(f'{MAGENTA}\n \033[0m Bowtie file path:{RESET} ', bowtie)
+            print(f'{MAGENTA}\n \033[0m BWA reference chromosome path:{RESET} ', ref_chrom)
             
             # execute the analysis script
             os.system('python3 trimmed_analysis_tools_v1.1.py')
         
         elif choice.lower() == 'no':
             # exit the loop and end the program
-            print('\033[1;45mAnalysis terminated. Goodbye.\033[0;0;0m')
+            print(f'{MAGENTA}\nAnalysis terminated. Goodbye.{RESET} \n')
             break
         else:
             # handle invalid input by asking the user to enter either yes or no
-            print('\033[1;45mEnter either yes or no.\033[0;0;0m')
+            print(f'{MAGENTA}\nEnter either yes or no.{RESET} \n')
 
 run_again()
