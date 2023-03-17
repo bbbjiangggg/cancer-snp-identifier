@@ -31,15 +31,26 @@ user = input('Enter the email address to be notified once the analysis is comple
 # Add the job title
 job = input('Enter a job name: ')
 
-# Add the path to where bowtie files are found (must end in "bowtie/bowtie")
-while True:
-    bowtie = input('Copy and paste the complete path to your bowtie files: ')
-    if os.path.isfile(bowtie):
-        break
-    else:
-        print(f'{RED}Error: "{bowtie}" does not exist or is not a valid file. Please try again.{RESET}')
 
-subprocess.run(['sed', '-i', f's|bowtie2_path/{bowtie}/g', 'trimmed_bash_sra_v1.1.txt'])
+# Add the path to where bowtie files are found (must end in "bowtie/bowtie")
+bowtie = input('Copy and paste the complete path to your bowtie files: ')
+
+# Define the path to the file
+file_path = 'trimmed_bash_sra_v1.1.txt'
+
+# Define the string to be replaced and the new string
+old_string = 'bowtie2_path/g'
+new_string = f'{bowtie}/g'
+
+# Define the sed command to replace the string in the file
+sed_command = f"sed -i 's/{old_string}/{new_string}/g' {'trimmed_bash_sra_v1.1.txt'}"
+
+# Execute the sed command using subprocess
+subprocess.run(sed_command, shell=True)
+
+
+
+
 
 
 # Add the path to where reference chromosome is found
@@ -107,6 +118,7 @@ def replace_in_file(file_path, old_text, new_text):
     with open(file_path, 'w') as f:
         f.write(content)
 
+
 # These commands will replace each SRR number in the .txt file with 
 # each of the accession numbers entered by the user
 for index, srr in enumerate(srr_list):
@@ -114,8 +126,9 @@ for index, srr in enumerate(srr_list):
     replace_in_file('trimmed_bash_sra_v1.1.txt', 'now', srr)
 
     # Run the commands on the trimmed_bash_sra_v1.1.txt file
-    command = 'cat trimmed_bash_sra_v1.1.txt | bash'
-    subprocess.run(command, shell=True, check=True)
+    with open('trimmed_bash_sra_v1.1.txt', 'r') as f:
+        subprocess.run(['bash'], stdin=f)
+
 
     # Replace the changed names back to the original
     replace_in_file('trimmed_bash_sra_v1.1.txt', placement[index], 'number')
