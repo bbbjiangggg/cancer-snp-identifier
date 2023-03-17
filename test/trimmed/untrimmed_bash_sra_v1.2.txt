@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Define colors for output messages
+PURPLE='\033[0;35m'
+NC='\033[0m' # No Color
+
+# Inform user that number analysis has started
+echo -e "${PURPLE}Number analysis now initiated${NC}"
+
+# Map reads using Bowtie2
+bowtie2 --very-fast-local -x /Volumes/WD_BLUE/Users/blue/sra/bowtie/22_bowtie_ind/bowtie now/now_trimmed.fq.gz -S now/now_mapped.sam
+samtools view -S -b now/now_mapped.sam > now/now_mapped.bam
+
+# Sort the mapped reads using Samtools
+echo -e "${PURPLE}Sorting using Samtools${NC}"
+samtools sort now/now_mapped.bam > now/now_mapped.sorted.bam
+
+# Summarize the base calls of aligned reads to the reference sequence using bcftools mpileup
+echo -e "${PURPLE}Summarizing the base calls of aligned reads to the reference sequence (mpileup)${NC}"
+bcftools mpileup -f /Volumes/WD_BLUE/Users/blue/sra/bwa/22_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.22.fa now/now_mapped.sorted.bam | bcftools call -mv -Ob -o now/now_mapped.raw.bcf
+
+# Finalize VCF
+echo -e "${PURPLE}Finalizing VCF${NC}"
+bcftools view now/now_mapped.raw.bcf | vcfutils.pl varFilter - > now/now_mapped.var.-final.vcf
+
+# Clean up
+rm now/now_mapped.sam now/now_mapped.bam now/now_mapped.sorted.bam now/now_mapped.raw.bcf
+
+# Inform user that the process is complete
+echo -e "${PURPLE}Ending...${NC}"
+
