@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import os
-import subprocess
-from pathlib import Path
+from pyutil import filereplace
 
 #THIS PROGRAM IS FOR TRIMMED FILES ONLY
 
@@ -24,29 +23,15 @@ job = input('Enter a job name: ')
 
 # Add the path to where bowtie files are found (must end in "bowtie/bowtie")
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
-subprocess.run(['sed', '-i', f's/bowtie2_path/{bowtie}/g', 'trimmed_bash_sra_v1.1.txt'])
+filereplace('trimmed_bash_sra_v1.1.txt', 'bowtie2_path', bowtie)
 
 # Add the path to where reference chromosome is found
 ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
-subprocess.run(['sed', '-i', f's/ref_chrom/{ref_chrom}/g', 'trimmed_bash_sra_v1.1.txt'])
-
-# Get the path to the trimmed bash script
-script_path = Path(__file__).parent / 'trimmed_bash_sra_v1.1.txt'
-
-# Check if the script file exists
-if not script_path.is_file():
-    print(f"Error: Script file {script_path} not found")
-else:
-    # Replace the bowtie2_path variable in the script file
-    subprocess.run(['sed', '-i', f's/bowtie2_path/{bowtie}/g', str(script_path)])
-
-    # Replace the ref_chrom variable in the script file
-    subprocess.run(['sed', '-i', f's/ref_chrom/{ref_chrom}/g', str(script_path)])
+filereplace('trimmed_bash_sra_v1.1.txt', 'ref_chrom', ref_chrom)
 
 # Printing the sorted list of unanalyzed files
 print('\033[1;45mThese are the unanalyzed files in the current directory:\033[0m')
 
-# This will store the list of unanalyzed files
 files = os.listdir()
 new = [i for i in files if 'RR' in i and '.txt' not in i]
 
@@ -74,32 +59,22 @@ placement = [ordinal(n) for n in range(1, number + 1)]
 # This will set different variables for different SRR sequences
 srr_list = new[:number]
 
-# Replace the variables in the text file using subprocess
-def replace_in_file(file_path, old_text, new_text):
-    with open(file_path, 'r') as f:
-        content = f.read()
-    content = content.replace(old_text, new_text)
-    with open(file_path, 'w') as f:
-        f.write(content)
-
 # These commands will replace each SRR number in the .txt file with 
 # each of the accession numbers entered by the user
 for index, srr in enumerate(srr_list):
-    replace_in_file('trimmed_bash_sra_v1.1.txt', 'number', placement[index])
-    replace_in_file('trimmed_bash_sra_v1.1.txt', 'now', srr)
+    filereplace('trimmed_bash_sra_v1.1.txt', 'number', placement[index])
+    filereplace('trimmed_bash_sra_v1.1.txt', 'now', srr)
 
     # Run the commands on the trimmed_bash_sra_v1.1.txt file
-    command = 'cat trimmed_bash_sra_v1.1.txt | bash'
-    subprocess.run(command, shell=True, check=True)
+    os.system('cat trimmed_bash_sra_v1.1.txt | bash')
 
     # Replace the changed names back to the original
-    replace_in_file('trimmed_bash_sra_v1.1.txt', placement[index], 'number')
-    replace_in_file('trimmed_bash_sra_v1.1.txt', srr, 'now')
+    filereplace('trimmed_bash_sra_v1.1.txt', placement[index], 'number')
+    filereplace('trimmed_bash_sra_v1.1.txt', srr, 'now')
 
-#reset the bowtie2_path and refchrome path
-replace_in_file('trimmed_bash_sra_v1.1.txt', bowtie, 'bowtie2_path')
-replace_in_file('trimmed_bash_sra_v1.1.txt', ref_chrom, 'ref_chrom')
-
+    #reset the bowtie2_path and refchrome path
+filereplace('trimmed_bash_sra_v1.1.txt', bowtie, 'bowtie2_path')
+filereplace('trimmed_bash_sra_v1.1.txt', ref_chrom, 'ref_chrom')
 
 #send an email to the user to let them know the analysis is done
 email_message = f"Your {job}_name analysis is complete. Please log in to check the results."

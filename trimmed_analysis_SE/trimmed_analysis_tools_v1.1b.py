@@ -4,17 +4,26 @@ import subprocess
 from pathlib import Path
 
 # THIS PROGRAM IS FOR TRIMMED FILES ONLY
+#export PATH=/path/to/bowtie2:$PATH
+
 
 # must have sendemail installed on terminal
 # for Ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
 # for Mac, use: brew install sendemail
 
+# Define color codes
+RED = '\033[1;31m'
+GREEN = '\033[1;32m'
+MAGENTA = '\033[1;35m'
+BLUE = '\033[1;34m'
+RESET = '\033[0m'
+
 # Getting the current working directory
 src_dir = os.getcwd()
 
 # Printing current directory
-print('\033[1;45mCurrent working directory: ' + src_dir + '\033[0m')
-print('\033[1;45mUse the command "realpath file.txt" to get the complete path.\033[0m')
+print(f'{MAGENTA}\nCurrent working directory:{RESET} ' + src_dir)
+print(f'{MAGENTA}\nUse the command "realpath file.txt" to get the complete path.{RESET}')
 
 # Add the email to be notified when the process is done
 user = input('Enter the email address to be notified once the analysis is complete: ')
@@ -23,13 +32,26 @@ user = input('Enter the email address to be notified once the analysis is comple
 job = input('Enter a job name: ')
 
 # Add the path to where bowtie files are found (must end in "bowtie/bowtie")
-bowtie = input('Copy and paste the complete path to your bowtie files: ')
-subprocess.run(['sed', '-i', f's|bowtie2_path/{bowtie}/g|{bowtie}|g', 'trimmed_bash_sra_v1.1.txt'])
+while True:
+    bowtie = input('Copy and paste the complete path to your bowtie files: ')
+    if os.path.isfile(bowtie):
+        break
+    else:
+        print(f'{RED}Error: "{bowtie}" does not exist or is not a valid file. Please try again.{RESET}')
+
+subprocess.run(['sed', '-i', f's|bowtie2_path/{bowtie}/g', 'trimmed_bash_sra_v1.1.txt'])
 
 
 # Add the path to where reference chromosome is found
-ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
+while True:
+    ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
+    if os.path.isfile(ref_chrom):
+        break
+    else:
+        print(f'{RED}Error: "{ref_chrom}" does not exist or is not a valid file. Please try again.{RESET}')
+
 subprocess.run(['sed', '-i', f's|ref_chrom/{ref_chrom}/g', 'trimmed_bash_sra_v1.1.txt'])
+
 
 
 
@@ -47,7 +69,7 @@ else:
     subprocess.run(['sed', '-i', f's/ref_chrom/{ref_chrom}/g', str(script_path)])
 
 # Printing the sorted list of unanalyzed files
-print('\033[1;45mThese are the unanalyzed files in the current directory:\033[0m')
+print(f'{MAGENTA}\nThese are the unanalyzed files in the current directory:{RESET}')
 
 # This will store the list of unanalyzed files
 files = os.listdir()
@@ -106,34 +128,36 @@ replace_in_file('trimmed_bash_sra_v1.1.txt', ref_chrom, 'ref_chrom')
 
 #send an email to the user to let them know the analysis is done
 email_message = f"Your {job}_name analysis is complete. Please log in to check the results."
-os.system(f'sendemail -f sudoroot1775@outlook.com -t {user} -u {job}_name Analysis Complete -m "{email_message}" -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
+sendemail_args = ['sendemail', '-f', 'sudoroot1775@outlook.com', '-t', user, '-u', f'{job}_name Analysis Complete', '-m', email_message, '-s', 'smtp-mail.outlook.com:587', '-o', 'tls=yes', '-xu', 'sudoroot1775@outlook.com', '-xp', 'ydAEwVVu2s7uENC']
+subprocess.run(sendemail_args, check=True)
+
 print(f'Sent email to {user}.')
 
 print('\n')
-print('\033[1;45m trimmed_analysis_tools is ready to run.\033[0;0;0m \n')
+print(f'{MAGENTA}\n trimmed_analysis_tools is ready to run.{RESET} \n')
 
 def run_again():
     #runs trimmed_analysis_tools.py again
-    print('\033[1;45mtrimmed_analysis_tools.py is ready to run.\033[0;0;0m')
+    print(f'{MAGENTA}\ntrimmed_analysis_tools.py is ready to run.{RESET} \n')
 
     while True:
-        print('\033[1;45mWould you like to run another analysis?\033[0;0;0m')
+        print(f'{MAGENTA}\nWould you like to run another analysis?\033[0;0;0m')
         choice = input('Enter yes or no to continue: ')
 
         if choice.lower() == 'yes':
-            print('\033[1;45m \033[0m Email address used: ', user)
-            print('\033[1;45m \033[0m Bowtie file path: ', bowtie)
-            print('\033[1;45m \033[0m BWA reference chromosome path: ', ref_chrom)
+            print(f'{MAGENTA}\n \033[0m Email address used:{RESET} ', user)
+            print(f'{MAGENTA}\n \033[0m Bowtie file path:{RESET} ', bowtie)
+            print(f'{MAGENTA}\n \033[0m BWA reference chromosome path:{RESET} ', ref_chrom)
             
             # execute the analysis script
             os.system('python3 trimmed_analysis_tools_v1.1.py')
         
         elif choice.lower() == 'no':
             # exit the loop and end the program
-            print('\033[1;45mAnalysis terminated. Goodbye.\033[0;0;0m')
+            print(f'{MAGENTA}\nAnalysis terminated. Goodbye.{RESET} \n')
             break
         else:
             # handle invalid input by asking the user to enter either yes or no
-            print('\033[1;45mEnter either yes or no.\033[0;0;0m')
+            print(f'{MAGENTA}\nEnter either yes or no.{RESET} \n')
 
 run_again()
