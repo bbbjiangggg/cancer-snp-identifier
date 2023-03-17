@@ -4,6 +4,8 @@ import subprocess
 from pathlib import Path
 
 # THIS PROGRAM IS FOR TRIMMED FILES ONLY
+#export PATH=/path/to/bowtie2:$PATH
+
 
 # must have sendemail installed on terminal
 # for Ubuntu use: $ sudo apt-get install libio-socket-ssl-perl libnet-ssleay-perl sendemail
