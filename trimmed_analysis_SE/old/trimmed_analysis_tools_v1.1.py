@@ -23,11 +23,11 @@ job = input('Enter a job name: ')
 
 # Add the path to where bowtie files are found (must end in "bowtie/bowtie")
 bowtie = input('Copy and paste the complete path to your bowtie files: ')
-filereplace('trimmed_bash_sra_v1.1.txt', 'bowtie2_path', bowtie)
+filereplace('trimmed_bash_sra_v1.2.txt', 'bowtie2_path', bowtie)
 
 # Add the path to where reference chromosome is found
 ref_chrom = input('Copy and paste the complete path to your reference chromosome: ')
-filereplace('trimmed_bash_sra_v1.1.txt', 'ref_chrom', ref_chrom)
+filereplace('trimmed_bash_sra_v1.2.txt', 'ref_chrom', ref_chrom)
 
 # Printing the sorted list of unanalyzed files
 print('\033[1;45mThese are the unanalyzed files in the current directory:\033[0m')
@@ -62,19 +62,19 @@ srr_list = new[:number]
 # These commands will replace each SRR number in the .txt file with 
 # each of the accession numbers entered by the user
 for index, srr in enumerate(srr_list):
-    filereplace('trimmed_bash_sra_v1.1.txt', 'number', placement[index])
-    filereplace('trimmed_bash_sra_v1.1.txt', 'now', srr)
+    filereplace('trimmed_bash_sra_v1.2.txt', 'number', placement[index])
+    filereplace('trimmed_bash_sra_v1.2.txt', 'now', srr)
 
-    # Run the commands on the trimmed_bash_sra_v1.1.txt file
-    os.system('cat trimmed_bash_sra_v1.1.txt | bash')
+    # Run the commands on the trimmed_bash_sra_v1.2.txt file
+    os.system('cat trimmed_bash_sra_v1.2.txt | bash')
 
     # Replace the changed names back to the original
-    filereplace('trimmed_bash_sra_v1.1.txt', placement[index], 'number')
-    filereplace('trimmed_bash_sra_v1.1.txt', srr, 'now')
+    filereplace('trimmed_bash_sra_v1.2.txt', placement[index], 'number')
+    filereplace('trimmed_bash_sra_v1.2.txt', srr, 'now')
 
     #reset the bowtie2_path and refchrome path
-filereplace('trimmed_bash_sra_v1.1.txt', bowtie, 'bowtie2_path')
-filereplace('trimmed_bash_sra_v1.1.txt', ref_chrom, 'ref_chrom')
+filereplace('trimmed_bash_sra_v1.2.txt', bowtie, 'bowtie2_path')
+filereplace('trimmed_bash_sra_v1.2.txt', ref_chrom, 'ref_chrom')
 
 #send an email to the user to let them know the analysis is done
 email_message = f"Your {job}_name analysis is complete. Please log in to check the results."

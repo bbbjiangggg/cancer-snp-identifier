@@ -1,12 +1,5 @@
 #!/bin/bash
 
-# Check if CRISPResso2 is installed
-if ! command -v crispresso2 &> /dev/null
-then
-    echo "CRISPResso2 is not installed. Installing now..."
-    pip3 install CRISPResso2
-fi
-
 # Define input parameters
 output_folder="output"
 num_threads=4
