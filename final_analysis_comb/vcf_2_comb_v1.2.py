@@ -117,7 +117,7 @@ else:
 
 print('A copy of ' + directory + ' has been created.')
 print('\n')
-input(f'{MAGENTA}\nPress enter to continue...{RESET}')
+input(f'{BLUE}\nPress enter to continue...{RESET}')
 
 
 #Combining vcf reports
