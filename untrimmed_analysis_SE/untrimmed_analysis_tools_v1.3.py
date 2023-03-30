@@ -5,6 +5,18 @@ import shutil
 import subprocess
 from pathlib import Path
 import signal
+import importlib
+import subprocess
+
+packages = ['os', 'shutil', 'subprocess', 'pathlib', 'signal']
+
+# Check if packages are installed, install them if necessary
+for package in packages:
+    try:
+        importlib.import_module(package)
+    except ImportError:
+        print(f'{package} is not installed. Installing...')
+        subprocess.run(['pip', 'install', package])
 
 # Define color codes
 RED = '\033[1;31m'
