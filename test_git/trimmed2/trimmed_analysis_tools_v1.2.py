@@ -27,32 +27,33 @@ RESET = '\033[0m'
 
 def replace_file_on_interrupt(sig, frame):
     # Remove the untrimmed_bash_sra_v1.2.txt file
-    os.remove('untrimmed_bash_sra_v1.2.txt')
-    print('\nRemoving untrimmed_bash_sra_v1.2.txt...')
+    os.remove('trimmed_bash_sra_v1.2.txt')
+    print('\nRemoving trimmed_bash_sra_v1.2.txt...')
     exit(1)
 
 # Register the signal handler
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
 
-# THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
+# THIS PROGRAM IS FOR TRIMMED ANALYSIS
 
 bash_script = f"""#!/bin/bash
 
-echo -e "\n\033[1;35mMapping reads using Bowtie2...\033[0m "
-bowtie2 --very-fast-local -x bowtie2_path SRR_one/SRR_one_trimmed.fq.gz -S SRR_one/SRR_one_mapped.sam
+echo -e "\n\033[1;35mMapping reads using Bowtie2 for srr_one...\033[0m "
+bowtie2 --very-fast-local -x bowtie2_path srr_one/srr_one_trimmed.fq.gz -S srr_one/srr_one_mapped.sam
 
-samtools view -S -b SRR_one/SRR_one_mapped.sam > SRR_one/SRR_one_mapped.bam
+samtools view -S -b srr_one/srr_one_mapped.sam > srr_one/srr_one_mapped.bam
 
-echo -e "\n\033[1;35mSorting using Samtools...\033[0m "
-samtools sort SRR_one/SRR_one_mapped.bam > SRR_one/SRR_one_mapped.sorted.bam
+echo -e "\n\033[1;35mSorting using Samtools for srr_one...\033[0m "
+samtools sort srr_one/srr_one_mapped.bam > srr_one/srr_one_mapped.sorted.bam
 
-echo -e "\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m "
-bcftools mpileup -f ref_chrom_path SRR_one/SRR_one_mapped.sorted.bam | bcftools call -mv -Ob -o SRR_one/SRR_one_mapped.raw.bcf
+echo -e "\n\033[1;35mSummarizing the base calls (mpileup) for srr_one...\033[0m "
+bcftools mpileup -f ref_chrom_path srr_one/srr_one_mapped.sorted.bam | bcftools call -mv -Ob -o srr_one/srr_one_mapped.raw.bcf
 
-echo -e "\n\033[1;35mFinalizing VCF...\033[0m "
-bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_mapped.var.-final.vcf
+echo -e "\n\033[1;35mFinalizing VCF for srr_one...\033[0m "
+bcftools view srr_one/srr_one_mapped.raw.bcf | vcfutils.pl varFilter - > srr_one/srr_one_mapped.var.-final.vcf
 
-rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
+# Remove unnecessary files
+rm srr_one/srr_one_mapped.sam srr_one/srr_one_mapped.bam srr_one/srr_one_mapped.sorted.bam srr_one/srr_one_mapped.raw.bcf
 
 """
 
@@ -113,8 +114,8 @@ def find_unanalyzed_files(src_dir):
         file_dir = os.path.join(src_dir, f)
         content = os.listdir(file_dir)
         for doc in content:
-            if '_mapped.var-final.vcf' in doc:
-                name = doc.replace('_mapped.var-final.vcf', '')
+            if '_mapped.var.-final.vcf' in doc:
+                name = doc.replace('_mapped.var.-final.vcf', '')
                 vcfs.append(name)
 
     return sorted(list(set(files) - set(vcfs)))
@@ -153,14 +154,14 @@ def replace_in_file(file_path, old_string, new_string):
 # each of the accession numbers entered by the user
 for index, srr in enumerate(srr_list):
     replace_in_file('trimmed_bash_sra_v1.2.txt', 'number', placement[index])
-    replace_in_file('trimmed_bash_sra_v1.2.txt', 'now', srr)
+    replace_in_file('trimmed_bash_sra_v1.2.txt', 'srr_one', srr)
 
     # Run the commands on the trimmed_bash_sra_v1.2.txt file
     os.system('cat trimmed_bash_sra_v1.2.txt | bash')
 
     # Replace the changed names back to the original
     replace_in_file('trimmed_bash_sra_v1.2.txt', placement[index], 'number')
-    replace_in_file('trimmed_bash_sra_v1.2.txt', srr, 'now')
+    replace_in_file('trimmed_bash_sra_v1.2.txt', srr, 'srr_one')
 
 # Reset the bowtie2_path and ref_chrom path
 replace_in_file('trimmed_bash_sra_v1.2.txt', bowtie2_path, 'bowtie2_path')
@@ -169,7 +170,7 @@ replace_in_file('trimmed_bash_sra_v1.2.txt', ref_chrom_path, 'ref_chrom')
 
 
 
-#send an email to the user to let them know the analysis is done
+#send an email to the user to let them ksrr_one the analysis is done
 email_message = f"Your {job_title}_name analysis is complete. Please log in to check the results."
 os.system(f'sendemail -f sudoroot1775@outlook.com -t {user} -u {job_title}_name Analysis Complete -m "{email_message}" -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
 print(f'Sent email to {user}.')
@@ -189,7 +190,7 @@ def run_again():
             print(f'{MAGENTA}3){RESET} BWA reference chromosome path: ', ref_chrom_path)
             
             # execute the analysis script
-            os.system('python3 trimmed_analysis_tools_v1.1.py')
+            os.system('python3 trimmed_analysis_tools_v1.2.py')
         
         elif choice.lower() == 'no':
             # exit the loop and end the program
@@ -198,5 +199,9 @@ def run_again():
         else:
             # handle invalid input by asking the user to enter either yes or no
             print(f'{MAGENTA}\nEnter either yes or no.{RESET}')
+
+#Remove the trimmed_bash_sra_v1.2.txt file
+os.system('rm trimmed_bash_sra_v1.2.txt')
+
 
 run_again()
