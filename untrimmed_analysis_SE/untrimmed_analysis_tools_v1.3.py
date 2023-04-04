@@ -237,7 +237,7 @@ def run_analysis():
             print(f'{MAGENTA} 4) {RESET} Bowtie file path: ', bowtie2_path)
             print(f'{MAGENTA} 5) {RESET} BWA reference chromosome path: ', ref_chrom_path)
             print(f'{MAGENTA} 6) {RESET} Accession list file name: ', accession)
-            os.system('python3 untrimmed_analysis_tools_v1.1bb.py')
+            os.system('python3 untrimmed_analysis_tools_v1.3.py')
 
         elif choice.lower() == 'no':
             print(f'{MAGENTA} Analysis terminated. Goodbye. {RESET}')
