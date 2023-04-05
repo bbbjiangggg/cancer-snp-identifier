@@ -39,23 +39,28 @@ signal.signal(signal.SIGINT, replace_file_on_interrupt)
 bash_script = f"""#!/bin/bash
 
 echo -e "\n\033[1;35mMapping reads using Bowtie2 for srr_one...\033[0m "
-bowtie2 --very-fast-local -x bowtie2_path srr_one/srr_one_trimmed.fq.gz -S srr_one/srr_one_mapped.sam
+bowtie2 --very-fast-local -x bowtie2_path srr_one/srr_one_sorted.bam -S srr_one/srr_one_mapped.sam
 
 samtools view -S -b srr_one/srr_one_mapped.sam > srr_one/srr_one_mapped.bam
 
 echo -e "\n\033[1;35mSorting using Samtools for srr_one...\033[0m "
 samtools sort srr_one/srr_one_mapped.bam > srr_one/srr_one_mapped.sorted.bam
 
-echo -e "\n\033[1;35mSummarizing the base calls (mpileup) for srr_one...\033[0m "
-bcftools mpileup -f ref_chrom_path srr_one/srr_one_mapped.sorted.bam | bcftools call -mv -Ob -o srr_one/srr_one_mapped.raw.bcf
-
-echo -e "\n\033[1;35mFinalizing VCF for srr_one...\033[0m "
-bcftools view srr_one/srr_one_mapped.raw.bcf | vcfutils.pl varFilter - > srr_one/srr_one_mapped.var.-final.vcf
-
-# Remove unnecessary files
-rm srr_one/srr_one_mapped.sam srr_one/srr_one_mapped.bam srr_one/srr_one_mapped.sorted.bam srr_one/srr_one_mapped.raw.bcf
+echo -e "\n\033[1;35mGetting potential targets using CRISPResso2...\033[0m "
+python -c "import CRISPResso2; CRISPResso2.fastq2Crispresso('srr_one', 'srr_one/output', 'srr_one/srr_one_mapped.sorted.bam', 'srr_one/srr_one_mapped.sorted.bam.bai', 'srr_one/srr_one_mapped.sam', '', '', '', 'bowtie2', True, 50, 50, '', '', '', '', '', '', False, False, False, False, False, False, False, False, 50, 50, False, False, False, True, False, False, '', '', '', '', '', False, '', '', '', '', '', False, '', '', '', '', '', '')"
 
 """
+
+# Define the srr_list variable
+srr_list = []
+
+for srr in srr_list:
+    # Run the commands on the crispr_bash_script.txt file
+    os.system(f'cat crispr_bash_script.txt | bash -s {srr}')
+
+# Remove the crispr_bash_script.txt file
+os.system('rm crispr_bash_script.txt')
+
 
 with open("trimmed_bash_sra_v1.2.txt", "w") as f:
     f.write(bash_script)
@@ -190,7 +195,7 @@ def run_again():
             print(f'{MAGENTA}3){RESET} BWA reference chromosome path: ', ref_chrom_path)
             
             # execute the analysis script
-            os.system('python3 trimmed_analysis_tools_v1.2.py')
+            os.system('python3 trimmed_analysis_tools_v1.2crisp.py')
         
         elif choice.lower() == 'no':
             # exit the loop and end the program
