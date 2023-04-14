@@ -18,6 +18,8 @@ for package in packages:
         print(f'{package} is not installed. Installing...')
         subprocess.run(['pip', 'install', package])
 
+##############################################################################
+
 # Define color codes
 RED = '\033[1;31m'
 GREEN = '\033[1;32m'
@@ -33,6 +35,8 @@ def replace_file_on_interrupt(sig, frame):
 
 # Register the signal handler
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
+
+################################################################################
 
 # THIS PROGRAM IS FOR TRIMMED ANALYSIS
 
@@ -60,6 +64,7 @@ rm srr_one/srr_one_mapped.sam srr_one/srr_one_mapped.bam srr_one/srr_one_mapped.
 with open("trimmed_bash_sra_v1.2.txt", "w") as f:
     f.write(bash_script)
 
+##############################################################################
 
 # THIS PROGRAM IS FOR TRIMMED WHOLE ANALYSIS
 
@@ -168,6 +173,9 @@ replace_in_file('trimmed_bash_sra_v1.2.txt', bowtie2_path, 'bowtie2_path')
 replace_in_file('trimmed_bash_sra_v1.2.txt', ref_chrom_path, 'ref_chrom')
 
 
+
+
+##############################################################################
 
 
 #send an email to the user to let them ksrr_one the analysis is done
