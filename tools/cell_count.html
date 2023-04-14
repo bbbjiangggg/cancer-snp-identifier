@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cell Seeding Calculator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .error {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cell Seeding Calculator</h1>
+  <form id="cellSeedingForm">
+    <label for="plate">Enter the plate you wish to use (96-wells, 24-wells, 6-wells):</label>
+    <input type="text" id="plate" name="plate">
+    <br><br>
+    <label for="wells">Enter the number of wells from the plate you wish to use:</label>
+    <input type="number" id="wells" name="wells">
+    <br><br>
+    <label for="inwellvol">Enter the intended volume (ml) for each well of the plate (number only):</label>
+    <input type="number" id="inwellvol" name="inwellvol" step="0.01">
+    <br><br>
+    <label for="cells">Enter the number of live cell count:</label>
+    <input type="number" id="cells" name="cells" step="0.01">
+    <br><br>
+    <label for="density">Enter the seeding density you wish to use in your experiment (e.g. 1.0e5):</label>
+    <input type="number" id="density" name="density" step="0.01">
+    <br><br>
+    <input type="submit" value="Calculate">
+  </form>
+  <p id="result"></p>
+  <script>
+    document.getElementById('cellSeedingForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const plate = document.getElementById('plate').value;
+      const wells = document.getElementById('wells').value;
+      const inwellvol = document.getElementById('inwellvol').value;
+      const cells = document.getElementById('cells').value;
+      const density = document.getElementById('density').value;
+
+      const wellvol = parseFloat(inwellvol) * parseFloat(wells) + 1;
+
+      const final = density * wellvol / cells;
+      const final2 = Math.round(final * 100) / 100;
+      const micro = final2 * 1000;
+      const newMedium = wellvol - final2;
+
+      const resultParagraph = document.getElementById('result');
+
+      if (final > 1) {
+        resultParagraph.innerHTML = '<span class="error">ERROR: You do not have enough cells to seed the wells you have chosen. Please choose a lower seeding density or a lower number of wells.</span>';
+      } else {
+        resultParagraph.innerHTML = 'The number of live cell count you will need are: ' + final2 + ' ml<br><br>Therefore, mix:<br>' + micro + ' μl of the live cell count<br>with ' + newMedium + ' ml of new medium<br>to get a seeding density of ' + density + ' cells/ml';
+      }
+    });
+  </script>
+</body>
+</html>

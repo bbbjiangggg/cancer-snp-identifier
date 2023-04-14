@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Linear Equation Solver</title>
+  </head>
+  <body style="background-color: #e6f9ff;">
+    <h1 style="color: #4d4dff;">Linear Equation Solver</h1>
+    <p style="color: #336699;">Enter the values for the following equation:</p>
+    <p style="color: #336699;">y = mx + b</p>
+    <form>
+      <label for="m" style="color: #336699;">m:</label>
+      <input type="number" id="m" name="m"><br><br>
+      <label for="b" style="color: #336699;">b:</label>
+      <input type="number" id="b" name="b"><br><br>
+      <label for="y" style="color: #336699;">y:</label>
+      <input type="number" id="y" name="y"><br><br>
+      <input type="button" onclick="solve()" value="Solve" style="background-color: #4d4dff; color: #fff; padding: 10px 20px; border-radius: 5px;">
+    </form>
+    <p id="result" style="color: #336699;"></p>
+    <script>
+      function solve() {
+        let m = document.getElementById("m").value;
+        let b = document.getElementById("b").value;
+        let y = document.getElementById("y").value;
+        let x = (y - b) / m;
+        document.getElementById("result").innerHTML = "x = " + x;
+      }
+    </script>
+  </body>
+</html>
