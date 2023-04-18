@@ -34,13 +34,9 @@ def replace_file_on_interrupt(sig, frame):
 # Register the signal handler
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
 
-# THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
+bash_script = """#!/bin/bash
 
-bash_script = f"""#!/bin/bash
-
-#!/bin/bash
-
-echo -e "\n\033[1;35mDownloading number sequence SRR_one from SRA...\033[0m "
+echo -e "\\n\033[1;35mDownloading number sequence SRR_one from SRA...\\033[0m "
 fastq-dump SRR_one
 
 if [ -d "SRR_one" ]; then
@@ -50,54 +46,46 @@ fi
 mkdir SRR_one
 mv SRR_one.fastq SRR_one
 
-echo -e "\n\033[1;35mRunning fastqc on SRR_one...\033[0m "
+echo -e "\\n\033[1;35mRunning fastqc on SRR_one...\\033[0m "
 fastqc SRR_one/SRR_one.fastq
 
-echo -e "\n\033[1;35mTrimming SRR_one...\033[0m "
+echo -e "\\n\033[1;35mTrimming SRR_one...\\033[0m "
 java -jar trim_path SE SRR_one/SRR_one.fastq SRR_one/SRR_one_trimmed.fq.gz ILLUMINACLIP:truseq3_path:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35
 
-echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
+echo -e "\\n\033[1;35mRunning fastqc on trimmed SRR_one...\\033[0m "
 fastqc SRR_one/SRR_one_trimmed.fq.gz
 
-echo -e "\n\033[1;35mMapping reads using Bowtie2...\033[0m "
+echo -e "\\n\033[1;35mMapping reads using Bowtie2...\\033[0m "
 bowtie2 --very-fast-local -x bowtie2_path SRR_one/SRR_one_trimmed.fq.gz -S SRR_one/SRR_one_mapped.sam
 
 samtools view -S -b SRR_one/SRR_one_mapped.sam > SRR_one/SRR_one_mapped.bam
 
-echo -e "\n\033[1;35mSorting using Samtools...\033[0m "
+echo -e "\\n\033[1;35mSorting using Samtools...\\033[0m "
 samtools sort SRR_one/SRR_one_mapped.bam > SRR_one/SRR_one_mapped.sorted.bam
 
-echo -e "\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m "
+echo -e "\\n\033[1;35mSummarizing the base calls (mpileup)...\\033[0m "
 bcftools mpileup -f ref_chrom_path SRR_one/SRR_one_mapped.sorted.bam | bcftools call -mv -Ob -o SRR_one/SRR_one_mapped.raw.bcf
 
-echo -e "\n\033[1;35mFinalizing VCF...\033[0m "
+echo -e "\\n\033[1;35mFinalizing VCF...\\033[0m "
 bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_mapped.var.-final.vcf
 
 rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
 
-# Get the current directory
-dir=$(pwd)
-
-# Search for directories matching the pattern SRR* or ERR* in the current directory
-directories=(${dir}/SRR* ${dir}/ERR*)
-
-# Find the position of the current SRR_one directory in the list of directories
+directories=("SRR_one_1" "SRR_one_2" "SRR_one_3" "SRR_one_4" "SRR_one_5" "SRR_one_6" "SRR_one_7")
 match_position=0
-for ((i=0; i<${#directories[@]}; i++))
-do
-    if [[ ${directories[i]} == ${dir}/SRR_one* ]]; then
-        match_position=$((i+1))
-        break
-    fi
+
+for i in "${!directories[@]}"; do
+  if [ "${directories[i]}" == "SRR_one" ]; then
+    match_position=$((i+1))
+    break
+  fi
 done
 
-# Print a message indicating the position of the matching directory
 if [ "$match_position" -ne 0 ]; then
-    echo "Match found at position $match_position out of ${#directories[@]} directories"
+  echo "Match found at position $match_position out of ${#directories[@]} directories"
 else
-    echo "No match found for SRR_one"
+  echo "No match found for SRR_one"
 fi
-
 """
 
 with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
