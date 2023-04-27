@@ -71,21 +71,26 @@ bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one
 
 rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
 
-directories=("SRR_one_1" "SRR_one_2" "SRR_one_3" "SRR_one_4" "SRR_one_5" "SRR_one_6" "SRR_one_7")
-match_position=0
+#!/bin/bash
 
-for i in "${!directories[@]}"; do
-  if [ "${directories[i]}" == "SRR_one" ]; then
-    match_position=$((i+1))
-    break
-  fi
+# Find all directories in the current directory with "RR" in the name
+DIRECTORIES=$(find . -maxdepth 1 -type d -name "*RR*")
+
+# Initialize a counter for directories without the target file
+MISSING_COUNT=0
+
+# Loop through the directories and check for the target file
+for DIR in $DIRECTORIES; do
+    if [[ -f "${DIR}"/*_mapped.var.-final.vcf ]]; then
+        echo "Found target file in $DIR"
+    else
+        echo "Target file not found in $DIR"
+        ((MISSING_COUNT++))
+    fi
 done
 
-if [ "$match_position" -ne 0 ]; then
-  echo "Match found at position $match_position out of ${#directories[@]} directories"
-else
-  echo "No match found for SRR_one"
-fi
+echo "Total number of analyses left: $MISSING_COUNT"
+
 """
 
 with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
