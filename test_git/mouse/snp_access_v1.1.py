@@ -46,7 +46,7 @@ with open(csv_file, 'r') as csvfile_in, open('snp_accession_output.csv', 'w', ne
     for row in reader:
         combined_column = row[0] + ':' + row[1]
         print(combined_column)
-        handle = Entrez.esearch(db="snp", term=combined_column + "[Homo sapiens]")
+        handle = Entrez.esearch(db="snp", term=combined_column + "[Mus musculus]")
         record = Entrez.read(handle)
         handle.close()
 
