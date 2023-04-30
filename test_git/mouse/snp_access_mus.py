@@ -27,10 +27,12 @@ with open("snp_accession_output.csv", "w", newline="") as csvfile:
         handle.close()
 
         # Append the SNP accession numbers
-        rs_accessions = ["rs" + accession for accession in record["IdList"]]
+        rs_accessions = ["rs" + accession for accession in record["IdList"]] if record["IdList"] else ["unknown"]
+
+        # Print the position and SNP accessions to the screen
+        print(f"Position {position}: {', '.join(rs_accessions)}")
 
         # Write the position and SNP accessions to the output file
         writer.writerow([position, ", ".join(rs_accessions)])
 
 print("SNP Accessions added to 'snp_accession_output.csv'")
-
