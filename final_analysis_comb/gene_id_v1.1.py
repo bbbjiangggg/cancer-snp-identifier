@@ -27,7 +27,7 @@ with open(input_file_name, "r") as input_file, open(output_file_name, "w", newli
     # Process each row in the input CSV file
     for row in reader:
         # Get the SNP accession from the 'Accession' column
-        snp_accession = row['Accession'] if row['Accession'] else 'N/A'
+        snp_accession = row['SNP Accession'] if row['SNP Accession'] else 'N/A'
         # Construct the API URL to get the SNP position
         url = ensembl_url + "variation/human/" + snp_accession + "?content-type=application/json"
         # Open the URL and retrieve the data
