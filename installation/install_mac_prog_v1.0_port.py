@@ -8,66 +8,50 @@ print("\033[1;45m ONLY RUN THIS PROGRAM IN YOUR HOME DIRECTORY  \033[0;0;0m")
 print("\033[1;45m to access your home directory open Finder and then click on Go and Home.  \033[0;0;0m")
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 
-#checking for the installation of xcode
+# Checking for the installation of Xcode
 print("\033[1;45m Checking for the installation of Xcode \033[0;0;0m")
 os.system('xcode-select --install')
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
-#checking for installation of homebrew
-print("\033[1;45m Checking for installation of Homebrew \033[0;0;0m")
-if os.system("brew --version") == 0:
-    print("\033[1;45m Homebrew is installed \033[0;0;0m")
-else:
-    print("\033[1;45m Homebrew is not installed \033[0;0;0m")
-    print("\033[1;45m installing Homebrew \033[0;0;0m")
-    os.system("/bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)\"")
-    print("\033[1;45m Homebrew is installed \033[0;0;0m")
-
-input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
-print('\n')
-
-#checking for installation of python3
+# Checking for installation of python3
 print("\033[1;45m Checking for installation of Python3 \033[0;0;0m")
 if os.system("python3 --version") == 0:
     print("\033[1;45m Python3 is installed \033[0;0;0m")
 else:
     print("\033[1;45m Python3 is not installed \033[0;0;0m")
-    print("\033[1;45m installing Python3 \033[0;0;0m")
-    os.system("brew install python3")
+    print("\033[1;45m Installing Python3 \033[0;0;0m")
+    os.system("port install python39")
     print("\033[1;45m Python3 is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
-#checking for installation of pip3
+# Checking for installation of pip3
 print("\033[1;45m Checking for installation of Pip3 \033[0;0;0m")
 if os.system("pip3 --version") == 0:
     print("\033[1;45m Pip3 is installed \033[0;0;0m")
 else:
     print("\033[1;45m Pip3 is not installed \033[0;0;0m")
-    print("\033[1;45m installing Pip3 \033[0;0;0m")
-    os.system("brew install pip3")
+    print("\033[1;45m Installing Pip3 \033[0;0;0m")
+    os.system("port install py39-pip")
     print("\033[1;45m Pip3 is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
 print('\n')
 
-import pip 
-
 os.system('pip3 install python-util')
 os.system('pip3 install pandas')
 subprocess.run(['pip3', 'install', 'biopython'])
 
-
-#checking for the installation of wget
+# Checking for the installation of wget
 print("\033[1;45m Checking for installation of Wget \033[0;0;0m")
 if os.system("wget --version") == 0:
     print("\033[1;45m Wget is installed \033[0;0;0m")
 else:
     print("\033[1;45m Wget is not installed \033[0;0;0m")
-    print("\033[1;45m installing Wget \033[0;0;0m")
-    os.system("brew install wget")
+    print("\033[1;45m Installing Wget \033[0;0;0m")
+    os.system("port install wget")
     print("\033[1;45m Wget is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
@@ -80,7 +64,7 @@ if os.system("sendemail --version") == 0:
 else:
     print("\033[1;45m Sendemail is not installed \033[0;0;0m")
     print("\033[1;45m installing Sendemail \033[0;0;0m")
-    os.system("brew install sendemail")
+    os.system("port install sendemail")
     print("\033[1;45m Sendemail is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
@@ -93,7 +77,7 @@ if os.system("tabix --version") == 0:
 else:
     print("\033[1;45m Tabix is not installed \033[0;0;0m")
     print("\033[1;45m installing Tabix \033[0;0;0m")
-    os.system("brew install htslib")
+    os.system("port install Tabix")
     print("\033[1;45m Tabix is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
@@ -106,7 +90,7 @@ if os.system("gzip --version") == 0:
 else:
     print("\033[1;45m Gzip is not installed \033[0;0;0m")
     print("\033[1;45m installing Gzip \033[0;0;0m")
-    os.system("brew install gzip")
+    os.system("port install gzip")
     print("\033[1;45m Gzip is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
@@ -119,7 +103,7 @@ if os.system("gsha256sum --version") == 0:
 else:
     print("\033[1;45m Coreutils is not installed \033[0;0;0m")
     print("\033[1;45m installing Coreutils \033[0;0;0m")
-    os.system("brew install coreutils")
+    os.system("port install coreutils")
     print("\033[1;45m Coreutils is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
@@ -143,7 +127,7 @@ os.system('export PATH=$PATH:~/sratoolkit/bin')
 
 #install fastqc
 print("\033[1;45m Installing FastQC \033[0;0;0m")
-os.system("brew install fastqc")
+os.system("port install fastqc")
 
 print("\033[1;45m FastQC installed \033[0;0;0m")
 print('\n')
@@ -156,8 +140,8 @@ if os.system("java -version") == 0:
 else:
     print("\033[1;45m Java is not installed \033[0;0;0m")
     print("\033[1;45m installing Java \033[0;0;0m")
-    os.system("brew cask install java")
-    os.system("brew install openjdk")
+    os.system("port cask install java")
+    os.system("port install openjdk")
     print("\033[1;45m Java is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
@@ -181,25 +165,25 @@ print('\n')
 
 #install bwa
 print("\033[1;45m Installing BWA \033[0;0;0m")
-os.system("brew install bwa")
+os.system("port install bwa")
 print("\033[1;45m BWA installed \033[0;0;0m")
 print('\n')
 
 #install bowtie2
 print("\033[1;45m Installing Bowtie2 \033[0;0;0m")
-os.system("brew install bowtie2")
+os.system("port install bowtie2")
 print("\033[1;45m Bowtie2 installed \033[0;0;0m")
 print('\n')
 
 #install samtools
 print("\033[1;45m Installing SAMtools \033[0;0;0m")
-os.system("brew install samtools")
+os.system("port install samtools")
 print("\033[1;45m SAMtools installed \033[0;0;0m")
 print('\n')
 
 #install bcftools
 print("\033[1;45m Installing BCFtools \033[0;0;0m")
-os.system("brew install bcftools")
+os.system("port install bcftools")
 print("\033[1;45m BCFtools installed \033[0;0;0m")
 print('\n')
 
