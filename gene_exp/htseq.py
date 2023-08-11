@@ -3,6 +3,7 @@ import shutil
 import subprocess
 from pathlib import Path
 import csv
+import gzip
 
 
 
@@ -16,6 +17,13 @@ RESET = '\033[0m'
 def main(annotation_file_path: str, output_dir_path: str):
     annotation_file = Path(annotation_file_path)
     output_dir = Path(output_dir_path)
+
+# Decompress the GTF file if it is in .gz format
+    if annotation_file_path.endswith('.gz'):
+        decompressed_file_path = annotation_file_path[:-3]  # Remove .gz extension
+        with gzip.open(annotation_file_path, 'rt') as gz_file, open(decompressed_file_path, 'w') as output_file:
+            output_file.write(gz_file.read())
+        annotation_file_path = decompressed_file_path
 
     if not annotation_file.is_file():
         print(f'{RED}{annotation_file} is not a valid file path{RESET}')
@@ -34,6 +42,7 @@ def main(annotation_file_path: str, output_dir_path: str):
                     # Move the mapped BAM file to the output directory
                     output_bam_path = output_dir / file_name
                     input_bam_path = Path(dir_name) / file_name
+
 
                     # Check if the BAM file is valid
                     if subprocess.call(['samtools', 'quickcheck', str(input_bam_path)]) != 0:
