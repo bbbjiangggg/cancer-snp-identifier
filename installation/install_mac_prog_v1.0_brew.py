@@ -93,7 +93,7 @@ if os.system("tabix --version") == 0:
 else:
     print("\033[1;45m Tabix is not installed \033[0;0;0m")
     print("\033[1;45m installing Tabix \033[0;0;0m")
-    os.system("brew install htslib")
+    os.system("brew install Tabix")
     print("\033[1;45m Tabix is installed \033[0;0;0m")
 
 input('\033[1;45m Press enter to continue... \033[0;0;0m \n')
