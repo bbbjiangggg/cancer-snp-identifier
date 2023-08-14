@@ -108,7 +108,7 @@ input(f'{BLUE}Press enter to continue...{RESET}\n')
 print()
 
 # check if default-jdk is installed
-print(f'{MAGENTA}Checking default-jdk{RESET}')
+'''print(f'{MAGENTA}Checking default-jdk{RESET}')
 result = subprocess.run(['javac', '-version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 if 'command not found' in result.stderr.decode('utf-8'):
     print(f'{RED}default-jdk is not installed{RESET}')
@@ -119,7 +119,7 @@ if 'command not found' in result.stderr.decode('utf-8'):
 else:
     print(f'{GREEN}default-jdk is already installed{RESET}')
 input(f'{BLUE}Press enter to continue...{RESET}\n')
-print()
+print()'''
 
 
 # create directory $HOME/local/bin if it does not exist
