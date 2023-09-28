@@ -1,4 +1,9 @@
-#!/usr/bin/env python3
+#!/usr/bin/env pyt
+print(f"\033[1;31mComputed bowtie_index_path: \033[0m{bowtie_index_path}")
+
+if not os.path.exists(bowtie_index_path + ".1.bt2"):
+    print("\033[1;31mThe bowtie_index_path does not point to a valid Bowtie2 index.\033[0m")
+hon3
 
 import os
 import shutil
@@ -55,7 +60,8 @@ echo -e "\n\033[1;35mTrimming SRR_one...\033[0m "
 java -jar trim_path SE SRR_one/SRR_one.fastq SRR_one/SRR_one_trimmed.fq.gz ILLUMINACLIP:truseq3_path:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35
 
 echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
-fastqc SRR_one/SRR_one_trimmed.fq.gz
+fastqc SRR_one/SRR_one_print(f"\033[1;31mUsing bowtie_index_path: \033[0m{bowtie_index_path}")
+trimmed.fq.gz
 
 echo -e "\n\033[1;35mMapping reads using Bowtie2...\033[0m "
 bowtie2 --very-fast-local -x bowtie_index_path SRR_one/SRR_one_trimmed.fq.gz -S SRR_one/SRR_one_mapped.sam
@@ -140,6 +146,131 @@ valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
 chromosome = ""
 while chromosome not in valid_chromosomes:
     chromosome = input(f'{MAGENTA}Enter the chromosome number or name (e.g., 1, 2, ... 22, X, Y) to be analyzed: {RESET}')
+    if chromosome not in valid_chromosomes:
+        print(f"{RED}Invalid chromosome number or name. Please enter a valid chromosome.{RESET}")
+
+# Construct the paths for BWA and Bowtie files based on the chromosome
+bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+
+
+
+
+
+'''
+# Add the path to where bowtie files are found (must end in 'bowtie')
+bowtie_index_path = input(f'{MAGENTA}5){RESET} Copy and paste the complete path to your Bowtie files: ')
+replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+
+# Add the path to where reference chromosome is found
+bwa_chrom_path = input(f'{MAGENTA}6){RESET} Copy and paste the complete path to your BWA reference chromosome: ')
+replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)'''
+
+
+###########################################################################
+
+# Define the directory to search in
+search_dir = cwd
+
+# Get a list of all directories in the search directory
+all_dirs = next(os.walk(search_dir))[1]
+
+# Create an empty list to store directories that have the vcf file
+vcf_dirs = []
+
+# Loop over each directory
+for d in all_dirs:
+    # Check if the vcf file exists in the directory
+    vcf_file = os.path.join(search_dir, d, f'{d}_mapped.var.-final.vcf')
+    if os.path.exists(vcf_file):
+        vcf_dirs.append(d)
+
+
+
+# This asks the user to type in the path to the accession list
+accession = input(f'{MAGENTA}7){RESET}Copy and paste the name of the accession list file (make sure it is in the same directory):\n ')
+
+# Read the accession list file
+with open(accession, 'r') as file:
+    srr_list = [line.strip() for line in file if line.strip()]
+
+# Create a new list of accession numbers to be analyzed
+to_analyze = []
+for sra in srr_list:
+    # Check if a directory with the same SRA/ERR number exists and has a file ending with mapped.var.-final.vcf
+    sra_dir = f'{cwd}/{sra}'
+    vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
+    if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
+        print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
+    else:
+        to_analyze.append(sra)
+
+# This asks the user to type in the number of SRA sequences to be analyzed
+num_sra_seqs = int(input(f'\n{MAGENTA}8){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
+
+# Set different variables for different sra sequences
+sra_list = to_analyze[:num_sra_seqs]
+
+
+
+###############################################################################
+
+
+# This will store placement numbers into a list
+ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
+placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
+
+
+
+# These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
+for index, sra in enumerate(sra_list):
+    replace_in_untrimmed_bash_srr('number', placement[index])
+    replace_in_untrimmed_bash_srr('SRR_one', sra)
+    # Run the commands on the untrimmed_bash_sra_v1.2.txt file
+    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
+
+    # Replace the changed names back to original
+    replace_in_untrimmed_bash_srr(placement[index], 'number')
+    replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+
+# Reset the paths
+replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
+replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
+replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
+replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+
+
+#run the commands on the sendemail.txt file
+print('Sending email to ' + user + ' ....')
+os.system('sendemail -f sudoroot1775@outlook.com -t ' + user + ' -u ' + job_title + '_name_Analysis Done -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
+
+
+def run_analysis():
+    #Runs untrimmed_analysis_tools.py and prompts user to continue or exit.
+    print(f'{MAGENTA}untrimmed_analysis_tools is ready to run.{RESET} \n')
+    while True:
+        print(f'{MAGENTA}Would you like to run another analysis? {RESET}')
+        choice = input('Enter yes/no to continue: ')
+        if choice.lower() == 'yes':
+            print(f'{MAGENTA} 1) {RESET} Email address used: ', user)
+            print(f'{MAGENTA} 2) {RESET} trimmomatic-0.39.jar file path: ', trim_path)
+            print(f'{MAGENTA} 3) {RESET} TruSeq3 file path: ', truseq3_path)
+            print(f'{MAGENTA} 4) {RESET} Bowtie file path: ', bowtie_index_path)
+            print(f'{MAGENTA} 5) {RESET} BWA reference chromosome path: ', bwa_chrom_path)
+            print(f'{MAGENTA} 6) {RESET} Accession list file name: ', accession)
+            os.system('python3 untrimmed_analysis_tools_v1.3.py')
+
+        elif choice.lower() == 'no':
+            print(f'{MAGENTA} Analysis terminated. Goodbye. {RESET}')
+            break
+        else:
+            print(f'{MAGENTA} Enter either yes or no.{RESET} ')
+
+os.remove('untrimmed_bash_sra_v1.2.txt')
+
+run_analysis()
+
+e chromosome number or name (e.g., 1, 2, ... 22, X, Y) to be analyzed: {RESET}')
     if chromosome not in valid_chromosomes:
         print(f"{RED}Invalid chromosome number or name. Please enter a valid chromosome.{RESET}")
 
