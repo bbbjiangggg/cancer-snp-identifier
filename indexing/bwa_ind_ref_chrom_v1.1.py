@@ -2,8 +2,6 @@
 
 import os
 
-# BWA is used to index the reference chromosome
-
 def start():
     # make necessary directory
     while True:
@@ -29,6 +27,9 @@ def start():
         
     os.system('bwa index *.gz*')
     os.system('bgzip -d *.gz*')
+    
+    # Running samtools command to faidx the chromosome
+    os.system('samtools faidx Homo_sapiens.GRCh38.dna.chromosome.' + number + '.fa')
     
     print()
     print('\033[1;45mYour path to reference chromosome ' + number + ' is:\033[0;0;0m')
