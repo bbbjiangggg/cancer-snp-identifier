@@ -12,15 +12,15 @@ def download_and_index_chromosome(number):
         print(f'\033[1;45mBWA index for chromosome {number} already exists. Skipping...\033[0;0;0m')
         return
 
-    # Make necessary directory
+    # Make necessary directory if not present
     if not os.path.exists(directory_name):
         os.system('mkdir ' + directory_name)
-
     os.chdir(directory_name)
         
-    # Download chromosome sequence
-    print('\033[1;45mDownloading Chromosome '+ number + '\033[0;0;0m')
-    os.system('wget http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.'+ number +'.fa.gz')
+    # Download chromosome sequence only if it's not already downloaded
+    if not os.path.exists(f'Homo_sapiens.GRCh38.dna.chromosome.{number}.fa.gz'):
+        print('\033[1;45mDownloading Chromosome '+ number + '\033[0;0;0m')
+        os.system('wget http://ftp.ensembl.org/pub/release-104/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.chromosome.'+ number +'.fa.gz')
               
     # Indexing chromosome file
     print('\033[1;45mIndexing with BWA...\033[0;0;0m')
