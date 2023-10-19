@@ -25,14 +25,26 @@ def execute_command(command, message):
 
 # Main script execution
 if __name__ == "__main__":
+    # Ask the user to input the chromosome number
+    chrom_number = input("Please enter the chromosome number: ")
+
+    # Construct the ref_chrom_path
+    ref_chrom_path = f"/usr/local/bin/bwa/9_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chrom_number}.fa"
+
+    # Check if the reference chromosome file exists
+    if not Path(ref_chrom_path).is_file():
+        print(f"{RED}The reference chromosome file does not exist at {ref_chrom_path}{RESET}")
+        exit(1)
+
     # Scan for directories starting with ERR or SRR
     dirs = [d for d in os.listdir() if os.path.isdir(d) and (d.startswith("ERR") or d.startswith("SRR"))]
 
     for dir in dirs:
         print(f"{GREEN}Processing directory: {dir}{RESET}")
 
-        # Replace 'ref_chrom_path' with the actual path to your reference chromosome file
-        ref_chrom_path = "/mnt/e/gene_exp/bwa/GRCh38_reference.fa"
+        # Command 0: Sort bam file
+        cmd0 = f"samtools sort {dir}/{dir}_mapped.bam > {dir}/{dir}_mapped.sorted.bam"
+        execute_command(cmd0, f"\n{MAGENTA}Sorting BAM file...{RESET}")
 
         # Command 1: Summarize base calls
         cmd1 = f"bcftools mpileup -f {ref_chrom_path} {dir}/{dir}_mapped.sorted.bam | bcftools call -mv -Ob -o {dir}/{dir}_mapped.raw.bcf"
