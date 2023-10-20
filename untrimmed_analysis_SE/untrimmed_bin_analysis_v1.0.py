@@ -64,7 +64,7 @@ else
     echo -e "\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
 fi
 
-echo -e "\n\033[1;35mMapping reads using Bowtie2...\033[0m "
+echo -e "\n\033[1;35mMapping SRR_one reads using Bowtie2...\033[0m "
 bowtie2 --very-fast-local -x bowtie_index_path SRR_one/SRR_one_trimmed.fq.gz -S SRR_one/SRR_one_mapped.sam
 
 samtools view -S -b SRR_one/SRR_one_mapped.sam > SRR_one/SRR_one_mapped.bam
