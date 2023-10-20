@@ -141,7 +141,8 @@ while analysis_scope not in ["1", "2"]:
 
 # Based on the choice, set the paths
 if analysis_scope == "1":  # Whole Genome
-    bwa_chrom_path = "/usr/local/bin/bwa/hg38_bwa_ind/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+    # Modify the BWA path to the specified pattern
+    bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
     bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
 else:  # Specific Chromosome
     valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
