@@ -37,24 +37,32 @@ signal.signal(signal.SIGINT, replace_file_on_interrupt)
 
 bash_script = f"""#!/bin/bash
 
-echo -e "\n\033[1;35mDownloading number sequence SRR_one from SRA...\033[0m "
-fastq-dump SRR_one
+# Define the path of the potential trimmed file
+TRIMMED_FILE="SRR_one/SRR_one_trimmed.fq.gz"
 
-if [ -d "SRR_one" ]; then
-  rm -r "SRR_one"
+# Check if the trimmed file already exists
+if [ ! -f "$TRIMMED_FILE" ]; then
+    echo -e "\n\033[1;35mDownloading number sequence SRR_one from SRA...\033[0m "
+    fastq-dump SRR_one
+
+    if [ -d "SRR_one" ]; then
+      rm -r "SRR_one"
+    fi
+
+    mkdir SRR_one
+    mv SRR_one.fastq SRR_one
+
+    echo -e "\n\033[1;35mRunning fastqc on SRR_one...\033[0m "
+    fastqc SRR_one/SRR_one.fastq
+
+    echo -e "\n\033[1;35mTrimming SRR_one...\033[0m "
+    java -jar trim_path SE SRR_one/SRR_one.fastq SRR_one/SRR_one_trimmed.fq.gz ILLUMINACLIP:truseq3_path:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35
+
+    echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
+    fastqc SRR_one/SRR_one_trimmed.fq.gz
+else
+    echo -e "\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
 fi
-
-mkdir SRR_one
-mv SRR_one.fastq SRR_one
-
-echo -e "\n\033[1;35mRunning fastqc on SRR_one...\033[0m "
-fastqc SRR_one/SRR_one.fastq
-
-echo -e "\n\033[1;35mTrimming SRR_one...\033[0m "
-java -jar trim_path SE SRR_one/SRR_one.fastq SRR_one/SRR_one_trimmed.fq.gz ILLUMINACLIP:truseq3_path:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35
-
-echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
-fastqc SRR_one/SRR_one_trimmed.fq.gz
 
 echo -e "\n\033[1;35mMapping reads using Bowtie2...\033[0m "
 bowtie2 --very-fast-local -x bowtie_index_path SRR_one/SRR_one_trimmed.fq.gz -S SRR_one/SRR_one_mapped.sam
