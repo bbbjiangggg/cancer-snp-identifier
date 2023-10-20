@@ -62,7 +62,7 @@ java -jar trim_path SE -threads 4 SRR_one/SRR_one.fastq SRR_one/SRR_one_trimmed.
 echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
 fastqc SRR_one/SRR_one_trimmed.fq.gz
 
-echo -e "\n\033[1;35mMapping reads using Bowtie2...\033[0m "
+echo -e "\n\033[1;35mMapping SRR_one reads using Bowtie2...\033[0m "
 bowtie2 --very-fast-local -x bowtie2_path -U SRR_one/SRR_one_trimmed.fq.gz -S SRR_one/SRR_one_mapped.sam
 
 samtools view -S -b SRR_one/SRR_one_mapped.sam > SRR_one/SRR_one_mapped.bam
