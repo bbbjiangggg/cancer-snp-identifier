@@ -140,41 +140,45 @@ else:
     truseq3_path = input(f'{MAGENTA}4){RESET} Copy and paste the absolute path to your TruSeq3-SE.fa file: ')
     replace_in_untrimmed_bash_srr('truseq3_path', truseq3_path)
 
-# Ask the user if they want to analyze the whole genome or a specific chromosome
+# Ask the user if they want to analyze the whole genome or specific chromosomes
 analysis_scope = ""
 while analysis_scope not in ["1", "2"]:
-    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or a specific chromosome?\n1) Whole Genome\n2) Specific Chromosome\nEnter the number corresponding to your choice: {RESET}")
+    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
     if analysis_scope not in ["1", "2"]:
-        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosome.{RESET}")
+        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
 
-# Based on the choice, set the paths
-if analysis_scope == "1":  # Whole Genome
-    # Modify the BWA path to the specified pattern
+# If Whole Genome
+if analysis_scope == "1":
     bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
     bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-else:  # Specific Chromosome
+    chroms_to_analyze = ['whole_genome']
+else:  # Specific Chromosomes
     valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
-    chromosome = ""
-    while chromosome not in valid_chromosomes:
-        chromosome = input(f"{MAGENTA}Enter the chromosome number (e.g., 1, 2, ... 22, X, Y) to be analyzed: {RESET}")
-        if chromosome not in valid_chromosomes:
-            print(f"{RED}Invalid chromosome number or name. Please enter a valid chromosome.{RESET}")
+    chroms_to_analyze = []
+    print(f"{MAGENTA}Enter the chromosome numbers separated by comma (e.g., 1,2,X,Y) to be analyzed:{RESET}")
+    input_chroms = input().split(',')
+    for chrom in input_chroms:
+        if chrom.strip() in valid_chromosomes:
+            chroms_to_analyze.append(chrom.strip())
+        else:
+            print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
 
-    # Construct the paths for BWA and Bowtie files based on the chromosome
-    bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-    bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+# Iterating through each chromosome for analysis
+for chromosome in chroms_to_analyze:
+    if chromosome != 'whole_genome':
+        # Construct the paths for BWA and Bowtie files based on the chromosome
+        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
+    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
+    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
 
-# Print the paths
-print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+    # Add the path to where bowtie files are found (must end in 'bowtie')
+    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
 
+    # Add the path to where reference chromosome is found
+    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
-
-# Add the path to where bowtie files are found (must end in 'bowtie')
-replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
-
-# Add the path to where reference chromosome is found
-replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
 
 ###########################################################################
