@@ -6,16 +6,11 @@ import subprocess
 from pathlib import Path
 import signal
 import importlib
+import logging
 
-packages = ['os', 'shutil', 'subprocess', 'pathlib', 'signal']
-
-# Check if packages are installed, install them if necessary
-for package in packages:
-    try:
-        importlib.import_module(package)
-    except ImportError:
-        print(f'{package} is not installed. Installing...')
-        subprocess.run(['pip', 'install', package])
+# Initialize logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Define color codes
 RED = '\033[1;31m'
@@ -25,13 +20,15 @@ BLUE = '\033[1;34m'
 RESET = '\033[0m'
 
 def replace_file_on_interrupt(sig, frame):
-    # Remove the untrimmed_bash_sra_v1.2.txt file
-    os.remove('untrimmed_bash_sra_v1.2.txt')
-    print('\nRemoving untrimmed_bash_sra_v1.2.txt...')
+    file_to_remove = 'untrimmed_bash_sra_v1.2.txt'
+    if os.path.exists(file_to_remove):
+        os.remove(file_to_remove)
+        logger.info(f"Removed {file_to_remove} due to interrupt.")
     exit(1)
 
-# Register the signal handler
+# Register the signal handlers
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
+signal.signal(signal.SIGTERM, replace_file_on_interrupt)
 
 # THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 bash_script = f"""#!/bin/bash
@@ -146,37 +143,39 @@ while analysis_scope not in ["1", "2"]:
     if analysis_scope not in ["1", "2"]:
         print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
 
-# If Whole Genome
-if analysis_scope == "1":
+if analysis_scope == "1":  # Whole Genome
+    # Modify the BWA path to the specified pattern
     bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
     bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-    chroms_to_analyze = ['whole_genome']
 else:  # Specific Chromosomes
     valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
-    chroms_to_analyze = []
-    print(f"{MAGENTA}Enter the chromosome numbers separated by comma (e.g., 1,2,X,Y) to be analyzed:{RESET}")
-    input_chroms = input().split(',')
-    for chrom in input_chroms:
-        if chrom.strip() in valid_chromosomes:
-            chroms_to_analyze.append(chrom.strip())
-        else:
-            print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
+    chromosomes = input(f"{MAGENTA}Enter the chromosomes (e.g., 1,2,3,...,X,Y) separated by commas to be analyzed: {RESET}").split(',')
+    for chromosome in chromosomes:
+        chromosome = chromosome.strip()
+        if chromosome not in valid_chromosomes:
+            print(f"{RED}Invalid chromosome number or name: {chromosome}. Skipping it.{RESET}")
+            continue
 
-# Iterating through each chromosome for analysis
-for chromosome in chroms_to_analyze:
-    if chromosome != 'whole_genome':
         # Construct the paths for BWA and Bowtie files based on the chromosome
         bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
         bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
-    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
 
-    # Add the path to where bowtie files are found (must end in 'bowtie')
-    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+        # Generate the bash script for this specific chromosome
+        bash_script_chrom = bash_script.replace("{chromosome}", chromosome)
+        with open(f"untrimmed_bash_sra_v1.2_{chromosome}.txt", "w") as f:
+            f.write(bash_script_chrom)
 
-    # Add the path to where reference chromosome is found
-    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+        # Replace the bwa_chrom_path and bowtie_index_path in the bash script
+        replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+        replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+
+        # Run the bash script for this specific chromosome
+        subprocess.run(['bash', str(cwd) + f'/untrimmed_bash_sra_v1.2_{chromosome}.txt'])
+
+        # Delete the bash script for this chromosome after execution
+        os.remove(f'untrimmed_bash_sra_v1.2_{chromosome}.txt')
+
+
 
 
 
