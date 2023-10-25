@@ -88,7 +88,7 @@ with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
 original_bash_script = bash_script
 
 # Ask the user if they want to analyze the whole genome or specific chromosomes
-analysis_scope = ""
+'''analysis_scope = ""
 while analysis_scope not in ["1", "2"]:
     analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
     if analysis_scope not in ["1", "2"]:
@@ -120,7 +120,7 @@ for chromosome in chroms_to_analyze:
         bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
     print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
     print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")'''
 
 def replace_in_untrimmed_bash_srr(old_text, new_text):
     with open('untrimmed_bash_sra_v1.2.txt', 'r+') as file:
@@ -130,8 +130,6 @@ def replace_in_untrimmed_bash_srr(old_text, new_text):
         file.truncate()
 
 
-replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
-replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
 
 
