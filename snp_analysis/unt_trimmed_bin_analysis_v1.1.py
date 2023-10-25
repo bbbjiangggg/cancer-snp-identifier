@@ -175,7 +175,7 @@ with open(accession, 'r') as file:
 to_analyze = []
 for sra in srr_list:
     # Check if a directory with the same SRA/ERR number exists and has a file ending with mapped.var.-final.vcf
-print(f'{MAGENTA}Current SRA Sequence: {sra}{RESET}')
+    print(f'{MAGENTA}Current SRA Sequence: {sra}{RESET}')
 print(f'{MAGENTA}Current Chromosome: {chromosome}{RESET}')
     sra_dir = f'{cwd}/{sra}'
     vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
