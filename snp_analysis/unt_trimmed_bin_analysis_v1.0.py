@@ -32,7 +32,6 @@ def replace_file_on_interrupt(sig, frame):
 # Register the signal handler
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
 
-# THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 
 bash_script = f"""#!/bin/bash
 
@@ -84,18 +83,58 @@ rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.z
 with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
     f.write(bash_script)
 
-# THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 
-# Define functions to replace text in files
-def replace_text(file_path, old_text, new_text):
-    with open(file_path, 'r+') as file:
+# Store a copy of the original bash script to restore before each iteration
+original_bash_script = bash_script
+
+# Ask the user if they want to analyze the whole genome or specific chromosomes
+analysis_scope = ""
+while analysis_scope not in ["1", "2"]:
+    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
+    if analysis_scope not in ["1", "2"]:
+        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
+
+# If Whole Genome
+if analysis_scope == "1":
+    chroms_to_analyze = ['whole_genome']
+else:  # Specific Chromosomes
+    valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
+    chroms_to_analyze = []
+    print(f"{MAGENTA}Enter the chromosome numbers separated by comma (e.g., 1,2,X,Y) to be analyzed:{RESET}")
+    input_chroms = input().split(',')
+    for chrom in input_chroms:
+        if chrom.strip() in valid_chromosomes:
+            chroms_to_analyze.append(chrom.strip())
+        else:
+            print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
+
+# Iterating through each chromosome for analysis
+for chromosome in chroms_to_analyze:
+    # Restore the bash script to its original state
+    with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
+        f.write(original_bash_script)
+    
+    if chromosome != 'whole_genome':
+        # Construct the paths for BWA and Bowtie files based on the chromosome
+        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
+    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
+    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+
+def replace_in_untrimmed_bash_srr(old_text, new_text):
+    with open('untrimmed_bash_sra_v1.2.txt', 'r+') as file:
         text = file.read().replace(old_text, new_text)
         file.seek(0)
         file.write(text)
         file.truncate()
 
-def replace_in_untrimmed_bash_srr(old_text, new_text):
-    replace_text('untrimmed_bash_sra_v1.2.txt', old_text, new_text)
+    # Add the path to where bowtie files are found (must end in 'bowtie')
+    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+
+    # Add the path to where reference chromosome is found
+    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+
 
 
 # Get the current working directory
