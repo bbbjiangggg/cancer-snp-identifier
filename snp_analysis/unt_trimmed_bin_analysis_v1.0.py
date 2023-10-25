@@ -160,14 +160,20 @@ else:  # Specific Chromosome
 
 # Loop through the chromosomes to analyze
 for chromosome in chromosomes_to_analyze:
+
+    # Set the paths based on the chromosome
     if chromosome != 'whole_genome':
         # Construct the paths for BWA and Bowtie files based on the chromosome
         bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
         bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+    else:
+        bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+        bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
 
-# Print the paths
-print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+    # Print the paths
+    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
+    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+
 
 
 
@@ -260,11 +266,12 @@ for index, sra in enumerate(sra_list):
     if chromosome != 'whole_genome':
         replace_in_untrimmed_bash_srr(f'{chromosome}_{sra}_mapped.var.-final.vcf', f'{sra}_mapped.var.-final.vcf')
 
-# Reset the paths for the next chromosome
-replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
-replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
-replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
-replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+ # Reset the paths for the next chromosome
+    replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
+    replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
+    replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
+    replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+
 
 
 
