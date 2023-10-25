@@ -164,6 +164,7 @@ else:  # Specific Chromosomes
             print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
 
 # This asks the user to type in the path to the accession list
+print(f'{MAGENTA}Chromosomes to Analyze: {chroms_to_analyze}{RESET}')
 accession = input(f'{MAGENTA}8){RESET} Copy and paste the name of the accession list file: ')
 
 # Read the accession list file
@@ -174,6 +175,8 @@ with open(accession, 'r') as file:
 to_analyze = []
 for sra in srr_list:
     # Check if a directory with the same SRA/ERR number exists and has a file ending with mapped.var.-final.vcf
+print(f'{MAGENTA}Current SRA Sequence: {sra}{RESET}')
+print(f'{MAGENTA}Current Chromosome: {chromosome}{RESET}')
     sra_dir = f'{cwd}/{sra}'
     vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
     if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
@@ -187,9 +190,6 @@ num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish 
 # Set different variables for different sra sequences
 sra_list = to_analyze[:num_sra_seqs]
 # Iterating through each chromosome for analysis
-for chromosome in chroms_to_analyze:
-    if chromosome != 'whole_genome':
-        # Construct the paths for BWA and Bowtie files based on the chromosome
         bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
         bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
     print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
