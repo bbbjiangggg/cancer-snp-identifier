@@ -129,11 +129,9 @@ def replace_in_untrimmed_bash_srr(old_text, new_text):
         file.write(text)
         file.truncate()
 
-    # Add the path to where bowtie files are found (must end in 'bowtie')
-    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
 
-    # Add the path to where reference chromosome is found
-    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
 
 
