@@ -164,8 +164,8 @@ else:  # Specific Chromosomes
             print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
 
 # Define a function to perform analysis for a single SRA accession and a list of chromosomes
-def analyze_sra_for_chromosomes(sra, chroms_to_analyze):
-    for chromosome in chroms_to_analyze:
+def analyze_sra_for_chromosomes(sra, chroms_to_analyze, placement):
+    for index, chromosome in enumerate(chroms_to_analyze):
         if chromosome != 'whole_genome':
             # Construct the paths for BWA and Bowtie files based on the chromosome
             bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
@@ -240,9 +240,7 @@ num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish 
 # Set different variables for different SRA sequences
 sra_list = to_analyze[:num_sra_seqs]
 
-# Iterate over each SRA accession and analyze it for the specified chromosomes
-for sra in sra_list:
-    analyze_sra_for_chromosomes(sra, chroms_to_analyze)
+
 
 
 
@@ -253,7 +251,9 @@ for sra in sra_list:
 ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
 placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 
-
+# Iterate over each SRA accession and analyze it for the specified chromosomes
+for sra in sra_list:
+    analyze_sra_for_chromosomes(sra, chroms_to_analyze, placement)
 
 # These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
 for index, sra in enumerate(sra_list):
@@ -271,6 +271,7 @@ replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
 replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
 replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
 replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+
 
 
 
