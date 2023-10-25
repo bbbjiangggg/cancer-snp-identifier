@@ -1,4 +1,3 @@
-to_analyze = []
 #!/usr/bin/env python3
 
 import os
@@ -164,31 +163,8 @@ else:  # Specific Chromosomes
         else:
             print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
 
-# Iterating through each chromosome for analysis
-for chromosome in chroms_to_analyze:
-    if chromosome != 'whole_genome':
-        # Construct the paths for BWA and Bowtie files based on the chromosome
-        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
-    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
-
-    else:
-        to_analyze.append(sra)
-    sra_dir = f'{cwd}/{sra}'
-    vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
-    if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
-        print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
-
-# This asks the user to type in the number of SRA sequences to be analyzed
-num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
-
-# Set different variables for different sra sequences
-sra_list = to_analyze[:num_sra_seqs]
-
-# These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
-for index, sra in enumerate(sra_list):
+# Define a function to perform analysis for a single SRA accession and a list of chromosomes
+def analyze_sra_for_chromosomes(sra, chroms_to_analyze):
     for chromosome in chroms_to_analyze:
         if chromosome != 'whole_genome':
             # Construct the paths for BWA and Bowtie files based on the chromosome
@@ -198,7 +174,7 @@ for index, sra in enumerate(sra_list):
         print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
         print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
         
-        # Update paths and placeholders
+        # Update paths and placeholders in the script
         replace_in_untrimmed_bash_srr('number', placement[index])
         replace_in_untrimmed_bash_srr('SRR_one', sra)
         replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
@@ -207,9 +183,20 @@ for index, sra in enumerate(sra_list):
         # Run the commands on the untrimmed_bash_sra_v1.2.txt file
         subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
         
-        # Replace the changed names back to original
+        # Replace the changed names back to the original values
         replace_in_untrimmed_bash_srr(placement[index], 'number')
         replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+
+
+
+###########################################################################
+
+# Define the directory to search in
+search_dir = cwd
+
+# Get a list of all directories in the search directory
+all_dirs = next(os.walk(search_dir))[1]
+
 # Create an empty list to store directories that have the vcf file
 vcf_dirs = []
 
@@ -240,6 +227,23 @@ with open(accession, 'r') as file:
 to_analyze = []
 for sra in srr_list:
     # Check if a directory with the same SRA/ERR number exists and has a file ending with mapped.var.-final.vcf
+    sra_dir = f'{cwd}/{sra}'
+    vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
+    if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
+        print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
+    else:
+        to_analyze.append(sra)
+
+# Ask the user to type in the number of SRA sequences to be analyzed
+num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
+
+# Set different variables for different SRA sequences
+sra_list = to_analyze[:num_sra_seqs]
+
+# Iterate over each SRA accession and analyze it for the specified chromosomes
+for sra in sra_list:
+    analyze_sra_for_chromosomes(sra, chroms_to_analyze)
+
 
 
 ###############################################################################
@@ -262,11 +266,12 @@ for index, sra in enumerate(sra_list):
     replace_in_untrimmed_bash_srr(placement[index], 'number')
     replace_in_untrimmed_bash_srr(sra, 'SRR_one')
 
-# Reset the paths
+# Reset the paths in the script
 replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
 replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
 replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
 replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+
 
 
 #run the commands on the sendemail.txt file
