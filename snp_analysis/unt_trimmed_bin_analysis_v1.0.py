@@ -36,6 +36,9 @@ bash_script = f"""#!/bin/bash
 # Define the path of the potential trimmed file
 TRIMMED_FILE="SRR_one/SRR_one_trimmed.fq.gz"
 
+# Define chromosome name for file naming
+CHROMOSOME_NAME="{chromosome}"
+
 # Check if the trimmed file already exists
 if [ ! -f "$TRIMMED_FILE" ]; then
     echo -e "\n\033[1;35mDownloading number sequence SRR_one from SRA...\033[0m "
@@ -72,7 +75,11 @@ echo -e "\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m "
 bcftools mpileup -f bwa_chrom_path SRR_one/SRR_one_mapped.sorted.bam | bcftools call -mv -Ob -o SRR_one/SRR_one_mapped.raw.bcf
 
 echo -e "\n\033[1;35mFinalizing VCF...\033[0m "
-bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_chromosome_{chromosome}_mapped.var.-final.vcf
+if [ -z "$CHROMOSOME_NAME" ]; then
+    bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_mapped.var.-final.vcf
+else
+    bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_chromosome_${CHROMOSOME_NAME}_mapped.var.-final.vcf
+fi
 
 rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
 
@@ -161,7 +168,8 @@ else:  # Specific Chromosomes
         bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
 
         # Generate the bash script for this specific chromosome
-        bash_script_chrom = bash_script.replace("{chromosome}", chromosome)
+        bash_script_chrom = f""" # ... [rest of the bash script] """
+        bash_script_chrom = bash_script_chrom.replace("{chromosome}", chromosome)
         with open(f"untrimmed_bash_sra_v1.2_{chromosome}.txt", "w") as f:
             f.write(bash_script_chrom)
 
