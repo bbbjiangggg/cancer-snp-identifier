@@ -11,11 +11,11 @@ packages = ['os', 'shutil', 'subprocess', 'pathlib', 'signal']
 
 # Check if packages are installed, install them if necessary
 for package in packages:
-    try:
-        importlib.import_module(package)
-    except ImportError:
-        print(f'{package} is not installed. Installing...')
-        subprocess.run(['pip', 'install', package])
+try:
+importlib.import_module(package)
+except ImportError:
+print(f'{package} is not installed. Installing...')
+subprocess.run(['pip', 'install', package])
 
 # Define color codes
 RED = '\033[1;31m'
@@ -26,9 +26,9 @@ RESET = '\033[0m'
 
 def replace_file_on_interrupt(sig, frame):
     # Remove the untrimmed_bash_sra_v1.2.txt file
-    os.remove('untrimmed_bash_sra_v1.2.txt')
-    print('\nRemoving untrimmed_bash_sra_v1.2.txt...')
-    exit(1)
+os.remove('untrimmed_bash_sra_v1.2.txt')
+print('\nRemoving untrimmed_bash_sra_v1.2.txt...')
+exit(1)
 
 # Register the signal handler
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
@@ -42,26 +42,26 @@ TRIMMED_FILE="SRR_one/SRR_one_trimmed.fq.gz"
 
 # Check if the trimmed file already exists
 if [ ! -f "$TRIMMED_FILE" ]; then
-    echo -e "\n\033[1;35mDownloading number sequence SRR_one from SRA...\033[0m "
-    fastq-dump SRR_one
+echo -e "\n\033[1;35mDownloading number sequence SRR_one from SRA...\033[0m "
+fastq-dump SRR_one
 
-    if [ -d "SRR_one" ]; then
-      rm -r "SRR_one"
-    fi
+if [ -d "SRR_one" ]; then
+rm -r "SRR_one"
+fi
 
-    mkdir SRR_one
-    mv SRR_one.fastq SRR_one
+mkdir SRR_one
+mv SRR_one.fastq SRR_one
 
-    echo -e "\n\033[1;35mRunning fastqc on SRR_one...\033[0m "
-    fastqc SRR_one/SRR_one.fastq
+echo -e "\n\033[1;35mRunning fastqc on SRR_one...\033[0m "
+fastqc SRR_one/SRR_one.fastq
 
-    echo -e "\n\033[1;35mTrimming SRR_one...\033[0m "
-    java -jar trim_path SE SRR_one/SRR_one.fastq SRR_one/SRR_one_trimmed.fq.gz ILLUMINACLIP:truseq3_path:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35
+echo -e "\n\033[1;35mTrimming SRR_one...\033[0m "
+java -jar trim_path SE SRR_one/SRR_one.fastq SRR_one/SRR_one_trimmed.fq.gz ILLUMINACLIP:truseq3_path:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35
 
-    echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
-    fastqc SRR_one/SRR_one_trimmed.fq.gz
+echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
+fastqc SRR_one/SRR_one_trimmed.fq.gz
 else
-    echo -e "\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
+echo -e "\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
 fi
 
 echo -e "\n\033[1;35mMapping SRR_one reads using Bowtie2...\033[0m "
@@ -83,20 +83,20 @@ rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam S
 """
 
 with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
-    f.write(bash_script)
+f.write(bash_script)
 
 # THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 
 # Define functions to replace text in files
 def replace_text(file_path, old_text, new_text):
-    with open(file_path, 'r+') as file:
-        text = file.read().replace(old_text, new_text)
-        file.seek(0)
-        file.write(text)
-        file.truncate()
+with open(file_path, 'r+') as file:
+text = file.read().replace(old_text, new_text)
+file.seek(0)
+file.write(text)
+file.truncate()
 
 def replace_in_untrimmed_bash_srr(old_text, new_text):
-    replace_text('untrimmed_bash_sra_v1.2.txt', old_text, new_text)
+replace_text('untrimmed_bash_sra_v1.2.txt', old_text, new_text)
 
 
 # Get the current working directory
@@ -116,14 +116,14 @@ jar_path = os.path.expanduser(jar_file)
 
 
 if os.path.exists(jar_path):
-    trim_path = jar_path
-    replace_in_untrimmed_bash_srr('trim_path', trim_path)
-    print(f'{MAGENTA}3){RESET} {jar_path} is the absolute path.')
+trim_path = jar_path
+replace_in_untrimmed_bash_srr('trim_path', trim_path)
+print(f'{MAGENTA}3){RESET} {jar_path} is the absolute path.')
 else:
-    print(f'NOTE: {jar_path} does not match your absolute path.')
-    print('You have a different path for trimmomatic-0.39.jar')
-    trim_path = input(f'{MAGENTA}3){RESET} Copy and paste the absolute path to your trimmomatic-0.39.jar file: ')
-    replace_in_untrimmed_bash_srr('trim_path', trim_path)
+print(f'NOTE: {jar_path} does not match your absolute path.')
+print('You have a different path for trimmomatic-0.39.jar')
+trim_path = input(f'{MAGENTA}3){RESET} Copy and paste the absolute path to your trimmomatic-0.39.jar file: ')
+replace_in_untrimmed_bash_srr('trim_path', trim_path)
 
 
 
@@ -131,37 +131,37 @@ seq3_file = '/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa'
 seq3_path = os.path.expanduser(seq3_file)
 
 if os.path.exists(seq3_path):
-    truseq3_path = seq3_path
-    replace_in_untrimmed_bash_srr('truseq3_path', truseq3_path)
-    print(f'{MAGENTA}4){RESET} {seq3_path} is the absolute path.')
+truseq3_path = seq3_path
+replace_in_untrimmed_bash_srr('truseq3_path', truseq3_path)
+print(f'{MAGENTA}4){RESET} {seq3_path} is the absolute path.')
 else:
-    print(f'NOTE: {seq3_path} does not match your absolute path.')
-    print('You have a different path for TruSeq3-SE.fa')
-    truseq3_path = input(f'{MAGENTA}4){RESET} Copy and paste the absolute path to your TruSeq3-SE.fa file: ')
-    replace_in_untrimmed_bash_srr('truseq3_path', truseq3_path)
+print(f'NOTE: {seq3_path} does not match your absolute path.')
+print('You have a different path for TruSeq3-SE.fa')
+truseq3_path = input(f'{MAGENTA}4){RESET} Copy and paste the absolute path to your TruSeq3-SE.fa file: ')
+replace_in_untrimmed_bash_srr('truseq3_path', truseq3_path)
 
 # Ask the user if they want to analyze the whole genome or specific chromosomes
 analysis_scope = ""
 while analysis_scope not in ["1", "2"]:
-    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
-    if analysis_scope not in ["1", "2"]:
-        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
+analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
+if analysis_scope not in ["1", "2"]:
+print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
 
 # If Whole Genome
 if analysis_scope == "1":
-    bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-    bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-    chroms_to_analyze = ['whole_genome']
+bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
+chroms_to_analyze = ['whole_genome']
 else:  # Specific Chromosomes
-    valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
-    chroms_to_analyze = []
-    print(f"{MAGENTA}Enter the chromosome numbers separated by comma (e.g., 1,2,X,Y) to be analyzed:{RESET}")
-    input_chroms = input().split(',')
-    for chrom in input_chroms:
-        if chrom.strip() in valid_chromosomes:
-            chroms_to_analyze.append(chrom.strip())
-        else:
-            print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
+valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
+chroms_to_analyze = []
+print(f"{MAGENTA}Enter the chromosome numbers separated by comma (e.g., 1,2,X,Y) to be analyzed:{RESET}")
+input_chroms = input().split(',')
+for chrom in input_chroms:
+if chrom.strip() in valid_chromosomes:
+chroms_to_analyze.append(chrom.strip())
+else:
+print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
 
 # This asks the user to type in the path to the accession list
 print(f'{MAGENTA}Chromosomes to Analyze: {chroms_to_analyze}{RESET}')
@@ -169,20 +169,20 @@ accession = input(f'{MAGENTA}8){RESET} Copy and paste the name of the accession 
 
 # Read the accession list file
 with open(accession, 'r') as file:
-    srr_list = [line.strip() for line in file if line.strip()]
+srr_list = [line.strip() for line in file if line.strip()]
 
 # Create a new list of accession numbers to be analyzed
 to_analyze = []
 for sra in srr_list:
     # Check if a directory with the same SRA/ERR number exists and has a file ending with mapped.var.-final.vcf
-    print(f'{MAGENTA}Current SRA Sequence: {sra}{RESET}')
+print(f'{MAGENTA}Current SRA Sequence: {sra}{RESET}')
 print(f'{MAGENTA}Current Chromosome: {chromosome}{RESET}')
-    sra_dir = f'{cwd}/{sra}'
-    vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
-    if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
-        print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
-    else:
-        to_analyze.append(sra)
+sra_dir = f'{cwd}/{sra}'
+vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
+if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
+print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
+else:
+to_analyze.append(sra)
 
 # This asks the user to type in the number of SRA sequences to be analyzed
 num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
@@ -190,17 +190,17 @@ num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish 
 # Set different variables for different sra sequences
 sra_list = to_analyze[:num_sra_seqs]
 # Iterating through each chromosome for analysis
-        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
-    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
+print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
+print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
 
     # Add the path to where bowtie files are found (must end in 'bowtie')
-    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
 
     # Add the path to where reference chromosome is found
-    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
 
 ###########################################################################
@@ -217,15 +217,15 @@ vcf_dirs = []
 # Loop over each directory
 for d in all_dirs:
     # Define the path to the vcf file in the directory
-    vcf_file = os.path.join(search_dir, d, f'{d}_mapped.var.-final.vcf')
-    if os.path.exists(vcf_file):
+vcf_file = os.path.join(search_dir, d, f'{d}_mapped.var.-final.vcf')
+if os.path.exists(vcf_file):
         # Check if the vcf file is empty (0 bytes)
-        if os.path.getsize(vcf_file) == 0:
+if os.path.getsize(vcf_file) == 0:
             # Delete the empty vcf file
-            os.remove(vcf_file)
-            print(f"Deleted empty file: {vcf_file}")
-        else:
-            vcf_dirs.append(d)
+os.remove(vcf_file)
+print(f"Deleted empty file: {vcf_file}")
+else:
+vcf_dirs.append(d)
 
 
 
@@ -244,14 +244,14 @@ placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 
 # These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
 for index, sra in enumerate(sra_list):
-    replace_in_untrimmed_bash_srr('number', placement[index])
-    replace_in_untrimmed_bash_srr('SRR_one', sra)
+replace_in_untrimmed_bash_srr('number', placement[index])
+replace_in_untrimmed_bash_srr('SRR_one', sra)
     # Run the commands on the untrimmed_bash_sra_v1.2.txt file
-    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
+subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
 
     # Replace the changed names back to original
-    replace_in_untrimmed_bash_srr(placement[index], 'number')
-    replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+replace_in_untrimmed_bash_srr(placement[index], 'number')
+replace_in_untrimmed_bash_srr(sra, 'SRR_one')
 
 # Reset the paths
 replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
@@ -267,24 +267,24 @@ os.system('sendemail -f sudoroot1775@outlook.com -t ' + user + ' -u ' + job_titl
 
 def run_analysis():
     #Runs untrimmed_analysis_tools.py and prompts user to continue or exit.
-    print(f'{MAGENTA}untrimmed_analysis_tools is ready to run.{RESET} \n')
-    while True:
-        print(f'{MAGENTA}Would you like to run another analysis? {RESET}')
-        choice = input('Enter yes/no to continue: ')
-        if choice.lower() == 'yes':
-            print(f'{MAGENTA} 1) {RESET} Email address used: ', user)
-            print(f'{MAGENTA} 2) {RESET} trimmomatic-0.39.jar file path: ', trim_path)
-            print(f'{MAGENTA} 3) {RESET} TruSeq3 file path: ', truseq3_path)
-            print(f'{MAGENTA} 4) {RESET} Bowtie file path: ', bowtie_index_path)
-            print(f'{MAGENTA} 5) {RESET} BWA reference chromosome path: ', bwa_chrom_path)
-            print(f'{MAGENTA} 6) {RESET} Accession list file name: ', accession)
-            os.system('python3 /usr/local/bin/untrimmed_bin_analysis.py')
+print(f'{MAGENTA}untrimmed_analysis_tools is ready to run.{RESET} \n')
+while True:
+print(f'{MAGENTA}Would you like to run another analysis? {RESET}')
+choice = input('Enter yes/no to continue: ')
+if choice.lower() == 'yes':
+print(f'{MAGENTA} 1) {RESET} Email address used: ', user)
+print(f'{MAGENTA} 2) {RESET} trimmomatic-0.39.jar file path: ', trim_path)
+print(f'{MAGENTA} 3) {RESET} TruSeq3 file path: ', truseq3_path)
+print(f'{MAGENTA} 4) {RESET} Bowtie file path: ', bowtie_index_path)
+print(f'{MAGENTA} 5) {RESET} BWA reference chromosome path: ', bwa_chrom_path)
+print(f'{MAGENTA} 6) {RESET} Accession list file name: ', accession)
+os.system('python3 /usr/local/bin/untrimmed_bin_analysis.py')
 
-        elif choice.lower() == 'no':
-            print(f'{MAGENTA} Analysis terminated. Goodbye. {RESET}')
-            break
-        else:
-            print(f'{MAGENTA} Enter either yes or no.{RESET} ')
+elif choice.lower() == 'no':
+print(f'{MAGENTA} Analysis terminated. Goodbye. {RESET}')
+break
+else:
+print(f'{MAGENTA} Enter either yes or no.{RESET} ')
 
 os.remove('untrimmed_bash_sra_v1.2.txt')
 
