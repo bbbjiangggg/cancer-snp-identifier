@@ -253,18 +253,25 @@ placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 
 # Iterate over each SRA accession and analyze it for the specified chromosomes
 for sra in sra_list:
+    # Check if there are enough elements in the placement list for the current SRA
+    if len(placement) < len(chroms_to_analyze):
+        print(f"{RED}Not enough placement numbers for SRA: {sra}. Please adjust the number of sequences to analyze or add more placement numbers.{RESET}")
+        break
+    
     analyze_sra_for_chromosomes(sra, chroms_to_analyze, placement)
 
-# These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
-for index, sra in enumerate(sra_list):
-    replace_in_untrimmed_bash_srr('number', placement[index])
-    replace_in_untrimmed_bash_srr('SRR_one', sra)
-    # Run the commands on the untrimmed_bash_sra_v1.2.txt file
-    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
+    # These commands will replace each SRA number on .txt file with each of the accession numbers entered by the user
+    for index, sra in enumerate(sra_list):
+        if index < len(placement):
+            replace_in_untrimmed_bash_srr('number', placement[index])
+            replace_in_untrimmed_bash_srr('SRR_one', sra)
+            # Run the commands on the untrimmed_bash_sra_v1.2.txt file
+            subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
 
-    # Replace the changed names back to original
-    replace_in_untrimmed_bash_srr(placement[index], 'number')
-    replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+            # Replace the changed names back to the original
+            replace_in_untrimmed_bash_srr(placement[index], 'number')
+            replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+
 
 # Reset the paths in the script
 replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
