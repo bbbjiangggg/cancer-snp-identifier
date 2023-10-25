@@ -163,29 +163,95 @@ else:  # Specific Chromosomes
         else:
             print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
 
+# This asks the user to type in the path to the accession list
+accession = input(f'{MAGENTA}8){RESET} Copy and paste the name of the accession list file: ')
+
+# Read the accession list file
+with open(accession, 'r') as file:
+    srr_list = [line.strip() for line in file if line.strip()]
+
+# Create a new list of accession numbers to be analyzed
+to_analyze = []
+for sra in srr_list:
+    # Check if a directory with the same SRA/ERR number exists and has a file ending with mapped.var.-final.vcf
+    sra_dir = f'{cwd}/{sra}'
+    vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
+    if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
+        print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
+    else:
+        to_analyze.append(sra)
+
+# This asks the user to type in the number of SRA sequences to be analyzed
+num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
+
+# Set different variables for different sra sequences
+sra_list = to_analyze[:num_sra_seqs]
+# Iterating through each chromosome for analysis
+for chromosome in chroms_to_analyze:
+    if chromosome != 'whole_genome':
+        # Construct the paths for BWA and Bowtie files based on the chromosome
+        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
+    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
+    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+
+    # Add the path to where bowtie files are found (must end in 'bowtie')
+    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+
+    # Add the path to where reference chromosome is found
+    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+
+
+###########################################################################
+
+# Define the directory to search in
+search_dir = cwd
+
+# Get a list of all directories in the search directory
+all_dirs = next(os.walk(search_dir))[1]
+
+# Create an empty list to store directories that have the vcf file
+vcf_dirs = []
+
+# Loop over each directory
+for d in all_dirs:
+    # Define the path to the vcf file in the directory
+    vcf_file = os.path.join(search_dir, d, f'{d}_mapped.var.-final.vcf')
+    if os.path.exists(vcf_file):
+        # Check if the vcf file is empty (0 bytes)
+        if os.path.getsize(vcf_file) == 0:
+            # Delete the empty vcf file
+            os.remove(vcf_file)
+            print(f"Deleted empty file: {vcf_file}")
+        else:
+            vcf_dirs.append(d)
+
+
+
+
+
+
+
+###############################################################################
+
+
+# This will store placement numbers into a list
+ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
+placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
+
+
+
 # These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
 for index, sra in enumerate(sra_list):
-    for chromosome in chroms_to_analyze:
-        if chromosome != 'whole_genome':
-            # Construct the paths for BWA and Bowtie files based on the chromosome
-            bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-            bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-        print(f"{MAGENTA}Analyzing Chromosome: {chromosome} for SRA: {sra}{RESET}")
-        print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-        print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
-        
-        # Update paths and placeholders
-        replace_in_untrimmed_bash_srr('number', placement[index])
-        replace_in_untrimmed_bash_srr('SRR_one', sra)
-        replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
-        replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
-        
-        # Run the commands on the untrimmed_bash_sra_v1.2.txt file
-        subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
-        
-        # Replace the changed names back to original
-        replace_in_untrimmed_bash_srr(placement[index], 'number')
-        replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+    replace_in_untrimmed_bash_srr('number', placement[index])
+    replace_in_untrimmed_bash_srr('SRR_one', sra)
+    # Run the commands on the untrimmed_bash_sra_v1.2.txt file
+    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
+
+    # Replace the changed names back to original
+    replace_in_untrimmed_bash_srr(placement[index], 'number')
+    replace_in_untrimmed_bash_srr(sra, 'SRR_one')
 
 # Reset the paths
 replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
