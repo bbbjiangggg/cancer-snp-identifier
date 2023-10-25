@@ -173,12 +173,12 @@ for chromosome in chroms_to_analyze:
     print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
     print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
 
+    else:
+        to_analyze.append(sra)
     sra_dir = f'{cwd}/{sra}'
     vcf_file = f'{sra_dir}/{sra}_mapped.var.-final.vcf'
     if os.path.exists(sra_dir) and os.path.isfile(vcf_file):
         print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
-    else:
-        to_analyze.append(sra)
 
 # This asks the user to type in the number of SRA sequences to be analyzed
 num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
@@ -245,7 +245,7 @@ for sra in srr_list:
 
 
 # This will store placement numbers into a list
-    ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
+ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
 placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 
 
