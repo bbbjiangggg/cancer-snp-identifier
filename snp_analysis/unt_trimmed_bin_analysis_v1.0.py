@@ -6,11 +6,16 @@ import subprocess
 from pathlib import Path
 import signal
 import importlib
-import logging
 
-# Initialize logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+packages = ['os', 'shutil', 'subprocess', 'pathlib', 'signal']
+
+# Check if packages are installed, install them if necessary
+for package in packages:
+    try:
+        importlib.import_module(package)
+    except ImportError:
+        print(f'{package} is not installed. Installing...')
+        subprocess.run(['pip', 'install', package])
 
 # Define color codes
 RED = '\033[1;31m'
@@ -20,24 +25,20 @@ BLUE = '\033[1;34m'
 RESET = '\033[0m'
 
 def replace_file_on_interrupt(sig, frame):
-    file_to_remove = 'untrimmed_bash_sra_v1.2.txt'
-    if os.path.exists(file_to_remove):
-        os.remove(file_to_remove)
-        logger.info(f"Removed {file_to_remove} due to interrupt.")
+    # Remove the untrimmed_bash_sra_v1.2.txt file
+    os.remove('untrimmed_bash_sra_v1.2.txt')
+    print('\nRemoving untrimmed_bash_sra_v1.2.txt...')
     exit(1)
 
-# Register the signal handlers
+# Register the signal handler
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
-signal.signal(signal.SIGTERM, replace_file_on_interrupt)
 
 # THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
+
 bash_script = f"""#!/bin/bash
 
 # Define the path of the potential trimmed file
 TRIMMED_FILE="SRR_one/SRR_one_trimmed.fq.gz"
-
-# Define chromosome name for file naming
-CHROMOSOME_NAME="{chromosome}"
 
 # Check if the trimmed file already exists
 if [ ! -f "$TRIMMED_FILE" ]; then
@@ -75,11 +76,7 @@ echo -e "\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m "
 bcftools mpileup -f bwa_chrom_path SRR_one/SRR_one_mapped.sorted.bam | bcftools call -mv -Ob -o SRR_one/SRR_one_mapped.raw.bcf
 
 echo -e "\n\033[1;35mFinalizing VCF...\033[0m "
-if [ -z "$CHROMOSOME_NAME" ]; then
-    bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_mapped.var.-final.vcf
-else
-    bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_chromosome_${CHROMOSOME_NAME}_mapped.var.-final.vcf
-fi
+bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_mapped.var.-final.vcf
 
 rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
 
@@ -143,48 +140,41 @@ else:
     truseq3_path = input(f'{MAGENTA}4){RESET} Copy and paste the absolute path to your TruSeq3-SE.fa file: ')
     replace_in_untrimmed_bash_srr('truseq3_path', truseq3_path)
 
-# Ask the user if they want to analyze the whole genome or specific chromosomes
+# Ask the user if they want to analyze the whole genome or a specific chromosome
 analysis_scope = ""
 while analysis_scope not in ["1", "2"]:
-    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
+    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or a specific chromosome?\n1) Whole Genome\n2) Specific Chromosome\nEnter the number corresponding to your choice: {RESET}")
     if analysis_scope not in ["1", "2"]:
-        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
+        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosome.{RESET}")
 
+# Based on the choice, set the paths
 if analysis_scope == "1":  # Whole Genome
     # Modify the BWA path to the specified pattern
     bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
     bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-else:  # Specific Chromosomes
+else:  # Specific Chromosome
     valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
-    chromosomes = input(f"{MAGENTA}Enter the chromosomes (e.g., 1,2,3,...,X,Y) separated by commas to be analyzed: {RESET}").split(',')
-    for chromosome in chromosomes:
-        chromosome = chromosome.strip()
+    chromosome = ""
+    while chromosome not in valid_chromosomes:
+        chromosome = input(f"{MAGENTA}Enter the chromosome number (e.g., 1, 2, ... 22, X, Y) to be analyzed: {RESET}")
         if chromosome not in valid_chromosomes:
-            print(f"{RED}Invalid chromosome number or name: {chromosome}. Skipping it.{RESET}")
-            continue
+            print(f"{RED}Invalid chromosome number or name. Please enter a valid chromosome.{RESET}")
 
-        # Construct the paths for BWA and Bowtie files based on the chromosome
-        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+    # Construct the paths for BWA and Bowtie files based on the chromosome
+    bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+    bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
 
-        # Generate the bash script for this specific chromosome
-        bash_script_chrom = f""" # ... [rest of the bash script] """
-        bash_script_chrom = bash_script_chrom.replace("{chromosome}", chromosome)
-        with open(f"untrimmed_bash_sra_v1.2_{chromosome}.txt", "w") as f:
-            f.write(bash_script_chrom)
-
-        # Replace the bwa_chrom_path and bowtie_index_path in the bash script
-        replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
-        replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
-
-        # Run the bash script for this specific chromosome
-        subprocess.run(['bash', str(cwd) + f'/untrimmed_bash_sra_v1.2_{chromosome}.txt'])
-
-        # Delete the bash script for this chromosome after execution
-        os.remove(f'untrimmed_bash_sra_v1.2_{chromosome}.txt')
+# Print the paths
+print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
+print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
 
 
 
+# Add the path to where bowtie files are found (must end in 'bowtie')
+replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+
+# Add the path to where reference chromosome is found
+replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
 
 ###########################################################################
