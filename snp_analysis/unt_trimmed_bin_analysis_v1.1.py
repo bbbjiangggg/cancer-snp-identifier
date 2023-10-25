@@ -245,7 +245,7 @@ for sra in srr_list:
 
 
 # This will store placement numbers into a list
-ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
+    ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
 placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 
 
