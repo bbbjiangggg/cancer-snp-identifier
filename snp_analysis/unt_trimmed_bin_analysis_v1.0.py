@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import shutil
 import subprocess
 from pathlib import Path
 import signal
@@ -32,6 +33,7 @@ def replace_file_on_interrupt(sig, frame):
 # Register the signal handler
 signal.signal(signal.SIGINT, replace_file_on_interrupt)
 
+# THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 
 bash_script = f"""#!/bin/bash
 
@@ -59,7 +61,7 @@ if [ ! -f "$TRIMMED_FILE" ]; then
     echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
     fastqc SRR_one/SRR_one_trimmed.fq.gz
 else
-    echo -e "\n\033[1;35mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
+    echo -e "\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
 fi
 
 echo -e "\n\033[1;35mMapping SRR_one reads using Bowtie2...\033[0m "
@@ -76,61 +78,25 @@ bcftools mpileup -f bwa_chrom_path SRR_one/SRR_one_mapped.sorted.bam | bcftools 
 echo -e "\n\033[1;35mFinalizing VCF...\033[0m "
 bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_mapped.var.-final.vcf
 
-rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
+rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
 
 """
 
 with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
     f.write(bash_script)
 
+# THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 
-# Store a copy of the original bash script to restore before each iteration
-original_bash_script = bash_script
-
-# Ask the user if they want to analyze the whole genome or specific chromosomes
-'''analysis_scope = ""
-while analysis_scope not in ["1", "2"]:
-    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
-    if analysis_scope not in ["1", "2"]:
-        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
-
-# If Whole Genome
-if analysis_scope == "1":
-    chroms_to_analyze = ['whole_genome']
-else:  # Specific Chromosomes
-    valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
-    chroms_to_analyze = []
-    print(f"{MAGENTA}Enter the chromosome numbers separated by comma (e.g., 1,2,X,Y) to be analyzed:{RESET}")
-    input_chroms = input().split(',')
-    for chrom in input_chroms:
-        if chrom.strip() in valid_chromosomes:
-            chroms_to_analyze.append(chrom.strip())
-        else:
-            print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
-
-# Iterating through each chromosome for analysis
-for chromosome in chroms_to_analyze:
-    # Restore the bash script to its original state
-    with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
-        f.write(original_bash_script)
-    
-    if chromosome != 'whole_genome':
-        # Construct the paths for BWA and Bowtie files based on the chromosome
-        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
-    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")'''
-
-def replace_in_untrimmed_bash_srr(old_text, new_text):
-    with open('untrimmed_bash_sra_v1.2.txt', 'r+') as file:
+# Define functions to replace text in files
+def replace_text(file_path, old_text, new_text):
+    with open(file_path, 'r+') as file:
         text = file.read().replace(old_text, new_text)
         file.seek(0)
         file.write(text)
         file.truncate()
 
-
-
+def replace_in_untrimmed_bash_srr(old_text, new_text):
+    replace_text('untrimmed_bash_sra_v1.2.txt', old_text, new_text)
 
 
 # Get the current working directory
@@ -186,36 +152,28 @@ if analysis_scope == "1":  # Whole Genome
     # Modify the BWA path to the specified pattern
     bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
     bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-    chromosomes_to_analyze = ['whole_genome']
 else:  # Specific Chromosome
     valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
-    chromosomes_to_analyze = input(f"{MAGENTA}Enter the chromosome numbers (e.g., 1, 2, ... 22, X, Y) separated by commas to be analyzed: {RESET}").split(',')
-    chromosomes_to_analyze = [ch.strip() for ch in chromosomes_to_analyze if ch.strip() in valid_chromosomes]
+    chromosome = ""
+    while chromosome not in valid_chromosomes:
+        chromosome = input(f"{MAGENTA}Enter the chromosome number (e.g., 1, 2, ... 22, X, Y) to be analyzed: {RESET}")
+        if chromosome not in valid_chromosomes:
+            print(f"{RED}Invalid chromosome number or name. Please enter a valid chromosome.{RESET}")
 
+    # Construct the paths for BWA and Bowtie files based on the chromosome
+    bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+    bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
 
-# Loop through the chromosomes to analyze
-for chromosome in chromosomes_to_analyze:
-
-    # Set the paths based on the chromosome
-    if chromosome != 'whole_genome':
-        # Construct the paths for BWA and Bowtie files based on the chromosome
-        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-    else:
-        bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-        bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-
-    # Print the paths
-    print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-    print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
+# Print the paths
+print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
+print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
 
 
 
-
-# Replace bowtie_index_path
+# Add the path to where bowtie files are found (must end in 'bowtie')
 replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
 
-# Replace bwa_chrom_path
+# Add the path to where reference chromosome is found
 replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
 
@@ -285,11 +243,6 @@ placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 for index, sra in enumerate(sra_list):
     replace_in_untrimmed_bash_srr('number', placement[index])
     replace_in_untrimmed_bash_srr('SRR_one', sra)
-
-    # Add chromosome number to the filename
-    if chromosome != 'whole_genome':
-        replace_in_untrimmed_bash_srr(f'{sra}_mapped.var.-final.vcf', f'{chromosome}_{sra}_mapped.var.-final.vcf')
-
     # Run the commands on the untrimmed_bash_sra_v1.2.txt file
     subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
 
@@ -297,17 +250,11 @@ for index, sra in enumerate(sra_list):
     replace_in_untrimmed_bash_srr(placement[index], 'number')
     replace_in_untrimmed_bash_srr(sra, 'SRR_one')
 
-    # Reset filename after the analysis for that chromosome is done
-    if chromosome != 'whole_genome':
-        replace_in_untrimmed_bash_srr(f'{chromosome}_{sra}_mapped.var.-final.vcf', f'{sra}_mapped.var.-final.vcf')
-
- # Reset the paths for the next chromosome
-    replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
-    replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
-    replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
-    replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
-
-
+# Reset the paths
+replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
+replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
+replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
+replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
 
 
 #run the commands on the sendemail.txt file
