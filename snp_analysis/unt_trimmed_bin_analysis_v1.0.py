@@ -241,30 +241,30 @@ placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 
 
 # These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
-    for index, sra in enumerate(sra_list):
-        replace_in_untrimmed_bash_srr('number', placement[index])
-        replace_in_untrimmed_bash_srr('SRR_one', sra)
+for index, sra in enumerate(sra_list):
+    replace_in_untrimmed_bash_srr('number', placement[index])
+    replace_in_untrimmed_bash_srr('SRR_one', sra)
 
-        # Add chromosome number to the filename
-        if chromosome != 'whole_genome':
-            replace_in_untrimmed_bash_srr(f'{sra}_mapped.var.-final.vcf', f'{chromosome}_{sra}_mapped.var.-final.vcf')
+    # Add chromosome number to the filename
+    if chromosome != 'whole_genome':
+        replace_in_untrimmed_bash_srr(f'{sra}_mapped.var.-final.vcf', f'{chromosome}_{sra}_mapped.var.-final.vcf')
 
-        # Run the commands on the untrimmed_bash_sra_v1.2.txt file
-        subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
+    # Run the commands on the untrimmed_bash_sra_v1.2.txt file
+    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
 
-        # Replace the changed names back to original
-        replace_in_untrimmed_bash_srr(placement[index], 'number')
-        replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+    # Replace the changed names back to original
+    replace_in_untrimmed_bash_srr(placement[index], 'number')
+    replace_in_untrimmed_bash_srr(sra, 'SRR_one')
 
-        # Reset filename after the analysis for that chromosome is done
-        if chromosome != 'whole_genome':
-            replace_in_untrimmed_bash_srr(f'{chromosome}_{sra}_mapped.var.-final.vcf', f'{sra}_mapped.var.-final.vcf')
+    # Reset filename after the analysis for that chromosome is done
+    if chromosome != 'whole_genome':
+        replace_in_untrimmed_bash_srr(f'{chromosome}_{sra}_mapped.var.-final.vcf', f'{sra}_mapped.var.-final.vcf')
 
-    # Reset the paths for the next chromosome
-    replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
-    replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
-    replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
-    replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+# Reset the paths for the next chromosome
+replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
+replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
+replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
+replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
 
 
 
