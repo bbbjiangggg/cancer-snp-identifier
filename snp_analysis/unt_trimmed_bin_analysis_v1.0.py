@@ -60,7 +60,7 @@ if [ ! -f "$TRIMMED_FILE" ]; then
     echo -e "\n\033[1;35mRunning fastqc on trimmed SRR_one...\033[0m "
     fastqc SRR_one/SRR_one_trimmed.fq.gz
 else
-    echo -e "\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
+    echo -e "\n\033[1;35mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m"
 fi
 
 echo -e "\n\033[1;35mMapping SRR_one reads using Bowtie2...\033[0m "
