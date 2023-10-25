@@ -216,10 +216,10 @@ for chromosome in chromosomes_to_analyze:
 
 
 
-# Add the path to where bowtie files are found (must end in 'bowtie')
+# Replace bowtie_index_path
 replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
 
-# Add the path to where reference chromosome is found
+# Replace bwa_chrom_path
 replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
 
 
