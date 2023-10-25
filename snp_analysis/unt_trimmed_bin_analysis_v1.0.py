@@ -99,6 +99,9 @@ def replace_in_untrimmed_bash_srr(old_text, new_text):
     replace_text('untrimmed_bash_sra_v1.2.txt', old_text, new_text)
 
 
+
+chromosomes = input(f'{MAGENTA}0){RESET} Enter a comma-separated list of chromosome names/identifiers (e.g., SRR_one, SRR_two): ').split(',')
+
 # Get the current working directory
 cwd = Path.cwd()
 print('\n')
@@ -255,6 +258,17 @@ replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
 replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
 replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
 replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+
+
+
+for chrom in chromosomes:
+    # Update the Bash script with the current chromosome name
+    bash_script_temp = bash_script.replace('SRR_one', chrom.strip())
+    with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
+        f.write(bash_script_temp)
+    
+    # Execute the Bash script for that chromosome
+    os.system('bash untrimmed_bash_sra_v1.2.txt')
 
 
 #run the commands on the sendemail.txt file
