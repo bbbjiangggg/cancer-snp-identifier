@@ -35,7 +35,13 @@ signal.signal(signal.SIGINT, replace_file_on_interrupt)
 
 # THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 
-bash_script = f"""#!/bin/bash
+bash_script_template = """#!/bin/bash
+
+CHROMOSOME="{chromosome}"
+
+# Define the path of the potential trimmed file
+TRIMMED_FILE="SRR_one/SRR_one_trimmed_${{CHROMOSOME}}.fq.gz"
+
 
 # Define the path of the potential trimmed file
 TRIMMED_FILE="SRR_one/SRR_one_trimmed.fq.gz"
@@ -83,7 +89,7 @@ rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam S
 """
 
 with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
-    f.write(bash_script)
+    f.write(bash_script_template)
 
 # THIS PROGRAM IS FOR UNTRIMMED WHOLE ANALYSIS
 
@@ -141,52 +147,54 @@ else:
     replace_in_untrimmed_bash_srr('truseq3_path', truseq3_path)
 
 # Ask the user if they want to analyze the whole genome or specific chromosomes
-analysis_scope = ""
-while analysis_scope not in ["1", "2"]:
-    analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
-    if analysis_scope not in ["1", "2"]:
-        print(f"{RED}Invalid choice. Please enter 1 for Whole Genome or 2 for Specific Chromosomes.{RESET}")
-
-# If Whole Genome
+analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
 if analysis_scope == "1":
-    bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-    bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-    chroms_to_analyze = ['whole_genome']
-else:  # Specific Chromosomes
-    valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y"]
-    chroms_to_analyze = []
-    print(f"{MAGENTA}Enter the chromosome numbers separated by comma (e.g., 1,2,X,Y) to be analyzed:{RESET}")
-    input_chroms = input().split(',')
-    for chrom in input_chroms:
-        if chrom.strip() in valid_chromosomes:
-            chroms_to_analyze.append(chrom.strip())
-        else:
-            print(f"{RED}Invalid chromosome: {chrom}. Skipping.{RESET}")
+    chromosomes = ["Whole_Genome"]
+else:
+    chromosomes_input = input(f"{MAGENTA}Enter the chromosomes to be analyzed, separated by commas (e.g., 1,2,X,Y): {RESET}")
+    chromosomes = [chrom.strip() for chrom in chromosomes_input.split(",") if chrom.strip()]
 
-# Define a function to perform analysis for a single SRA accession and a list of chromosomes
-def analyze_sra_for_chromosomes(sra, chroms_to_analyze, placement):
-    for index, chromosome in enumerate(chroms_to_analyze):
-        if chromosome != 'whole_genome':
-            # Construct the paths for BWA and Bowtie files based on the chromosome
-            bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-            bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-        print(f"{MAGENTA}Analyzing Chromosome: {chromosome} for SRA: {sra}{RESET}")
-        print(f"{MAGENTA}Bowtie Index Path: {RESET}{bowtie_index_path}")
-        print(f"{MAGENTA}BWA Chromosome Path: {RESET}{bwa_chrom_path}")
-        
-        # Update paths and placeholders in the script
-        replace_in_untrimmed_bash_srr('number', placement[index])
-        replace_in_untrimmed_bash_srr('SRR_one', sra)
-        replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
-        replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
-        
-        # Run the commands on the untrimmed_bash_sra_v1.2.txt file
-        subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
-        
-        # Replace the changed names back to the original values
-        replace_in_untrimmed_bash_srr(placement[index], 'number')
-        replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+# Ensure that the chromosome names or numbers are valid
+valid_chromosomes = list(map(str, range(1, 23))) + ["X", "Y", "Whole_Genome"]
+for chrom in chromosomes:
+    if chrom not in valid_chromosomes:
+        print(f"{RED}Invalid chromosome: {chrom}. Please enter valid chromosome names or numbers.{RESET}")
+        exit(1)
 
+# Print the chromosomes selected for analysis
+print(f"{GREEN}Selected chromosomes for analysis: {', '.join(chromosomes)}{RESET}")
+
+# Loop over the selected chromosomes for analysis
+for chromosome in chromosomes:
+    print(f"{GREEN}Starting analysis for chromosome: {chromosome}{RESET}")
+    
+    # Set chromosome-specific paths
+    if chromosome == "Whole_Genome":
+        bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+        bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
+    else:
+        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+    
+    # Update the bash script with chromosome-specific paths
+    bash_script = bash_script_template.format(chromosome=chromosome)
+    with open("untrimmed_bash_sra_v1.2.sh", "w") as f:
+        f.write(bash_script)
+    
+    # Update paths in the bash script file
+    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+
+    # Run the bash script for the current chromosome
+    subprocess.run(['bash', 'untrimmed_bash_sra_v1.2.sh'])
+
+    # (Perform any other chromosome-specific analysis steps here)
+
+    # Reset the paths in the bash script file for the next iteration
+    replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
+    replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+    
+    print(f"{GREEN}Analysis completed for chromosome: {chromosome}{RESET}\n")
 
 
 ###########################################################################
@@ -234,13 +242,11 @@ for sra in srr_list:
     else:
         to_analyze.append(sra)
 
-# Ask the user to type in the number of SRA sequences to be analyzed
+# This asks the user to type in the number of SRA sequences to be analyzed
 num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
 
-# Set different variables for different SRA sequences
+# Set different variables for different sra sequences
 sra_list = to_analyze[:num_sra_seqs]
-
-
 
 
 
@@ -251,35 +257,24 @@ sra_list = to_analyze[:num_sra_seqs]
 ordinal = lambda n: f"{n}{['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][n % 10 if n % 10 <= 3 and n % 100 not in (11, 12, 13) else 0]}"
 placement = [ordinal(n) for n in range(1, num_sra_seqs + 1)]
 
-# Iterate over each SRA accession and analyze it for the specified chromosomes
-for sra in sra_list:
-    # Check if there are enough elements in the placement list for the current SRA
-    if len(placement) < len(chroms_to_analyze):
-        print(f"{RED}Not enough placement numbers for SRA: {sra}. Please adjust the number of sequences to analyze or add more placement numbers.{RESET}")
-        break
-    
-    analyze_sra_for_chromosomes(sra, chroms_to_analyze, placement)
-
-    # These commands will replace each SRA number on .txt file with each of the accession numbers entered by the user
-    for index, sra in enumerate(sra_list):
-        if index < len(placement):
-            replace_in_untrimmed_bash_srr('number', placement[index])
-            replace_in_untrimmed_bash_srr('SRR_one', sra)
-            # Run the commands on the untrimmed_bash_sra_v1.2.txt file
-            subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
-
-            # Replace the changed names back to the original
-            replace_in_untrimmed_bash_srr(placement[index], 'number')
-            replace_in_untrimmed_bash_srr(sra, 'SRR_one')
 
 
-# Reset the paths in the script
+# These commands will replace each SRA number on .txt file with each of the accession numbers entered by user
+for index, sra in enumerate(sra_list):
+    replace_in_untrimmed_bash_srr('number', placement[index])
+    replace_in_untrimmed_bash_srr('SRR_one', sra)
+    # Run the commands on the untrimmed_bash_sra_v1.2.txt file
+    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
+
+    # Replace the changed names back to original
+    replace_in_untrimmed_bash_srr(placement[index], 'number')
+    replace_in_untrimmed_bash_srr(sra, 'SRR_one')
+
+# Reset the paths
 replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
 replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
 replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
 replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
-
-
 
 
 #run the commands on the sendemail.txt file
