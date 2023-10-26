@@ -62,19 +62,23 @@ def main():
     else:
         print("\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m")
 
-    print(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2...\033[0m ")
-    run_command(f"bowtie2 --very-fast-local -x bowtie_index_path {trimmed_file} -S {accession_number}/{accession_number}_mapped.sam")
+    for chromosome in chromosomes_list:
+        bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+        bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+        
+        print(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ")
+        run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
 
-    run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped.sam > {accession_number}/{accession_number}_mapped.bam")
+        run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
-    print("\n\033[1;35mSorting using Samtools...\033[0m ")
-    run_command(f"samtools sort {accession_number}/{accession_number}_mapped.bam > {accession_number}/{accession_number}_mapped.sorted.bam")
+        print("\n\033[1;35mSorting using Samtools...\033[0m ")
+        run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam > {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam")
 
-    print("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ")
-    run_command(f"bcftools mpileup -f bwa_chrom_path {accession_number}/{accession_number}_mapped.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped.raw.bcf")
+        print("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ")
+        run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
 
-    print("\n\033[1;35mFinalizing VCF...\033[0m ")
-    run_command(f"bcftools view {accession_number}/{accession_number}_mapped.raw.bcf | vcfutils.pl varFilter - > {accession_number}/{accession_number}_mapped.var.-final.vcf")
+        print("\n\033[1;35mFinalizing VCF...\033[0m ")
+        run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf")
 
 if __name__ == "__main__":
     main()
