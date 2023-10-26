@@ -1,7 +1,6 @@
 import os
 import subprocess
 import sys
-import glob
 
 def run_command(command):
     try:
@@ -11,9 +10,13 @@ def run_command(command):
         sys.exit(1)
 
 def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path):
+    # Print the paths for each chromosome
     for chromosome in chromosomes_list:
+        # Construct the paths
         bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
         bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+    
+        # Print the paths
         print(f"\nPaths for chromosome {chromosome}:")
         print("BWA Chromosome Path:", bwa_chrom_path)
         print("Bowtie Index Path:", bowtie_index_path)
@@ -30,20 +33,14 @@ def read_accession_numbers(file_path):
         print(f"An error occurred while reading the file: {e}")
         sys.exit(1)
 
-def check_previous_runs(accession_number, chromosomes_list):
-    for chromosome in chromosomes_list:
-        vcf_file_pattern = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-        if glob.glob(vcf_file_pattern):
-            print(f"VCF file for {accession_number} chromosome {chromosome} already exists. Skipping...")
-            return True
-    return False
-
 def main():
+    # Define the base paths
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
     trimmomatic_path = "/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar"
     truseq3_path = "/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa"
 
+    # Prompt the user to enter the accession list file path and chromosomes
     accession_list_file = input("Please enter the path to the accession list file: ").strip()
     accession_numbers = read_accession_numbers(accession_list_file)
     
@@ -52,15 +49,15 @@ def main():
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
     
     chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma: ")
+    
+    # Split the input string by comma and remove leading/trailing whitespace
     chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
+    
+    # Print the list of chromosomes and their paths
     print("List of chromosomes to be analyzed:", chromosomes_list)
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
 
     for accession_number in accession_numbers_to_analyze:
-        if any(dir.startswith((accession_number)) for dir in os.listdir('.') if os.path.isdir(dir)):
-            if check_previous_runs(accession_number, chromosomes_list):
-                continue
-
         trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
         if not os.path.isfile(trimmed_file):
             print(f"\n\033[1;35mDownloading number sequence {accession_number} from SRA...\033[0m ")
