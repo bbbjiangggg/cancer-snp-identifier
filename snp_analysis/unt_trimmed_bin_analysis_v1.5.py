@@ -51,6 +51,14 @@ def delete_intermediate_files(accession_number, chromosome):
             os.remove(file_path)
             print(f"Deleted {file_path}")
 
+def get_verified_path(prompt_message):
+    while True:
+        path = input(prompt_message).strip()
+        if os.path.exists(path):
+            return path
+        else:
+            print("The provided path does not exist. Please try again.")
+
 def main():
     text = "CANCER IMMUNOLOGY"
     font = "banner3-D"
@@ -64,16 +72,25 @@ def main():
     trimmomatic_path = "/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar"
     truseq3_path = "/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa"
 
+    if not os.path.exists(bwa_base_path):
+        bwa_base_path = get_verified_path("BWA base path not found. Please enter the correct BWA base path: ")
+    if not os.path.exists(bowtie_base_path):
+        bowtie_base_path = get_verified_path("Bowtie base path not found. Please enter the correct Bowtie base path: ")
+    if not os.path.exists(trimmomatic_path):
+        trimmomatic_path = get_verified_path("Trimmomatic path not found. Please enter the correct Trimmomatic path: ")
+    if not os.path.exists(truseq3_path):
+        truseq3_path = get_verified_path("TruSeq3 path not found. Please enter the correct TruSeq3 path: ")
+
     user_email = input("Please enter your email address to receive a notification once the analysis is complete: ").strip()
     job_title = input("Please enter a job title for this analysis: ").strip()
     accession_list_file = input("Please enter the path to the accession list file: ").strip()
-    
+
     accession_numbers = read_accession_numbers(accession_list_file)
-    
+
     print(f"\nTotal accession numbers found: {len(accession_numbers)}")
     num_to_analyze = int(input("How many accession numbers do you want to analyze? "))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
-    
+
     all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
     chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ")
     vcf_option = 'separated'
@@ -85,7 +102,7 @@ def main():
             chromosomes_list = all_chromosomes
     else:
         chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
-    
+
     print("List of chromosomes to be analyzed:", chromosomes_list)
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path, vcf_option)
 
