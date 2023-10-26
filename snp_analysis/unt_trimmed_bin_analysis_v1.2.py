@@ -62,7 +62,7 @@ def process_accession(accession, chromosomes_list):
         subprocess.run(["bcftools", "view", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf", "-o", f"{accession}/{accession}_{chromosome}_mapped.var.-final.vcf"])
 
         # Remove intermediate files for this chromosome
-        subprocess.run(["rm", "-f", f"{accession}/{accession}_{chromosome}_mapped.sam", f"{accession}/{accession}_{chromosome}_mapped.bam", f"{accession}/{accession}_{chromosome}_mapped.sorted.bam", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])
+        '''subprocess.run(["rm", "-f", f"{accession}/{accession}_{chromosome}_mapped.sam", f"{accession}/{accession}_{chromosome}_mapped.bam", f"{accession}/{accession}_{chromosome}_mapped.sorted.bam", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])'''
 
 if __name__ == "__main__":
     # Prompt the user to enter the chromosomes
