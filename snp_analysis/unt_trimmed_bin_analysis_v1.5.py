@@ -53,11 +53,11 @@ def delete_intermediate_files(accession_number, chromosome):
 def main():
     text = "CANCER IMMUNOLOGY"
     font = "banner3-D"
-    width = 150  # Adjust the width as needed
+    terminal_width = os.get_terminal_size().columns
+    f = pyfiglet.Figlet(font=font, width=terminal_width)
+    logo = f.renderText(text)
+    print(logo.center(terminal_width))
 
-    f = pyfiglet.Figlet(font=font, width=width)
-    print(f.renderText(text))
-    
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
     trimmomatic_path = "/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar"
