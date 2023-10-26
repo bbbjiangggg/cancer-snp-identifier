@@ -32,6 +32,20 @@ def read_accession_numbers(file_path):
 def is_file_empty(file_path):
     return os.path.isfile(file_path) and os.path.getsize(file_path) == 0
 
+def delete_intermediate_files(accession_number, chromosome):
+    intermediate_files = [
+        f"{accession_number}/{accession_number}.fastq",
+        f"{accession_number}/{accession_number}_mapped_{chromosome}.sam",
+        f"{accession_number}/{accession_number}_mapped_{chromosome}.bam",
+        f"{accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf",
+        f"{accession_number}/{accession_number}_fastqc.zip",
+        f"{accession_number}/{accession_number}_trimmed_fastqc.zip"
+    ]
+    for file_path in intermediate_files:
+        if os.path.isfile(file_path):
+            os.remove(file_path)
+            print(f"Deleted {file_path}")
+
 def main():
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
@@ -98,6 +112,9 @@ def main():
 
             print("\n\033[1;35mFinalizing VCF...\033[0m ")
             run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
+
+            # Delete intermediate files to save disk space
+            delete_intermediate_files(accession_number, chromosome)
 
 if __name__ == "__main__":
     main()
