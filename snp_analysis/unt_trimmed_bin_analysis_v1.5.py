@@ -13,11 +13,11 @@ def run_command(command):
         print("\nAnalysis interrupted by user. Exiting.")
         sys.exit(1)
 
-def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path):
+def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path, vcf_option):
     for chromosome in chromosomes_list:
-        if chromosome != 'hg38':
-            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+        if chromosome != 'hg38' or vcf_option == 'combined':
+            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa" if chromosome != 'hg38' else f"{bwa_base_path}hg38/GRCh38_reference.fa"
+            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie" if chromosome != 'hg38' else f"{bowtie_base_path}hg38/bowtie"
             print(f"\nPaths for chromosome {chromosome}:")
             print("BWA Chromosome Path:", bwa_chrom_path)
             print("Bowtie Index Path:", bowtie_index_path)
@@ -87,7 +87,7 @@ def main():
         chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
     
     print("List of chromosomes to be analyzed:", chromosomes_list)
-    print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
+    print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path, vcf_option)
 
     for accession_number in accession_numbers_to_analyze:
         trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
