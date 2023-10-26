@@ -29,6 +29,9 @@ def read_accession_numbers(file_path):
         print(f"An error occurred while reading the file: {e}")
         sys.exit(1)
 
+def is_file_empty(file_path):
+    return os.path.isfile(file_path) and os.path.getsize(file_path) == 0
+
 def main():
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
@@ -72,9 +75,12 @@ def main():
 
         for chromosome in chromosomes_list:
             final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-            if os.path.isfile(final_vcf_file):
+            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
                 print(f"\n\033[1;32mVCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...\033[0m")
                 continue
+            elif is_file_empty(final_vcf_file):
+                print(f"\n\033[1;33mVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...\033[0m")
+                os.remove(final_vcf_file)
 
             bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
             bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
