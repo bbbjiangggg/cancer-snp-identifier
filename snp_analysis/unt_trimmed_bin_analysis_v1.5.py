@@ -15,8 +15,12 @@ def run_command(command):
 
 def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path):
     for chromosome in chromosomes_list:
-        bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-        bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+        if chromosome == 'hg38':
+            bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+            bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
+        else:
+            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
         print(f"\nPaths for chromosome {chromosome}:")
         print("BWA Chromosome Path:", bwa_chrom_path)
         print("Bowtie Index Path:", bowtie_index_path)
@@ -75,8 +79,13 @@ def main():
     
     all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y', 'hg38']
     chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ")
+    vcf_option = 'separated'
     if chromosomes_input.lower() == 'all':
-        chromosomes_list = all_chromosomes
+        vcf_option = input("Would you like a combined VCF file or separated VCF files for the chromosome results? (type 'combined' or 'separated'): ").strip().lower()
+        if vcf_option == 'combined':
+            chromosomes_list = ['hg38']
+        else:
+            chromosomes_list = all_chromosomes
     else:
         chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
     
@@ -115,8 +124,12 @@ def main():
                 print(f"\n\033[1;33mVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...\033[0m")
                 os.remove(final_vcf_file)
 
-            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+            if chromosome == 'hg38' and vcf_option == 'combined':
+                bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+                bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
+            else:
+                bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+                bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
 
             print(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ")
             run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
