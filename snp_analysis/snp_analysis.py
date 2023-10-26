@@ -1,19 +1,22 @@
-
 import os
+import subprocess
+from pathlib import Path
 
-def analyze_snp(file_path):
-    """
-    Analyze SNPs from a given file.
-    
-    Parameters:
-    file_path (str): The path to the file containing SNP data.
-    """
-    print(f"Analyzing SNPs from {file_path}...")
-    # Add your SNP analysis code here
+# Define color codes
+RED = '\033[1;31m'
+GREEN = '\033[1;32m'
+MAGENTA = '\033[1;35m'
+BLUE = '\033[1;34m'
+RESET = '\033[0m'
 
-    # Example: Print the content of the file
-    with open(file_path, 'r') as file:
-        content = file.read()
-        print(content)
+def run_analysis():
+    cwd = Path.cwd()
+    print(f'{MAGENTA}Running SNP Analysis...{RESET}')
 
-    print("SNP analysis completed.")
+    # Add your analysis logic here
+
+    print(f'{GREEN}Analysis Completed!{RESET}')
+
+if __name__ == "__main__":
+    run_analysis()
+
