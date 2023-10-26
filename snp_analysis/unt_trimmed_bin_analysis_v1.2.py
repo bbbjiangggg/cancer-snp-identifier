@@ -1,26 +1,84 @@
-# Prompt the user to enter the chromosomes
-chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma: ")
+import os
+import subprocess
 
-# Split the input string by comma
-chromosomes_list = chromosomes_input.split(',')
+def process_accession(accession, chromosomes_list):
+    # Define the base paths for BWA, Bowtie, and Trimmomatic
+    bwa_base_path = "/usr/local/bin/bwa/"
+    bowtie_base_path = "/usr/local/bin/bowtie/"
+    trimmomatic_path = "/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar"
+    truseq3_path = "/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa"
 
-# Remove leading and trailing whitespace from each chromosome name
-chromosomes_list = [chromosome.strip() for chromosome in chromosomes_list]
+    # Define the paths of the potential trimmed file and the original fastq file
+    trimmed_file = f"{accession}/{accession}_trimmed.fq.gz"
+    fastq_file = f"{accession}/{accession}.fastq"
 
-# Print the list of chromosomes
-print("List of chromosomes to be analyzed:", chromosomes_list)
+    # Check if the trimmed file already exists
+    if not os.path.isfile(trimmed_file):
+        print(f"\n\033[1;35mDownloading sequence {accession} from SRA...\033[0m")
+        subprocess.run(["fastq-dump", accession])
 
-# Define the base paths for BWA and Bowtie
-bwa_base_path = "/usr/local/bin/bwa/"
-bowtie_base_path = "/usr/local/bin/bowtie/"
+        if os.path.isdir(accession):
+            subprocess.run(["rm", "-r", accession])
 
-# Print the paths for each chromosome
-for chromosome in chromosomes_list:
-    # Construct the paths
-    bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-    bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+        os.makedirs(accession, exist_ok=True)
+        subprocess.run(["mv", f"{accession}.fastq", accession])
 
-    # Print the paths
-    print(f"\nPaths for chromosome {chromosome}:")
-    print("BWA Chromosome Path:", bwa_chrom_path)
-    print("Bowtie Index Path:", bowtie_index_path)
+        print(f"\n\033[1;35mRunning fastqc on {accession}...\033[0m")
+        subprocess.run(["fastqc", fastq_file])
+
+        print(f"\n\033[1;35mTrimming {accession}...\033[0m")
+        subprocess.run(["java", "-jar", trimmomatic_path, "SE", "-phred33", fastq_file, trimmed_file, "ILLUMINACLIP:" + truseq3_path + ":2:30:10", "SLIDINGWINDOW:4:20", "MINLEN:35"])
+
+        print(f"\n\033[1;35mRunning fastqc on trimmed {accession}...\033[0m")
+        subprocess.run(["fastqc", trimmed_file])
+    else:
+        print(f"\n\033[1;32mTrimmed file for {accession} already exists. Skipping download, trimming, and quality check...\033[0m")
+
+    # Loop over each chromosome and perform the processing
+    for chromosome in chromosomes_list:
+        # Construct the paths
+        bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+        bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+
+        # Print the paths
+        print(f"\nPaths for chromosome {chromosome}:")
+        print("BWA Chromosome Path:", bwa_chrom_path)
+        print("Bowtie Index Path:", bowtie_index_path)
+
+        print(f"\n\033[1;35mMapping {accession} reads using Bowtie2 for chromosome {chromosome}...\033[0m")
+        subprocess.run(["bowtie2", "--very-fast-local", "-x", bowtie_index_path, "-U", trimmed_file, "-S", f"{accession}/{accession}_{chromosome}_mapped.sam"])
+
+        subprocess.run(["samtools", "view", "-S", "-b", f"{accession}/{accession}_{chromosome}_mapped.sam", "-o", f"{accession}/{accession}_{chromosome}_mapped.bam"])
+        subprocess.run(["samtools", "sort", f"{accession}/{accession}_{chromosome}_mapped.bam", "-o", f"{accession}/{accession}_{chromosome}_mapped.sorted.bam"])
+
+        print(f"\n\033[1;35mSummarizing the base calls (mpileup) for chromosome {chromosome}...\033[0m")
+        subprocess.run(["bcftools", "mpileup", "-f", bwa_chrom_path, f"{accession}/{accession}_{chromosome}_mapped.sorted.bam", "-o", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])
+        subprocess.run(["bcftools", "call", "-mv", "-Ob", "-o", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])
+
+        print(f"\n\033[1;35mFinalizing VCF for chromosome {chromosome}...\033[0m")
+        subprocess.run(["bcftools", "view", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf", "-o", f"{accession}/{accession}_{chromosome}_mapped.var.-final.vcf"])
+
+        # Remove intermediate files for this chromosome
+        subprocess.run(["rm", "-f", f"{accession}/{accession}_{chromosome}_mapped.sam", f"{accession}/{accession}_{chromosome}_mapped.bam", f"{accession}/{accession}_{chromosome}_mapped.sorted.bam", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])
+
+
+if __name__ == "__main__":
+    # Prompt the user to enter the chromosomes
+    chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma: ")
+
+    # Split the input string by comma and remove leading and trailing whitespace from each chromosome name
+    chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
+
+    # Print the list of chromosomes
+    print("List of chromosomes to be analyzed:", chromosomes_list)
+
+    # Prompt the user to enter the accession numbers
+    accessions_input = input("\nPlease enter the accession numbers separated by a comma: ")
+
+    # Split the input string by comma and remove leading and trailing whitespace from each accession number
+    accessions_list = [accession.strip() for accession in accessions_input.split(',')]
+
+    # Process each accession number
+    for accession in accessions_list:
+        print(f"\nProcessing {accession}...")
+        process_accession(accession, chromosomes_list)
