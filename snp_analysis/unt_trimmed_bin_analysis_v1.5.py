@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+import pyfiglet
 
 def run_command(command):
     try:
@@ -50,6 +51,13 @@ def delete_intermediate_files(accession_number, chromosome):
             print(f"Deleted {file_path}")
 
 def main():
+    text = "CANCER IMMUNOLOGY"
+    font = "banner3-D"
+    width = 150  # Adjust the width as needed
+
+    f = pyfiglet.Figlet(font=font, width=width)
+    print(f.renderText(text))
+    
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
     trimmomatic_path = "/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar"
