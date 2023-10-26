@@ -43,6 +43,10 @@ def get_absolute_path(prompt, default_path, variable_name):
     replace_in_untrimmed_bash_srr(variable_name, path)
     return path
 
+trim_path = get_absolute_path("Enter the absolute path to your trimmomatic-0.39.jar file:", '/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar', 'trim_path')
+truseq3_path = get_absolute_path("Enter the absolute path to your TruSeq3-SE.fa file:", '/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa', 'truseq3_path')
+
+
 def run_analysis(chromosome):
     # Update the paths in the bash script based on the chromosome
     bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
@@ -128,10 +132,15 @@ bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one
 
 rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
 """
-        f.write(bash_script)
+
+with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
+    f.write(bash_script)
+
+# Get the current working directory
+cwd = Path.cwd()
     
     # Run the analysis for the current chromosome
-    run_analysis(chromosome)
+run_analysis(chromosome)
 
 # Reset the paths
 replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
