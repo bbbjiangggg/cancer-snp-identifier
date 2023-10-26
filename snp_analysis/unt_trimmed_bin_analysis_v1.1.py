@@ -43,10 +43,6 @@ def get_absolute_path(prompt, default_path, variable_name):
     replace_in_untrimmed_bash_srr(variable_name, path)
     return path
 
-trim_path = get_absolute_path("Enter the absolute path to your trimmomatic-0.39.jar file:", '/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar', 'trim_path')
-truseq3_path = get_absolute_path("Enter the absolute path to your TruSeq3-SE.fa file:", '/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa', 'truseq3_path')
-
-
 def run_analysis(chromosome):
     # Update the paths in the bash script based on the chromosome
     bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
@@ -81,14 +77,8 @@ accession = input(f'{MAGENTA}8){RESET} Copy and paste the name of the accession 
 with open(accession, 'r') as file:
     srr_list = [line.strip() for line in file if line.strip()]
 
-# Get the list of chromosomes to analyze
-chromosomes = input(f"{MAGENTA}Enter the chromosome numbers (e.g., 1, 2, ... 22, X, Y) separated by commas to be analyzed: {RESET}").split(',')
-chromosomes = [chrom.strip() for chrom in chromosomes]
-
-# Create a new bash script for each chromosome
-for chromosome in chromosomes:
-    with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
-        bash_script = f"""#!/bin/bash
+# Create the bash script template
+bash_script_template = """#!/bin/bash
 # Define the path of the potential trimmed file
 TRIMMED_FILE="SRR_one/SRR_one_trimmed.fq.gz"
 
@@ -130,24 +120,37 @@ bcftools mpileup -f bwa_chrom_path SRR_one/SRR_one_mapped.sorted.bam | bcftools 
 echo -e "\n\033[1;35mFinalizing VCF...\033[0m "
 bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one/SRR_one_mapped.var.-final.vcf
 
-rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
+rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
+
 """
 
-with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
-    f.write(bash_script)
+# Get the list of chromosomes to analyze
+chromosomes = input(f"{MAGENTA}Enter the chromosome numbers (e.g., 1, 2, ... 22, X, Y) separated by commas to be analyzed: {RESET}").split(',')
+chromosomes = [chrom.strip() for chrom in chromosomes]
 
-# Get the current working directory
-cwd = Path.cwd()
+# Create a new bash script for each chromosome, update paths, and run the analysis
+for chromosome in chromosomes:
+    # Update the paths in the bash script based on the chromosome
+    bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+    bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
     
-    # Run the analysis for the current chromosome
-run_analysis(chromosome)
+    # Write the updated bash script to a file
+    with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
+        f.write(bash_script_template)
+    
+    # Run the bash script
+    subprocess.run(['bash', str(cwd) + '/untrimmed_bash_sra_v1.2.txt'])
 
-# Reset the paths
-replace_in_untrimmed_bash_srr(trim_path, 'trim_path')
-replace_in_untrimmed_bash_srr(truseq3_path, 'truseq3_path')
+    # Reset the paths in the bash script
+    replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
+    replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
+
 
 # Send email notification
 print('Sending email to ' + user + ' ....')
 os.system('sendemail -f sudoroot1775@outlook.com -t ' + user + ' -u ' + job_title + '_Analysis Done -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC')
 
+# Clean up by removing the bash script file
 os.remove('untrimmed_bash_sra_v1.2.txt')
