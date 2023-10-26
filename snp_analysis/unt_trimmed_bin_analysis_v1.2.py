@@ -51,6 +51,9 @@ def process_accession(accession, chromosomes_list):
         subprocess.run(["samtools", "view", "-S", "-b", f"{accession}/{accession}_{chromosome}_mapped.sam", "-o", f"{accession}/{accession}_{chromosome}_mapped.bam"])
         subprocess.run(["samtools", "sort", f"{accession}/{accession}_{chromosome}_mapped.bam", "-o", f"{accession}/{accession}_{chromosome}_mapped.sorted.bam"])
 
+        print(f"\n\033[1;35mIndexing BAM file for chromosome {chromosome}...\033[0m")
+        subprocess.run(["samtools", "index", f"{accession}/{accession}_{chromosome}_mapped.sorted.bam"])
+
         print(f"\n\033[1;35mSummarizing the base calls (mpileup) for chromosome {chromosome}...\033[0m")
         subprocess.run(["bcftools", "mpileup", "-f", bwa_chrom_path, f"{accession}/{accession}_{chromosome}_mapped.sorted.bam", "-o", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])
         subprocess.run(["bcftools", "call", "-mv", "-Ob", "-o", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])
