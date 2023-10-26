@@ -15,15 +15,12 @@ def run_command(command):
 
 def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path):
     for chromosome in chromosomes_list:
-        if chromosome == 'hg38':
-            bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-            bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-        else:
+        if chromosome != 'hg38':
             bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
             bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
-        print(f"\nPaths for chromosome {chromosome}:")
-        print("BWA Chromosome Path:", bwa_chrom_path)
-        print("Bowtie Index Path:", bowtie_index_path)
+            print(f"\nPaths for chromosome {chromosome}:")
+            print("BWA Chromosome Path:", bwa_chrom_path)
+            print("Bowtie Index Path:", bowtie_index_path)
 
 def read_accession_numbers(file_path):
     try:
@@ -77,7 +74,7 @@ def main():
     num_to_analyze = int(input("How many accession numbers do you want to analyze? "))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
     
-    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y', 'hg38']
+    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
     chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ")
     vcf_option = 'separated'
     if chromosomes_input.lower() == 'all':
@@ -127,9 +124,11 @@ def main():
             if chromosome == 'hg38' and vcf_option == 'combined':
                 bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
                 bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-            else:
+            elif chromosome != 'hg38':
                 bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
                 bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+            else:
+                continue
 
             print(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ")
             run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
