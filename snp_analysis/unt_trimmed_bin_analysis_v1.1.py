@@ -164,9 +164,15 @@ for chrom in chromosomes:
 # Print the chromosomes selected for analysis
 print(f"{GREEN}Selected chromosomes for analysis: {', '.join(chromosomes)}{RESET}")
 
+to_analyze = []
+
 # Loop over the selected chromosomes for analysis
 for chromosome in chromosomes:
     print(f"{GREEN}Starting analysis for chromosome: {chromosome}{RESET}")
+     # Loop over the SRA sequences to be analyzed
+    for sra in to_analyze:
+        print(f"{GREEN}Starting analysis for SRA sequence: {sra} on chromosome: {chromosome}{RESET}")
+    
     
     # Set chromosome-specific paths
     if chromosome == "Whole_Genome":
@@ -224,6 +230,11 @@ for d in all_dirs:
 
 
 
+
+
+# This asks the user to type in the number of SRA sequences to be analyzed
+num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
+
 # This asks the user to type in the path to the accession list
 accession = input(f'{MAGENTA}8){RESET} Copy and paste the name of the accession list file: ')
 
@@ -241,9 +252,6 @@ for sra in srr_list:
         print(f'{sra} already has a mapped.var.-final.vcf file in the directory. Skipping analysis...')
     else:
         to_analyze.append(sra)
-
-# This asks the user to type in the number of SRA sequences to be analyzed
-num_sra_seqs = int(input(f'{MAGENTA}9){RESET}How many SRA sequences do you wish to analyze (out of {len(to_analyze)} remaining)? '))
 
 # Set different variables for different sra sequences
 sra_list = to_analyze[:num_sra_seqs]
