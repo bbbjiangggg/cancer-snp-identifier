@@ -59,12 +59,8 @@ def main():
     num_to_analyze = int(input("How many accession numbers do you want to analyze? "))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
     
-    chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma (or type 'all' to analyze all chromosomes): ")
-    if chromosomes_input.lower() == 'all':
-        chromosomes_list = [str(i) for i in range(1, 23)] + ['X', 'Y', 'hg38']
-    else:
-        chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
-        
+    chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma: ")
+    chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
     print("List of chromosomes to be analyzed:", chromosomes_list)
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
 
