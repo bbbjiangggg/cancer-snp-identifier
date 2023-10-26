@@ -83,8 +83,13 @@ rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam S
 
 """
 
+
+# Ensure that the updated bash script is written to the file
 with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
     f.write(bash_script)
+
+# Debugging: Print the modified bash script
+print(bash_script)
 
 # Define functions to replace text in files
 def replace_text(file_path, old_text, new_text):
@@ -112,11 +117,11 @@ job_title = input(f'{MAGENTA}2){RESET} Enter a job name: ')
 jar_file = '/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar'
 jar_path = os.path.expanduser(jar_file)
 
-
 if os.path.exists(jar_path):
     trim_path = jar_path
+    print(f'Trim Path: {trim_path}')  # Debugging: Print the trim path
     replace_in_untrimmed_bash_srr('trim_path', trim_path)
-    print(f'{MAGENTA}3){RESET} {jar_path} is the absolute path.')
+
 else:
     print(f'NOTE: {jar_path} does not match your absolute path.')
     print('You have a different path for trimmomatic-0.39.jar')
@@ -166,6 +171,7 @@ else:  # Specific Chromosomes
         replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
         replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
         
+ 
     
     # Reset the bash script text for the next iteration
         bash_script = original_bash_script
