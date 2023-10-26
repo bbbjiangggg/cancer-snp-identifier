@@ -70,18 +70,10 @@ def main():
     trimmomatic_path = "/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar"
     truseq3_path = "/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa"
 
-    # Prompt the user to enter the path to the accession list file and chromosomes
-    accession_list_file = input("Please enter the path to the accession list file (.txt): ").strip()
+    # Prompt the user to enter the number of accession numbers, chromosomes
+    num_accessions = int(input("How many accession numbers do you wish to analyze? "))
     chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma: ")
     
-    # Read accession numbers from the file
-    try:
-        with open(accession_list_file, 'r') as f:
-            accession_numbers = [line.strip() for line in f if line.strip()]
-    except Exception as e:
-        print(f"An error occurred while reading the accession list file: {e}", file=sys.stderr)
-        sys.exit(1)
-
     # Split the input string by comma and remove leading/trailing whitespace
     chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
     
@@ -90,7 +82,8 @@ def main():
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
 
     # Process each accession number
-    for accession_number in accession_numbers:
+    for _ in range(num_accessions):
+        accession_number = input("\nPlease enter an accession number: ").strip()
         process_accession_number(accession_number, chromosomes_list, bwa_base_path, bowtie_base_path, trimmomatic_path, truseq3_path)
 
 if __name__ == "__main__":
