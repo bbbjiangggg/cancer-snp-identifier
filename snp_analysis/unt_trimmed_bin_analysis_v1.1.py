@@ -150,18 +150,20 @@ else:  # Specific Chromosomes
     chromosomes = input(f"{MAGENTA}Enter the chromosome numbers (e.g., 1,2,X,Y) to be analyzed, separated by commas: {RESET}").split(',')
     chromosomes = [chrom.strip() for chrom in chromosomes]
 
-
-for chromosome in chromosomes:
-    print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
-    # Construct the paths for BWA and Bowtie files based on the chromosome
-    bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-    bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
-    
-    # Set the paths in the bash script
-    replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
-    replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
-    
-    # ... (code to run analysis for this chromosome)
+    for chromosome in chromosomes:
+        print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
+        # Construct the paths for BWA and Bowtie files based on the chromosome
+        bwa_chrom_path = f"/usr/local/bin/bwa/{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+        bowtie_index_path = f"/usr/local/bin/bowtie/{chromosome}_bowtie_ind/bowtie"
+        
+        # Print the paths
+        print(f"{GREEN}BWA Chromosome Path: {bwa_chrom_path}{RESET}")
+        print(f"{GREEN}Bowtie Index Path: {bowtie_index_path}{RESET}")
+        
+        # Set the paths in the bash script
+        replace_in_untrimmed_bash_srr('bowtie_index_path', bowtie_index_path)
+        replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
+        
     
     # Reset the paths for the next iteration
     replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
