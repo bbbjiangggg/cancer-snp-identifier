@@ -64,24 +64,30 @@ def process_accession(accession, chromosomes_list):
         # Remove intermediate files for this chromosome
         subprocess.run(["rm", "-f", f"{accession}/{accession}_{chromosome}_mapped.sam", f"{accession}/{accession}_{chromosome}_mapped.bam", f"{accession}/{accession}_{chromosome}_mapped.sorted.bam", f"{accession}/{accession}_{chromosome}_mapped.raw.bcf"])
 
-
 if __name__ == "__main__":
     # Prompt the user to enter the chromosomes
     chromosomes_input = input("Please enter the chromosomes to be analyzed, separated by a comma: ")
-
-    # Split the input string by comma and remove leading and trailing whitespace from each chromosome name
     chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
-
-    # Print the list of chromosomes
     print("List of chromosomes to be analyzed:", chromosomes_list)
 
-    # Prompt the user to enter the accession numbers
-    accessions_input = input("\nPlease enter the accession numbers separated by a comma: ")
+    # Prompt the user for the name of the text file containing accession numbers
+    accession_file = input("\nPlease enter the name of the .txt file that contains the list of accession numbers: ")
 
-    # Split the input string by comma and remove leading and trailing whitespace from each accession number
-    accessions_list = [accession.strip() for accession in accessions_input.split(',')]
+    try:
+        # Read the accession numbers from the file
+        with open(accession_file, 'r') as f:
+            accessions_list = [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        print(f"An error occurred while reading the file: {e}")
+        exit(1)
 
-    # Process each accession number
-    for accession in accessions_list:
+    # Prompt the user for the number of accession numbers to analyze
+    num_accessions = int(input(f"\nHow many accession numbers from the list do you want to analyze (max {len(accessions_list)}): "))
+    if num_accessions > len(accessions_list):
+        print("The specified number is greater than the number of accession numbers in the list. Exiting.")
+        exit(1)
+
+    # Process the specified number of accession numbers
+    for accession in accessions_list[:num_accessions]:
         print(f"\nProcessing {accession}...")
         process_accession(accession, chromosomes_list)
