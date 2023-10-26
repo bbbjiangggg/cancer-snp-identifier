@@ -141,6 +141,9 @@ else:
 # Ask the user if they want to analyze the whole genome or specific chromosomes
 analysis_scope = input(f"{MAGENTA}Would you like to analyze the whole genome or specific chromosomes?\n1) Whole Genome\n2) Specific Chromosomes\nEnter the number corresponding to your choice: {RESET}")
 
+# Store the original bash script text
+original_bash_script = bash_script
+
 # Based on the choice, set the paths
 if analysis_scope == "1":  # Whole Genome
     # Modify the BWA path to the specified pattern
@@ -148,8 +151,7 @@ if analysis_scope == "1":  # Whole Genome
     bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
 else:  # Specific Chromosomes
     chromosomes = input(f"{MAGENTA}Enter the chromosome numbers (e.g., 1,2,X,Y) to be analyzed, separated by commas: {RESET}").split(',')
-    chromosomes = [chrom.strip() for chrom in chromosomes]
-
+    chromosomes = [chrom.strip() for chrom in chromosomes]    
     for chromosome in chromosomes:
         print(f"{MAGENTA}Analyzing Chromosome: {chromosome}{RESET}")
         # Construct the paths for BWA and Bowtie files based on the chromosome
@@ -165,10 +167,10 @@ else:  # Specific Chromosomes
         replace_in_untrimmed_bash_srr('bwa_chrom_path', bwa_chrom_path)
         
     
-    # Reset the paths for the next iteration
-    replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
-    replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
-
+    # Reset the bash script text for the next iteration
+        bash_script = original_bash_script
+        with open("untrimmed_bash_sra_v1.2.txt", "w") as f:
+            f.write(bash_script)
 
 ###########################################################################
 
