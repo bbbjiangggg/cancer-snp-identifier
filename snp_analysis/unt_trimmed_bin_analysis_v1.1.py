@@ -12,10 +12,28 @@ MAGENTA = '\033[1;35m'
 BLUE = '\033[1;34m'
 RESET = '\033[0m'
 
+#!/usr/bin/env python3
+
+import os
+import subprocess
+from pathlib import Path
+import signal
+
+# Define color codes
+RED = '\033[1;31m'
+GREEN = '\033[1;32m'
+MAGENTA = '\033[1;35m'
+BLUE = '\033[1;34m'
+RESET = '\033[0m'
+
 def replace_file_on_interrupt(sig, frame):
-    # Remove the untrimmed_bash_sra_v1.2.txt file
-    os.remove('untrimmed_bash_sra_v1.2.txt')
-    print('\nRemoving untrimmed_bash_sra_v1.2.txt...')
+    # Use absolute path for file operations
+    bash_script_path = os.path.join(cwd, 'untrimmed_bash_sra_v1.2.txt')
+    
+    # Check if file exists before trying to remove it
+    if os.path.exists(bash_script_path):
+        os.remove(bash_script_path)
+        print('\nRemoving untrimmed_bash_sra_v1.2.txt...')
     exit(1)
 
 # Register the signal handler
@@ -23,11 +41,19 @@ signal.signal(signal.SIGINT, replace_file_on_interrupt)
 
 # Define functions to replace text in files
 def replace_text(file_path, old_text, new_text):
-    with open(file_path, 'r+') as file:
-        text = file.read().replace(old_text, new_text)
-        file.seek(0)
-        file.write(text)
-        file.truncate()
+    # Check if the file exists before trying to open it
+    if not os.path.exists(file_path):
+        print(f"Error: The file {file_path} does not exist.")
+        return
+    try:
+        with open(file_path, 'r+') as file:
+            text = file.read().replace(old_text, new_text)
+            file.seek(0)
+            file.write(text)
+            file.truncate()
+    except Exception as e:
+        print(f"An error occurred while trying to modify {file_path}: {str(e)}")
+
 
 def replace_in_untrimmed_bash_srr(old_text, new_text):
     replace_text('untrimmed_bash_sra_v1.2.txt', old_text, new_text)
@@ -57,8 +83,7 @@ def run_analysis(chromosome):
     replace_in_untrimmed_bash_srr(bowtie_index_path, 'bowtie_index_path')
     replace_in_untrimmed_bash_srr(bwa_chrom_path, 'bwa_chrom_path')
 
-# Get the current working directory
-cwd = Path.cwd()
+
 
 # Define the paths
 trim_path = get_absolute_path("Enter the absolute path to your trimmomatic-0.39.jar file:", '/usr/local/bin/Trimmomatic-0.39/trimmomatic-0.39.jar', 'trim_path')
@@ -123,6 +148,14 @@ bcftools view SRR_one/SRR_one_mapped.raw.bcf | vcfutils.pl varFilter - > SRR_one
 rm SRR_one/SRR_one.fastq SRR_one/SRR_one_mapped.sam SRR_one/SRR_one_mapped.bam SRR_one/SRR_one_mapped.sorted.bam SRR_one/SRR_one_mapped.raw.bcf SRR_one/SRR_one_fastqc.zip SRR_one/SRR_one_trimmed_fastqc.zip
 
 """
+
+# Get the current working directory
+cwd = Path.cwd()
+
+# Create the bash script template file before proceeding
+bash_script_path = os.path.join(cwd, 'untrimmed_bash_sra_v1.2.txt')
+with open(bash_script_path, "w") as f:
+    f.write(bash_script_template)
 
 # Get the list of chromosomes to analyze
 chromosomes = input(f"{MAGENTA}Enter the chromosome numbers (e.g., 1, 2, ... 22, X, Y) separated by commas to be analyzed: {RESET}").split(',')
