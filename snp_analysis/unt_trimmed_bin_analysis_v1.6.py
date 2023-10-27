@@ -180,4 +180,4 @@ def main():
     os.system(send_email_command)
 
 if __name__ == "__main__":
-   
+    main()
