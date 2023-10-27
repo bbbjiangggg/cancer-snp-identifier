@@ -6,9 +6,9 @@ from termcolor import colored
 
 def run_command(command):
     try:
-        subprocess.run(command, check=True, shell=True)
+        subprocess.run(command, check=True, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except subprocess.CalledProcessError as e:
-        print(colored(f"An error occurred: {e}", "magenta"), file=sys.stderr)
+        print(colored(f"An error occurred: {e.stderr.decode()}", "magenta"), file=sys.stderr)
         sys.exit(1)
     except KeyboardInterrupt:
         print(colored("\nAnalysis interrupted by user. Exiting.", "magenta"))
@@ -41,8 +41,6 @@ def is_file_empty(file_path):
 def delete_intermediate_files(accession_number, chromosome):
     intermediate_files = [
         f"{accession_number}/{accession_number}.fastq",
-        f"{accession_number}/{accession_number}_1.fastq",
-        f"{accession_number}/{accession_number}_2.fastq",
         f"{accession_number}/{accession_number}_mapped_{chromosome}.sam",
         f"{accession_number}/{accession_number}_mapped_{chromosome}.bam",
         f"{accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf",
@@ -86,10 +84,6 @@ def main():
 
     user_email = input(colored("1. Please enter your email address to receive a notification once the analysis is complete: ", "magenta")).strip()
     job_title = input(colored("2. Please enter a job title for this analysis: ", "magenta")).strip()
-    analysis_type = input(colored("2.1. Is this a single or paired end analysis? (type 'single' or 'paired'): ", "magenta")).strip().lower()
-    if analysis_type not in ['single', 'paired']:
-        print(colored("Invalid analysis type. Please enter 'single' or 'paired'.", "magenta"))
-        sys.exit(1)
     accession_list_file = input(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
@@ -113,33 +107,42 @@ def main():
     print(colored("List of chromosomes to be analyzed:", "magenta"), chromosomes_list)
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path, vcf_option)
 
+    analysis_type = input("Is this a single or paired-end analysis? (Enter 'single' or 'paired'): ").strip().lower()
+    if analysis_type not in ["single", "paired"]:
+        print("Invalid input! Please enter either 'single' or 'paired'.")
+        sys.exit(1)
+
     for accession_number in accession_numbers_to_analyze:
-        trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
-        if not os.path.isfile(trimmed_file):
-            if analysis_type == 'single':
-                print(colored(f"\n\033[1;35mDownloading number sequence {accession_number} from SRA...\033[0m ", "magenta"))
+        trimmed_file_1 = f"{accession_number}/{accession_number}_trimmed_1.fq.gz"
+        trimmed_file_2 = f"{accession_number}/{accession_number}_trimmed_2.fq.gz" if analysis_type == "paired" else None
+        
+        if not os.path.isfile(trimmed_file_1) or (analysis_type == "paired" and not os.path.isfile(trimmed_file_2)):
+            print(colored(f"\n\033[1;35mDownloading sequence {accession_number} from SRA...\033[0m ", "magenta"))
+            if analysis_type == "single":
                 run_command(f"fastq-dump {accession_number}")
-                os.rename(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
-            elif analysis_type == 'paired':
-                print(colored(f"\n\033[1;35mDownloading paired-end sequence {accession_number} from SRA...\033[0m ", "magenta"))
+                os.rename(f"{accession_number}.fastq", f"{accession_number}/{accession_number}_1.fastq")
+            else:
                 run_command(f"fastq-dump --split-files {accession_number}")
                 os.rename(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
                 os.rename(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
-                
-            print(colored(f"\n\033[1;35mRunning fastqc on {accession_number}...\033[0m ", "magenta"))
-            run_command(f"fastqc {accession_number}/{accession_number}.fastq")
+
+            print(colored(f"\n\033[1;35mRunning FastQC on {accession_number}...\033[0m ", "magenta"))
+            run_command(f"fastqc {accession_number}/{accession_number}_1.fastq")
+            if analysis_type == "paired":
+                run_command(f"fastqc {accession_number}/{accession_number}_2.fastq")
 
             print(colored(f"\n\033[1;35mTrimming {accession_number}...\033[0m ", "magenta"))
-            if analysis_type == 'single':
-                trim_command = f"java -jar {trimmomatic_path} SE -phred33 {accession_number}/{accession_number}.fastq {trimmed_file} ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35"
-            elif analysis_type == 'paired':
-                trim_command = f"java -jar {trimmomatic_path} PE -phred33 {accession_number}/{accession_number}_1.fastq {accession_number}/{accession_number}_2.fastq {trimmed_file}_1P {trimmed_file}_1U {trimmed_file}_2P {trimmed_file}_2U ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35"
-            run_command(trim_command)
+            if analysis_type == "single":
+                run_command(f"java -jar {trimmomatic_path} SE -threads 4 {accession_number}/{accession_number}_1.fastq {trimmed_file_1} ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35")
+            else:
+                run_command(f"java -jar {trimmomatic_path} PE -threads 4 {accession_number}/{accession_number}_1.fastq {accession_number}/{accession_number}_2.fastq {trimmed_file_1} {accession_number}/{accession_number}_unpaired_1.fq.gz {trimmed_file_2} {accession_number}/{accession_number}_unpaired_2.fq.gz ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35")
 
-            print(colored(f"\n\033[1;35mRunning fastqc on trimmed {accession_number}...\033[0m ", "magenta"))
-            run_command(f"fastqc {trimmed_file}")
+            print(colored(f"\n\033[1;35mRunning FastQC on trimmed {accession_number}...\033[0m ", "magenta"))
+            run_command(f"fastqc {trimmed_file_1}")
+            if analysis_type == "paired":
+                run_command(f"fastqc {trimmed_file_2}")
         else:
-            print(colored("\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m", "magenta"))
+            print(colored("\n\033[1;32mTrimmed files already exist. Skipping download, trimming, and quality check...\033[0m", "magenta"))
 
         for chromosome in chromosomes_list:
             final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
@@ -160,7 +163,10 @@ def main():
                 continue
 
             print(colored(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ", "magenta"))
-            run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
+            if analysis_type == "single":
+                run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} -U {trimmed_file_1} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
+            else:
+                run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} -1 {trimmed_file_1} -2 {trimmed_file_2} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
 
             run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
