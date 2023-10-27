@@ -82,18 +82,18 @@ def main():
     if not os.path.exists(truseq3_path):
         truseq3_path = get_verified_path("4. TruSeq3 path not found. Please enter the correct TruSeq3 path: ")
 
-    user_email = input(colored("5. Please enter your email address to receive a notification once the analysis is complete: ", "magenta")).strip()
-    job_title = input(colored("6. Please enter a job title for this analysis: ", "magenta")).strip()
-    accession_list_file = input(colored("7. Please enter the path to the accession list file: ", "magenta")).strip()
+    user_email = input(colored("1. Please enter your email address to receive a notification once the analysis is complete: ", "magenta")).strip()
+    job_title = input(colored("2., "magenta") Please enter a job title for this analysis: ").strip()
+    accession_list_file = input(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
 
     print(colored(f"\nTotal accession numbers found: {len(accession_numbers)}", "magenta"))
-    num_to_analyze = int(input(colored("8. How many accession numbers do you want to analyze? ", "magenta")))
+    num_to_analyze = int(input(colored("4. How many accession numbers do you want to analyze? ", "magenta")))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
 
     all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
-    chromosomes_input = input(colored("9. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
+    chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
     vcf_option = 'separated'
     if chromosomes_input.lower() == 'all':
         vcf_option = input(colored("10. Would you like a combined VCF file or separated VCF files for the chromosome results? (type 'combined' or 'separated'): ", "magenta")).strip().lower()
@@ -167,7 +167,7 @@ def main():
 
     send_email_command = f'sendemail -f sudoroot1775@outlook.com -t {user_email} -u "{job_title}_Analysis Done" -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC'
     os.system(send_email_command)
-    print("Analysis complete! A notification email has been sent.")
+    
 
 if __name__ == "__main__":
     main()
