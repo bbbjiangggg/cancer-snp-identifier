@@ -41,6 +41,8 @@ def is_file_empty(file_path):
 def delete_intermediate_files(accession_number, chromosome):
     intermediate_files = [
         f"{accession_number}/{accession_number}.fastq",
+        f"{accession_number}/{accession_number}_1.fastq",
+        f"{accession_number}/{accession_number}_2.fastq",
         f"{accession_number}/{accession_number}_mapped_{chromosome}.sam",
         f"{accession_number}/{accession_number}_mapped_{chromosome}.bam",
         f"{accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf",
@@ -114,14 +116,16 @@ def main():
     for accession_number in accession_numbers_to_analyze:
         trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
         if not os.path.isfile(trimmed_file):
-            print(colored(f"\n\033[1;35mDownloading number sequence {accession_number} from SRA...\033[0m ", "magenta"))
-            run_command(f"fastq-dump {accession_number}")
-
-            if os.path.isdir(accession_number):
-                os.rmdir(accession_number)
-            os.makedirs(accession_number, exist_ok=True)
-            os.rename(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
-
+            if analysis_type == 'single':
+                print(colored(f"\n\033[1;35mDownloading number sequence {accession_number} from SRA...\033[0m ", "magenta"))
+                run_command(f"fastq-dump {accession_number}")
+                os.rename(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
+            elif analysis_type == 'paired':
+                print(colored(f"\n\033[1;35mDownloading paired-end sequence {accession_number} from SRA...\033[0m ", "magenta"))
+                run_command(f"fastq-dump --split-files {accession_number}")
+                os.rename(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
+                os.rename(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
+                
             print(colored(f"\n\033[1;35mRunning fastqc on {accession_number}...\033[0m ", "magenta"))
             run_command(f"fastqc {accession_number}/{accession_number}.fastq")
 
@@ -176,4 +180,4 @@ def main():
     os.system(send_email_command)
 
 if __name__ == "__main__":
-    main()
+   
