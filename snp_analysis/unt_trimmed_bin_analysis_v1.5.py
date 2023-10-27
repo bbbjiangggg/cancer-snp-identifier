@@ -83,7 +83,7 @@ def main():
         truseq3_path = get_verified_path("4. TruSeq3 path not found. Please enter the correct TruSeq3 path: ")
 
     user_email = input(colored("1. Please enter your email address to receive a notification once the analysis is complete: ", "magenta")).strip()
-    job_title = input(colored("2., "magenta") Please enter a job title for this analysis: ").strip()
+    job_title = input(colored("2. Please enter a job title for this analysis: ", "magenta")).strip()
     accession_list_file = input(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
