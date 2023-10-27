@@ -66,7 +66,7 @@ def main():
     terminal_width = os.get_terminal_size().columns
     f = pyfiglet.Figlet(font=font, width=terminal_width)
     logo = f.renderText(text)
-    print(colored(logo.center(terminal_width), 'green'))
+    print(logo.center(terminal_width))
 
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
