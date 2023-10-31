@@ -85,7 +85,7 @@ def main():
     job_title = input("\033[1;35m2. Please enter a job title for this analysis: \033[0m").strip()
     accession_list_file = input("\033[1;35m3. Please enter the path to the accession list file: \033[0m").strip()
 
-     accession_numbers = read_accession_numbers(accession_list_file)
+    accession_numbers = read_accession_numbers(accession_list_file)
     print(f"\033[1;35m\nTotal accession numbers found: {len(accession_numbers)}\033[0m")
     num_to_analyze = int(input("\033[1;35m4. How many accession numbers do you want to analyze? \033[0m"))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
