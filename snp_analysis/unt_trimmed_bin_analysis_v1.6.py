@@ -112,16 +112,21 @@ def main():
     num_to_analyze = int(input(colored(f"4. How many of the remaining {remaining_analyses} accession numbers do you want to analyze? ", "magenta")))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze + completed_vcf_count][completed_vcf_count:]
 
+    chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
+    chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')] if chromosomes_input.lower() != 'all' else ['hg38']
+
+    print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
+
     remaining_accessions = len(accession_numbers_to_analyze)
     for accession_number in accession_numbers_to_analyze:
-        trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
-        if not os.path.isfile(trimmed_file):
-            print(colored(f"\n{6}. Downloading number sequence {accession_number} from SRA... (Remaining: {remaining_accessions})", "magenta"))
-            run_command(f"fastq-dump {accession_number}")
+            trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
+            if not os.path.isfile(trimmed_file):
+                print(colored(f"\n{6}. Downloading number sequence {accession_number} from SRA... (Remaining: {remaining_accessions})", "magenta"))
+                run_command(f"fastq-dump {accession_number}")
 
     chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
     chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')] if chromosomes_input.lower() != 'all' else ['hg38']
-    
+        
     if chromosomes_input.lower() != 'all':
         print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
 
