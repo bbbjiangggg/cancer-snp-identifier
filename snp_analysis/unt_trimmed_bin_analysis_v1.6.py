@@ -6,22 +6,20 @@ from termcolor import colored
 
 def run_command(command):
     try:
-        subprocess.run(command, check=True, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        subprocess.run(command, check=True, shell=True)
     except subprocess.CalledProcessError as e:
-        print(colored(f"An error occurred: {e.stderr.decode()}", "magenta"), file=sys.stderr)
+        print(colored(f"An error occurred: {e}", "magenta"), file=sys.stderr)
         sys.exit(1)
     except KeyboardInterrupt:
         print(colored("\nAnalysis interrupted by user. Exiting.", "magenta"))
         sys.exit(1)
 
-def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path, vcf_option):
-    for chromosome in chromosomes_list:
-        if chromosome != 'hg38' or vcf_option == 'combined':
-            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa" if chromosome != 'hg38' else f"{bwa_base_path}hg38/GRCh38_reference.fa"
-            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie" if chromosome != 'hg38' else f"{bowtie_base_path}hg38/bowtie"
-            print(colored(f"\nPaths for chromosome {chromosome}:", "magenta"))
-            print(colored("BWA Chromosome Path:", "magenta"), bwa_chrom_path)
-            print(colored("Bowtie Index Path:", "magenta"), bowtie_index_path)
+def print_chromosome_paths(bwa_base_path, bowtie_base_path):
+    bwa_chrom_path = f"{bwa_base_path}hg38/GRCh38_reference.fa"
+    bowtie_index_path = f"{bowtie_base_path}hg38/bowtie"
+    print(colored("\nPaths for analysis using hg38:", "magenta"))
+    print(colored("BWA Chromosome Path:", "magenta"), bwa_chrom_path)
+    print(colored("Bowtie Index Path:", "magenta"), bowtie_index_path)
 
 def read_accession_numbers(file_path):
     try:
@@ -38,12 +36,12 @@ def read_accession_numbers(file_path):
 def is_file_empty(file_path):
     return os.path.isfile(file_path) and os.path.getsize(file_path) == 0
 
-def delete_intermediate_files(accession_number, chromosome):
+def delete_intermediate_files(accession_number):
     intermediate_files = [
         f"{accession_number}/{accession_number}.fastq",
-        f"{accession_number}/{accession_number}_mapped_{chromosome}.sam",
-        f"{accession_number}/{accession_number}_mapped_{chromosome}.bam",
-        f"{accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf",
+        f"{accession_number}/{accession_number}_mapped_hg38.sam",
+        f"{accession_number}/{accession_number}_mapped_hg38.bam",
+        f"{accession_number}/{accession_number}_mapped_hg38.raw.bcf",
         f"{accession_number}/{accession_number}_fastqc.zip",
         f"{accession_number}/{accession_number}_trimmed_fastqc.zip"
     ]
@@ -92,95 +90,63 @@ def main():
     num_to_analyze = int(input(colored("4. How many accession numbers do you want to analyze? ", "magenta")))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
 
-    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
-    chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
-    vcf_option = 'separated'
-    if chromosomes_input.lower() == 'all':
-        vcf_option = input(colored("10. Would you like a combined VCF file or separated VCF files for the chromosome results? (type 'combined' or 'separated'): ", "magenta")).strip().lower()
-        if vcf_option == 'combined':
-            chromosomes_list = ['hg38']
-        else:
-            chromosomes_list = all_chromosomes
-    else:
-        chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
-
-    print(colored("List of chromosomes to be analyzed:", "magenta"), chromosomes_list)
-    print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path, vcf_option)
-
-    analysis_type = input("Is this a single or paired-end analysis? (Enter 'single' or 'paired'): ").strip().lower()
-    if analysis_type not in ["single", "paired"]:
-        print("Invalid input! Please enter either 'single' or 'paired'.")
+    chromosomes_input = input(colored("5. Please enter 'all' to analyze all chromosomes using hg38: ", "magenta")).strip().lower()
+    if chromosomes_input != 'all':
+        print(colored("Invalid input. Please restart the program and enter 'all' when prompted.", "magenta"))
         sys.exit(1)
 
-    for accession_number in accession_numbers_to_analyze:
-        trimmed_file_1 = f"{accession_number}/{accession_number}_trimmed_1.fq.gz"
-        trimmed_file_2 = f"{accession_number}/{accession_number}_trimmed_2.fq.gz" if analysis_type == "paired" else None
-        
-        if not os.path.isfile(trimmed_file_1) or (analysis_type == "paired" and not os.path.isfile(trimmed_file_2)):
-            print(colored(f"\n\033[1;35mDownloading sequence {accession_number} from SRA...\033[0m ", "magenta"))
-            if analysis_type == "single":
-                run_command(f"fastq-dump {accession_number}")
-                os.rename(f"{accession_number}.fastq", f"{accession_number}/{accession_number}_1.fastq")
-            else:
-                run_command(f"fastq-dump --split-files {accession_number}")
-                os.rename(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
-                os.rename(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
+    print_chromosome_paths(bwa_base_path, bowtie_base_path)
 
-            print(colored(f"\n\033[1;35mRunning FastQC on {accession_number}...\033[0m ", "magenta"))
-            run_command(f"fastqc {accession_number}/{accession_number}_1.fastq")
-            if analysis_type == "paired":
-                run_command(f"fastqc {accession_number}/{accession_number}_2.fastq")
+    for accession_number in accession_numbers_to_analyze:
+        trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
+        if not os.path.isfile(trimmed_file):
+            print(colored(f"\n\033[1;35mDownloading number sequence {accession_number} from SRA...\033[0m ", "magenta"))
+            run_command(f"fastq-dump {accession_number}")
+
+            if os.path.isdir(accession_number):
+                os.rmdir(accession_number)
+            os.makedirs(accession_number, exist_ok=True)
+            os.rename(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
+
+            print(colored(f"\n\033[1;35mRunning fastqc on {accession_number}...\033[0m ", "magenta"))
+            run_command(f"fastqc {accession_number}/{accession_number}.fastq")
 
             print(colored(f"\n\033[1;35mTrimming {accession_number}...\033[0m ", "magenta"))
-            if analysis_type == "single":
-                run_command(f"java -jar {trimmomatic_path} SE -threads 4 {accession_number}/{accession_number}_1.fastq {trimmed_file_1} ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35")
-            else:
-                run_command(f"java -jar {trimmomatic_path} PE -threads 4 {accession_number}/{accession_number}_1.fastq {accession_number}/{accession_number}_2.fastq {trimmed_file_1} {accession_number}/{accession_number}_unpaired_1.fq.gz {trimmed_file_2} {accession_number}/{accession_number}_unpaired_2.fq.gz ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35")
+            trim_command = f"java -jar {trimmomatic_path} SE -phred33 {accession_number}/{accession_number}.fastq {trimmed_file} ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35"
+            run_command(trim_command)
 
-            print(colored(f"\n\033[1;35mRunning FastQC on trimmed {accession_number}...\033[0m ", "magenta"))
-            run_command(f"fastqc {trimmed_file_1}")
-            if analysis_type == "paired":
-                run_command(f"fastqc {trimmed_file_2}")
+            print(colored(f"\n\033[1;35mRunning fastqc on trimmed {accession_number}...\033[0m ", "magenta"))
+            run_command(f"fastqc {trimmed_file}")
         else:
-            print(colored("\n\033[1;32mTrimmed files already exist. Skipping download, trimming, and quality check...\033[0m", "magenta"))
+            print(colored("\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m", "magenta"))
 
-        for chromosome in chromosomes_list:
-            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
-                print(colored(f"\n\033[1;32mVCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...\033[0m", "magenta"))
-                continue
-            elif is_file_empty(final_vcf_file):
-                print(colored(f"\n\033[1;33mVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...\033[0m", "magenta"))
-                os.remove(final_vcf_file)
+        final_vcf_file = f"{accession_number}/{accession_number}_mapped_hg38.var.-final.vcf"
+        if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+            print(colored(f"\n\033[1;32mVCF file for {accession_number}, hg38 already exists. Skipping analysis...\033[0m", "magenta"))
+            continue
+        elif is_file_empty(final_vcf_file):
+            print(colored(f"\n\033[1;33mVCF file for {accession_number}, hg38 is empty. Deleting and adding to analysis...\033[0m", "magenta"))
+            os.remove(final_vcf_file)
 
-            if chromosome == 'hg38' and vcf_option == 'combined':
-                bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-                bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-            elif chromosome != 'hg38':
-                bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-                bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
-            else:
-                continue
+        bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+        bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
 
-            print(colored(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ", "magenta"))
-            if analysis_type == "single":
-                run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} -U {trimmed_file_1} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
-            else:
-                run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} -1 {trimmed_file_1} -2 {trimmed_file_2} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
+        print(colored(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for hg38...\033[0m ", "magenta"))
+        run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_hg38.sam")
 
-            run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
+        run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_hg38.sam > {accession_number}/{accession_number}_mapped_hg38.bam")
 
-            print(colored("\n\033[1;35mSorting using Samtools...\033[0m ", "magenta"))
-            run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam > {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam")
+        print(colored("\n\033[1;35mSorting using Samtools...\033[0m ", "magenta"))
+        run_command(f"samtools sort {accession_number}/{accession_number}_mapped_hg38.bam > {accession_number}/{accession_number}_mapped_hg38.sorted.bam")
 
-            print(colored("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ", "magenta"))
-            run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
+        print(colored("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ", "magenta"))
+        run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_hg38.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_hg38.raw.bcf")
 
-            print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
-            run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
+        print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
+        run_command(f"bcftools view {accession_number}/{accession_number}_mapped_hg38.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
 
-            # Delete intermediate files to save disk space
-            delete_intermediate_files(accession_number, chromosome)
+        # Delete intermediate files to save disk space
+        delete_intermediate_files(accession_number)
 
     send_email_command = f'sendemail -f sudoroot1775@outlook.com -t {user_email} -u "{job_title}_Analysis Done" -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC'
     os.system(send_email_command)
