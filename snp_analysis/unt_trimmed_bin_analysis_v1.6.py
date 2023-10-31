@@ -86,10 +86,23 @@ def main():
     accession_list_file = get_verified_path(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
+    completed_vcf_count = 0
+
+    for accession_number in accession_numbers:
+        for chromosome in all_chromosomes:
+            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
+            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+                completed_vcf_count += 1
+                break
 
     print(colored(f"\nTotal accession numbers found: {len(accession_numbers)}", "magenta"))
-    num_to_analyze = int(input(colored("4. How many accession numbers do you want to analyze? ", "magenta")))
-    accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
+    print(colored(f"Completed analyses with final VCF files: {completed_vcf_count}", "magenta"))
+    remaining_analyses = len(accession_numbers) - completed_vcf_count
+    print(colored(f"Remaining analyses to be performed: {remaining_analyses}", "magenta"))
+
+    num_to_analyze = int(input(colored("4. How many of the remaining accession numbers do you want to analyze? ", "magenta")))
+    accession_numbers_to_analyze = accession_numbers[:num_to_analyze + completed_vcf_count][completed_vcf_count:]
+
 
     all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
     chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
