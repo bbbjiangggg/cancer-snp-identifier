@@ -114,15 +114,14 @@ def main():
 
     chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
     chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')] if chromosomes_input.lower() != 'all' else ['hg38']
-
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
 
     remaining_accessions = len(accession_numbers_to_analyze)
     for accession_number in accession_numbers_to_analyze:
-            trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
-            if not os.path.isfile(trimmed_file):
-                print(colored(f"\n{6}. Downloading number sequence {accession_number} from SRA... (Remaining: {remaining_accessions})", "magenta"))
-                run_command(f"fastq-dump {accession_number}")
+        trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
+        if not os.path.isfile(trimmed_file):
+            print(colored(f"\n{6}. Downloading number sequence {accession_number} from SRA... (Remaining: {remaining_accessions})", "magenta"))
+            run_command(f"fastq-dump {accession_number}")
 
     chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
     chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')] if chromosomes_input.lower() != 'all' else ['hg38']
@@ -146,7 +145,7 @@ def main():
             elif is_file_empty(final_vcf_file):
                 print(colored(f"\nVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...", "magenta"))
                 os.remove(final_vcf_file)
-
+        
             bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
             bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
             
@@ -167,7 +166,7 @@ def main():
 
             # Delete intermediate files to save disk space
             delete_intermediate_files(accession_number, chromosome)
-
+        remaining_accessions -= 1
     send_email_command = f'sendemail -f sudoroot1775@outlook.com -t {user_email} -u "{job_title}_Analysis Done" -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC'
     os.system(send_email_command)
 
