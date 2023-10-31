@@ -86,6 +86,8 @@ def main():
     accession_list_file = get_verified_path(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
+    
+    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y', 'hg38']
     completed_vcf_count = 0
 
     for accession_number in accession_numbers:
@@ -102,6 +104,7 @@ def main():
 
     num_to_analyze = int(input(colored("4. How many of the remaining accession numbers do you want to analyze? ", "magenta")))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze + completed_vcf_count][completed_vcf_count:]
+
 
 
     all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
