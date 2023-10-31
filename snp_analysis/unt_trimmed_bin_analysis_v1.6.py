@@ -16,11 +16,18 @@ def run_command(command):
 
 def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path):
     for chromosome in chromosomes_list:
-        bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa" if chromosome != 'hg38' else f"{bwa_base_path}hg38/GRCh38_reference.fa"
-        bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie" if chromosome != 'hg38' else f"{bowtie_base_path}hg38/bowtie"
-        print(colored(f"\nPaths for chromosome {chromosome}:", "magenta"))
-        print("BWA Chromosome Path: " + bwa_chrom_path)
-        print("Bowtie Index Path: " + bowtie_index_path)
+        if chromosome == 'hg38':
+            print(colored(f"\nPaths for chromosome {chromosome}:", "magenta"))
+            bwa_chrom_path = f"{bwa_base_path}hg38/GRCh38_reference.fa"
+            bowtie_index_path = f"{bowtie_base_path}hg38/bowtie"
+            print("BWA Chromosome Path: " + bwa_chrom_path)
+            print("Bowtie Index Path: " + bowtie_index_path)
+        elif chromosome != 'hg38':
+            print(colored(f"\nPaths for chromosome {chromosome}:", "magenta"))
+            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+            print("BWA Chromosome Path: " + bwa_chrom_path)
+            print("Bowtie Index Path: " + bowtie_index_path)
 
 def read_accession_numbers(file_path):
     try:
@@ -73,17 +80,17 @@ def main():
     truseq3_path = "/usr/local/bin/Trimmomatic-0.39/adapters/TruSeq3-SE.fa"
 
     if not os.path.exists(bwa_base_path):
-        bwa_base_path = get_verified_path(colored("1. BWA base path not found. Please enter the correct BWA base path: ", "magenta"))
+        bwa_base_path = get_verified_path("1. BWA base path not found. Please enter the correct BWA base path: ")
     if not os.path.exists(bowtie_base_path):
-        bowtie_base_path = get_verified_path(colored("2. Bowtie base path not found. Please enter the correct Bowtie base path: ", "magenta"))
+        bowtie_base_path = get_verified_path("2. Bowtie base path not found. Please enter the correct Bowtie base path: ")
     if not os.path.exists(trimmomatic_path):
-        trimmomatic_path = get_verified_path(colored("3. Trimmomatic path not found. Please enter the correct Trimmomatic path: ", "magenta"))
+        trimmomatic_path = get_verified_path("3. Trimmomatic path not found. Please enter the correct Trimmomatic path: ")
     if not os.path.exists(truseq3_path):
-        truseq3_path = get_verified_path(colored("4. TruSeq3 path not found. Please enter the correct TruSeq3 path: ", "magenta"))
+        truseq3_path = get_verified_path("4. TruSeq3 path not found. Please enter the correct TruSeq3 path: ")
 
     user_email = input(colored("1. Please enter your email address to receive a notification once the analysis is complete: ", "magenta")).strip()
     job_title = input(colored("2. Please enter a job title for this analysis: ", "magenta")).strip()
-    accession_list_file = get_verified_path(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
+    accession_list_file = get_verified_path("3. Please enter the path to the accession list file: ")
 
     accession_numbers = read_accession_numbers(accession_list_file)
     
@@ -102,64 +109,45 @@ def main():
     remaining_analyses = len(accession_numbers) - completed_vcf_count
     print(colored(f"Remaining analyses to be performed: {remaining_analyses}", "magenta"))
 
-    num_to_analyze = int(input(colored("4. How many of the remaining accession numbers do you want to analyze? ", "magenta")))
+    num_to_analyze = int(input(colored(f"4. How many of the remaining {remaining_analyses} accession numbers do you want to analyze? ", "magenta")))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze + completed_vcf_count][completed_vcf_count:]
 
+    remaining_accessions = len(accession_numbers_to_analyze)
+    for accession_number in accession_numbers_to_analyze:
+        trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
+        if not os.path.isfile(trimmed_file):
+            print(colored(f"\n{6}. Downloading number sequence {accession_number} from SRA... (Remaining: {remaining_accessions})", "magenta"))
+            run_command(f"fastq-dump {accession_number}")
 
-
-    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
     chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
-    if chromosomes_input.lower() == 'all':
-        chromosomes_list = ['hg38']
-    else:
-        chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
-
-    print("List of chromosomes to be analyzed:", chromosomes_list)
-    print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
-
-
+    chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')] if chromosomes_input.lower() != 'all' else ['hg38']
+    
+    if chromosomes_input.lower() != 'all':
+        print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
 
     for accession_number in accession_numbers_to_analyze:
         trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
         if not os.path.isfile(trimmed_file):
-            print(colored(f"\n\033[1;35m{6}. Downloading number sequence {accession_number} from SRA...\033[0m ", "magenta"))
+            # Downloading and processing steps here
+            print(colored(f"\n{6}. Downloading number sequence {accession_number} from SRA... (Remaining: {remaining_accessions})", "magenta"))
             run_command(f"fastq-dump {accession_number}")
-
-            if os.path.isdir(accession_number):
-                os.rmdir(accession_number)
-            os.makedirs(accession_number, exist_ok=True)
-            os.rename(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
-
-            print(colored(f"\n\033[1;35m{7}. Running fastqc on {accession_number}...\033[0m ", "magenta"))
-            run_command(f"fastqc {accession_number}/{accession_number}.fastq")
-
-            print(colored(f"\n\033[1;35m{8}. Trimming {accession_number}...\033[0m ", "magenta"))
-            trim_command = f"java -jar {trimmomatic_path} SE -phred33 {accession_number}/{accession_number}.fastq {trimmed_file} ILLUMINACLIP:{truseq3_path}:2:30:10 SLIDINGWINDOW:4:20 MINLEN:35"
-            run_command(trim_command)
-
-            print(colored(f"\n\033[1;35m{9}. Running fastqc on trimmed {accession_number}...\033[0m ", "magenta"))
-            run_command(f"fastqc {trimmed_file}")
-        else:
-            print(colored("\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m", "magenta"))
+            # Add commands for processing here
 
         for chromosome in chromosomes_list:
             final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
             if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
-                print(colored(f"\n\033[1;32mVCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...\033[0m", "magenta"))
+                print(colored(f"\nVCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...", "magenta"))
                 continue
             elif is_file_empty(final_vcf_file):
-                print(colored(f"\n\033[1;33mVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...\033[0m", "magenta"))
+                print(colored(f"\nVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...", "magenta"))
                 os.remove(final_vcf_file)
 
-            if chromosome == 'hg38':
-                bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-                bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-            else:
-                bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-                bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
-
-            print(colored(f"\n\033[1;35m{10}. Mapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ", "magenta"))
+            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+            
+            print(colored(f"\nMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}... (Remaining: {remaining_accessions})", "magenta"))
             run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
+         
 
             run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
