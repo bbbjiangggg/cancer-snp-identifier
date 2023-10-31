@@ -16,12 +16,11 @@ def run_command(command):
 
 def print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path):
     for chromosome in chromosomes_list:
-        if chromosome == 'hg38':
-            bwa_chrom_path = f"{bwa_base_path}hg38/GRCh38_reference.fa"
-            bowtie_index_path = f"{bowtie_base_path}hg38/bowtie"
-            print(colored(f"\nPaths for chromosome {chromosome}:", "magenta"))
-            print("BWA Chromosome Path: " + bwa_chrom_path)
-            print("Bowtie Index Path: " + bowtie_index_path)
+        bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa" if chromosome != 'hg38' else f"{bwa_base_path}hg38/GRCh38_reference.fa"
+        bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie" if chromosome != 'hg38' else f"{bowtie_base_path}hg38/bowtie"
+        print(colored(f"\nPaths for chromosome {chromosome}:", "magenta"))
+        print("BWA Chromosome Path: " + bwa_chrom_path)
+        print("Bowtie Index Path: " + bowtie_index_path)
 
 def read_accession_numbers(file_path):
     try:
@@ -101,6 +100,7 @@ def main():
 
     print("List of chromosomes to be analyzed:", chromosomes_list)
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
+
 
 
     for accession_number in accession_numbers_to_analyze:
