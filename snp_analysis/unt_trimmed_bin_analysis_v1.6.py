@@ -64,9 +64,17 @@ def main():
     text = "CANCER IMMUNOLOGY"
     font = "banner3-D"
     terminal_width = os.get_terminal_size().columns
+    
     f = pyfiglet.Figlet(font=font, width=terminal_width)
     logo = f.renderText(text)
+    
     print(logo.center(terminal_width))
+    
+    # Get the name of the currently running Python script
+    script_name = sys.argv[0]
+    
+    # Print the script name in smaller letters
+    print(script_name.center(terminal_width).lower())
 
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
