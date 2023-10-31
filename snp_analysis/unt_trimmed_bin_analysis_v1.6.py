@@ -64,17 +64,9 @@ def main():
     text = "CANCER IMMUNOLOGY"
     font = "banner3-D"
     terminal_width = os.get_terminal_size().columns
-    
     f = pyfiglet.Figlet(font=font, width=terminal_width)
     logo = f.renderText(text)
-    
     print(logo.center(terminal_width))
-    
-    # Get the name of the currently running Python script
-    script_name = sys.argv[0]
-    
-    # Print the script name in smaller letters
-    print(script_name.center(terminal_width).lower())
 
     bwa_base_path = "/usr/local/bin/bwa/"
     bowtie_base_path = "/usr/local/bin/bowtie/"
@@ -99,6 +91,26 @@ def main():
     print(colored(f"\nTotal accession numbers found: {len(accession_numbers)}", "magenta"))
     num_to_analyze = int(input(colored("4. How many accession numbers do you want to analyze? ", "magenta")))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
+
+    # Counter for already processed VCF files
+    already_processed = 0
+
+    for accession_number in accession_numbers_to_analyze:
+        # ... (other code) ...
+        for chromosome in chromosomes_list:
+            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
+            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+                print(colored(f"\n\033[1;32mVCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...\033[0m", "magenta"))
+                already_processed += 1
+                break  # Assuming you want to skip to the next accession number if any VCF file exists
+            elif is_file_empty(final_vcf_file):
+                print(colored(f"\n\033[1;33mVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...\033[0m", "magenta"))
+                os.remove(final_vcf_file)
+
+    # Print the adjusted total
+    adjusted_total = num_to_analyze - already_processed
+    print(colored(f"\nAdjusted total accession numbers to analyze (excluding already processed): {adjusted_total}", "magenta"))
+
 
     all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
     chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
