@@ -81,17 +81,17 @@ def main():
     if not os.path.exists(truseq3_path):
         truseq3_path = get_verified_path("4. TruSeq3 path not found. Please enter the correct TruSeq3 path: ")
 
-    user_email = input("\033[1;35m1. Please enter your email address to receive a notification once the analysis is complete: \033[0m").strip()
-    job_title = input("\033[1;35m2. Please enter a job title for this analysis: \033[0m").strip()
-    accession_list_file = input("\033[1;35m3. Please enter the path to the accession list file: \033[0m").strip()
+    user_email = input("\033[1;35m1.\033[0m Please enter your email address to receive a notification once the analysis is complete: ").strip()
+    job_title = input("\033[1;35m2.\033[0m Please enter a job title for this analysis: ").strip()
+    accession_list_file = input("\033[1;35m3.\033[0m Please enter the path to the accession list file: ").strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
     print(f"\033[1;35m\nTotal accession numbers found: {len(accession_numbers)}\033[0m")
-    num_to_analyze = int(input("\033[1;35m4. How many accession numbers do you want to analyze? \033[0m"))
+    num_to_analyze = int(input("\033[1;35m4.\033[0m How many accession numbers do you want to analyze? "))
     accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
 
     all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
-    chromosomes_input = input("\033[1;35m5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: \033[0m")
+    chromosomes_input = input("\033[1;35m5.\033[0m Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ")
     vcf_option = 'combined'
 
     if chromosomes_input.lower() == 'all':
