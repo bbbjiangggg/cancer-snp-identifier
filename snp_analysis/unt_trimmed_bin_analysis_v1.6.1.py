@@ -150,40 +150,49 @@ def main():
         else:
             print(colored("\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m", "magenta"))
 
-        for chromosome in chromosomes_list:
-            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+    for chromosome in chromosomes_list:
+        final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
+        print(f"Checking VCF file for {accession_number}, chromosome {chromosome}...")
+
+        if os.path.isfile(final_vcf_file):
+            if not is_file_empty(final_vcf_file):
                 print(colored(f"\n\033[1;32mVCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...\033[0m", "magenta"))
                 continue
-            elif is_file_empty(final_vcf_file):
+            else:
                 print(colored(f"\n\033[1;33mVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...\033[0m", "magenta"))
                 os.remove(final_vcf_file)
+        
+        all_chromosomes_skipped = False
 
-            if chromosome == 'hg38' and vcf_option == 'combined':
-                bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-                bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-            elif chromosome != 'hg38':
-                bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-                bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
-            else:
-                continue
+        if chromosome == 'hg38' and vcf_option == 'combined':
+            bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+            bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
+        elif chromosome != 'hg38':
+            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+        else:
+            continue
 
-            print(colored(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ", "magenta"))
-            run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
+        if all_chromosomes_skipped:
+            print(f"All chromosomes for {accession_number} were skipped because VCF files exist. Moving to the next accession number.")
 
-            run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
-            print(colored("\n\033[1;35mSorting using Samtools...\033[0m ", "magenta"))
-            run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam > {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam")
+        print(colored(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ", "magenta"))
+        run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
 
-            print(colored("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ", "magenta"))
-            run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
+        run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
-            print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
-            run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
+        print(colored("\n\033[1;35mSorting using Samtools...\033[0m ", "magenta"))
+        run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam > {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam")
 
-            # Delete intermediate files to save disk space
-            delete_intermediate_files(accession_number, chromosome)
+        print(colored("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ", "magenta"))
+        run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
+
+        print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
+        run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
+
+        # Delete intermediate files to save disk space
+        delete_intermediate_files(accession_number, chromosome)
 
     send_email_command = f'sendemail -f sudoroot1775@outlook.com -t {user_email} -u "{job_title}_Analysis Done" -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC'
     os.system(send_email_command)
