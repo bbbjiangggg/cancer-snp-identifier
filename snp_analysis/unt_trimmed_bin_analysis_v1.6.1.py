@@ -60,19 +60,19 @@ def get_verified_path(prompt_message):
         else:
             print(colored("The provided path does not exist. Please try again.", "magenta"))
 
-def count_completed_analyses(accession_numbers, all_chromosomes):
-    completed = 0
+def count_completed_vcf_files(accession_numbers, chromosomes_list, vcf_option):
+    completed_vcf_count = 0
     for accession_number in accession_numbers:
-        all_completed = True
-        for chromosome in all_chromosomes:
-            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-            if not (os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file)):
-                all_completed = False
-                break
-        if all_completed:
-            completed += 1
-    return completed
-
+        if vcf_option == 'combined':
+            final_vcf_file = f"{accession_number}/{accession_number}_mapped_hg38.var.-final.vcf"
+            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+                completed_vcf_count += 1
+        else:
+            for chromosome in chromosomes_list:
+                final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
+                if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+                    completed_vcf_count += 1
+    return completed_vcf_count
 
 def main():
     text = "CANCER IMMUNOLOGY"
@@ -102,26 +102,26 @@ def main():
 
     accession_numbers = read_accession_numbers(accession_list_file)
 
-        # Count completed analyses and determine remaining accession numbers
-    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
-    completed_analyses = count_completed_analyses(accession_numbers, all_chromosomes)
-    remaining_analyses = len(accession_numbers) - completed_analyses
     print(colored(f"\nTotal accession numbers found: {len(accession_numbers)}", "magenta"))
-    print(colored(f"Number of completed analyses: {completed_analyses}", "magenta"))
-    print(colored(f"Remaining accession numbers to analyze: {remaining_analyses}", "magenta"))
+    num_to_analyze = int(input(colored("4. How many accession numbers do you want to analyze? ", "magenta")))
+    accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
 
-    # Ask user how many accession numbers to analyze
-    num_to_analyze = int(input(colored(f"4. How many accession numbers do you want to analyze? (default {remaining_analyses}): ", "magenta")) or remaining_analyses)
-    accession_numbers_to_analyze = accession_numbers[completed_analyses:completed_analyses + num_to_analyze]
-
+    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
     chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
+    vcf_option = 'separated'  # Default option for separated chromosomes
 
-    # Automatically set chromosomes_list and vcf_option for "all" option
     if chromosomes_input.lower() == 'all':
         chromosomes_list = ['hg38']
-        vcf_option = 'combined'
+        vcf_option = 'combined'  # Set to combined when "all" is chosen
     else:
         chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
+
+    # Call the function to count completed VCF files and inform the user
+    completed_vcf_count = count_completed_vcf_files(accession_numbers, chromosomes_list, vcf_option)
+    if completed_vcf_count > 0:
+        print(colored(f"\n{completed_vcf_count} VCF final file(s) have already been completed for the chosen chromosome(s).", "magenta"))
+    else:
+        print(colored("\nNo VCF final files have been completed yet for the chosen chromosome(s).", "magenta"))
 
 
     print(colored("List of chromosomes to be analyzed:", "magenta"), chromosomes_list)
