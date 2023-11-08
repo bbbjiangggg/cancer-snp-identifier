@@ -110,10 +110,6 @@ def main():
         if not (os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file)):
             accession_numbers_without_vcf.append(accession_number)
 
-    # Inform the user how many accession numbers are available for analysis after filtering
-    print(colored(f"\nTotal accession numbers available for analysis: {len(accession_numbers_without_vcf)}", "magenta"))
-
-
 
     chromosomes_input = input(colored("4. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
     vcf_option = 'separated'  # Default option for separated chromosomes
