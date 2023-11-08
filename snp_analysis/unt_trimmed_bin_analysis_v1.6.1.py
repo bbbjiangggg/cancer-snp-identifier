@@ -101,13 +101,9 @@ def main():
     accession_list_file = input(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
-
     print(colored(f"\nTotal accession numbers found: {len(accession_numbers)}", "magenta"))
-    num_to_analyze = int(input(colored("4. How many accession numbers do you want to analyze? ", "magenta")))
-    accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
 
-    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
-    chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
+    chromosomes_input = input(colored("4. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
     vcf_option = 'separated'  # Default option for separated chromosomes
 
     if chromosomes_input.lower() == 'all':
@@ -122,6 +118,10 @@ def main():
         print(colored(f"\n{completed_vcf_count} VCF final file(s) have already been completed for the chosen chromosome(s).", "magenta"))
     else:
         print(colored("\nNo VCF final files have been completed yet for the chosen chromosome(s).", "magenta"))
+
+    # Now ask how many accession numbers they want to analyze after informing about completed VCF files
+    num_to_analyze = int(input(colored("5. How many accession numbers do you want to analyze? ", "magenta")))
+    accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
 
 
     print(colored("List of chromosomes to be analyzed:", "magenta"), chromosomes_list)
