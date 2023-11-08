@@ -92,10 +92,16 @@ for item in listdir(homedir):
         for content in listdir(subdir):
             match = re.match(r".*mapped_(\d+).var.-final.vcf", content)
             if match:
+<<<<<<< Updated upstream
                 file_chr = match.group(1)
                 if file_chr == chr:
                     shutil.move(os.path.join(subdir, content), os.path.join(isecdir, content))
                     print(f'Copied {content} corresponding to chromosome {chr} to: {directory}')
+=======
+                chr = match.group(1)
+                shutil.move(os.path.join(subdir, content), os.path.join(isecdir, content))
+                print(f'Copied {content} corresponding to chromosome {chr} to: {directory}')
+>>>>>>> Stashed changes
             else:
                 pass
     else:
