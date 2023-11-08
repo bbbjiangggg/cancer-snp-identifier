@@ -60,19 +60,19 @@ def get_verified_path(prompt_message):
         else:
             print(colored("The provided path does not exist. Please try again.", "magenta"))
 
-def check_final_vcf_files(accession_numbers, chromosomes_list):
+def count_completed_vcf_files(accession_numbers, chromosomes_list, vcf_option):
+    completed_vcf_count = 0
     for accession_number in accession_numbers:
-        print(colored(f"Checking VCF files for accession number: {accession_number}", "cyan"))
-        for chromosome in chromosomes_list:
-            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-            if os.path.isfile(final_vcf_file):
-                if is_file_empty(final_vcf_file):
-                    print(colored(f"The VCF file for {accession_number}, chromosome {chromosome} is empty.", "yellow"))
-                else:
-                    print(colored(f"VCF file for {accession_number}, chromosome {chromosome} is present and not empty.", "green"))
-            else:
-                print(colored(f"No VCF file found for {accession_number}, chromosome {chromosome}.", "red"))
-
+        if vcf_option == 'combined':
+            final_vcf_file = f"{accession_number}/{accession_number}_mapped_hg38.var.-final.vcf"
+            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+                completed_vcf_count += 1
+        else:
+            for chromosome in chromosomes_list:
+                final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
+                if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+                    completed_vcf_count += 1
+    return completed_vcf_count
 
 def main():
     text = "CANCER IMMUNOLOGY"
@@ -101,27 +101,40 @@ def main():
     accession_list_file = input(colored("3. Please enter the path to the accession list file: ", "magenta")).strip()
 
     accession_numbers = read_accession_numbers(accession_list_file)
-
     print(colored(f"\nTotal accession numbers found: {len(accession_numbers)}", "magenta"))
-    num_to_analyze = int(input(colored("4. How many accession numbers do you want to analyze? ", "magenta")))
-    accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
 
-    all_chromosomes = [str(i) for i in range(1, 23)] + ['X', 'Y']
-    chromosomes_input = input(colored("5. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
+    # Filter out accession numbers that already have completed VCF files
+    accession_numbers_without_vcf = []
+    for accession_number in accession_numbers:
+        final_vcf_file = f"{accession_number}/{accession_number}_mapped_22.var.-final.vcf"
+        if not (os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file)):
+            accession_numbers_without_vcf.append(accession_number)
+
+
+    chromosomes_input = input(colored("4. Please enter the chromosomes to be analyzed, separated by a comma, or type 'all' to analyze all chromosomes: ", "magenta"))
+    vcf_option = 'separated'  # Default option for separated chromosomes
 
     if chromosomes_input.lower() == 'all':
-    # Set vcf_option to 'combined' automatically when "all" is chosen
-        vcf_option = 'combined'
         chromosomes_list = ['hg38']
+        vcf_option = 'combined'  # Set to combined when "all" is chosen
     else:
         chromosomes_list = [chromosome.strip() for chromosome in chromosomes_input.split(',')]
 
+    # Call the function to count completed VCF files and inform the user
+    completed_vcf_count = count_completed_vcf_files(accession_numbers, chromosomes_list, vcf_option)
+    if completed_vcf_count > 0:
+        print(colored(f"\n{completed_vcf_count} VCF final file(s) have already been completed for the chosen chromosome(s).", "magenta"))
+    else:
+        print(colored("\nNo VCF final files have been completed yet for the chosen chromosome(s).", "magenta"))
+
+    # Now ask how many accession numbers they want to analyze from the filtered list
+    num_to_analyze = int(input(colored("5. How many accession numbers do you want to analyze from the available list? ", "magenta")))
+    accession_numbers_to_analyze = accession_numbers_without_vcf[:num_to_analyze]
+
+
+
     print(colored("List of chromosomes to be analyzed:", "magenta"), chromosomes_list)
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path, vcf_option)
-
-    # Perform the check
-    check_final_vcf_files(accession_numbers_to_analyze, chromosomes_list)
-
 
     for accession_number in accession_numbers_to_analyze:
         trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq.gz"
@@ -146,40 +159,49 @@ def main():
         else:
             print(colored("\n\033[1;32mTrimmed file already exists. Skipping download, trimming, and quality check...\033[0m", "magenta"))
 
-        for chromosome in chromosomes_list:
-            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
+    for chromosome in chromosomes_list:
+        final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
+        print(f"Checking VCF file for {accession_number}, chromosome {chromosome}...")
+
+        if os.path.isfile(final_vcf_file):
+            if not is_file_empty(final_vcf_file):
                 print(colored(f"\n\033[1;32mVCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...\033[0m", "magenta"))
                 continue
-            elif is_file_empty(final_vcf_file):
+            else:
                 print(colored(f"\n\033[1;33mVCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...\033[0m", "magenta"))
                 os.remove(final_vcf_file)
+        
+        all_chromosomes_skipped = False
 
-            if chromosome == 'hg38' and vcf_option == 'combined':
-                bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
-                bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
-            elif chromosome != 'hg38':
-                bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
-                bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
-            else:
-                continue
+        if chromosome == 'hg38' and vcf_option == 'combined':
+            bwa_chrom_path = "/usr/local/bin/bwa/hg38/GRCh38_reference.fa"
+            bowtie_index_path = "/usr/local/bin/bowtie/hg38/bowtie"
+        elif chromosome != 'hg38':
+            bwa_chrom_path = f"{bwa_base_path}{chromosome}_bwa_ind/Homo_sapiens.GRCh38.dna.chromosome.{chromosome}.fa"
+            bowtie_index_path = f"{bowtie_base_path}{chromosome}_bowtie_ind/bowtie"
+        else:
+            continue
 
-            print(colored(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ", "magenta"))
-            run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
+        if all_chromosomes_skipped:
+            print(f"All chromosomes for {accession_number} were skipped because VCF files exist. Moving to the next accession number.")
 
-            run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
-            print(colored("\n\033[1;35mSorting using Samtools...\033[0m ", "magenta"))
-            run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam > {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam")
+        print(colored(f"\n\033[1;35mMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...\033[0m ", "magenta"))
+        run_command(f"bowtie2 --very-fast-local -x {bowtie_index_path} {trimmed_file} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam")
 
-            print(colored("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ", "magenta"))
-            run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
+        run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
-            print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
-            run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
+        print(colored("\n\033[1;35mSorting using Samtools...\033[0m ", "magenta"))
+        run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam > {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam")
 
-            # Delete intermediate files to save disk space
-            delete_intermediate_files(accession_number, chromosome)
+        print(colored("\n\033[1;35mSummarizing the base calls (mpileup)...\033[0m ", "magenta"))
+        run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
+
+        print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
+        run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
+
+        # Delete intermediate files to save disk space
+        delete_intermediate_files(accession_number, chromosome)
 
     send_email_command = f'sendemail -f sudoroot1775@outlook.com -t {user_email} -u "{job_title}_Analysis Done" -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC'
     os.system(send_email_command)
