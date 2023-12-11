@@ -90,11 +90,19 @@ for item in listdir(homedir):
     if 'RR' in item:
         subdir = os.path.join(homedir, item)
         for content in listdir(subdir):
-            if '.vcf' in content and ('_chr' + chr + '_') in content:
-                shutil.move(os.path.join(subdir, content),
-                            os.path.join(isecdir, content))
-            else: pass
-    else: pass
+            match = re.match(r".*chr_([0-9XY]+)\.mapped\.var.-final.vcf", content)
+            if match:
+                file_chr = match.group(1)
+                print(f"Found file: {content}, Chromosome in file: {file_chr}")
+                if file_chr == chr:
+                    print(f"Moving file {content} to {isecdir}")
+                    shutil.move(os.path.join(subdir, content), os.path.join(isecdir, content))
+                    print(f'Copied {content} corresponding to chromosome {chr} to: {directory}')
+            else:
+                print(f"No match for file: {content}")
+    else:
+        print(f"Skipping item: {item}")
+
 
 print('All VCF files corresponding to chromosome ' + chr + ' have been copied to: ' + directory)
 print('\n')
