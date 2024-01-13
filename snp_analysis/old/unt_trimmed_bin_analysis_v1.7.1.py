@@ -3,7 +3,25 @@ import subprocess
 import sys
 import shutil
 import pyfiglet
+import socket
+import sendgrid
+from sendgrid.helpers.mail import Mail, Email, To, Content
 from termcolor import colored
+
+# Declare these variables as global so they can be accessed in functions
+global user_email, job_title
+
+def run_command(command):
+    try:
+        subprocess.run(command, check=True, shell=True)
+    except subprocess.CalledProcessError as e:
+        send_interruption_email(user_email, job_title, f"An error occurred during command execution: {e}")
+        print(colored(f"An error occurred: {e}", "red"), file=sys.stderr)
+        sys.exit(1)
+    except KeyboardInterrupt:
+        send_interruption_email(user_email, job_title, "User interrupted the process.")
+        print(colored("\nAnalysis interrupted by user. Exiting.", "red"))
+        sys.exit(1)
 
 def run_command(command):
     try:
@@ -64,7 +82,37 @@ def get_verified_path(prompt_message):
         else:
             print(colored("The provided path does not exist. Please try again.", "yellow"))
 
+def send_email_via_sendgrid(from_email, to_email, job_title, hostname, content):
+    api_key = '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'  # Your SendGrid API Key
+    sg = sendgrid.SendGridAPIClient(api_key=api_key)
+    
+    subject = f"{job_title} on {hostname} Analysis Completed"
+    from_email = Email(from_email)
+    to_email = To(to_email)
+    content = Content("text/plain", content)
+
+    mail = Mail(from_email, to_email, subject, content)
+
+    response = sg.client.mail.send.post(request_body=mail.get())
+
+    # Simplified user-friendly output based on the response
+    if response.status_code == 202:
+        print("Email sent successfully! Please check your inbox.")
+    elif 400 <= response.status_code < 500:
+        print("Failed to send email: There was a problem with the request. Please check the details and try again.")
+    elif 500 <= response.status_code < 600:
+        print("Failed to send email: Server error occurred. Please try again later.")
+    else:
+        print(f"Failed to send email: Unexpected status code received: {response.status_code}")
+
+def send_interruption_email(to_email, job_title, reason):
+    from_email = 'sudoroot1775@outlook.com'  # Your "from" email address
+    hostname = socket.gethostname()  # Automatically detect the host computer name
+    content = f"The analysis was interrupted. Reason: {reason}"
+    send_email_via_sendgrid(from_email, to_email, job_title, hostname, content)
+
 def main():
+    global user_email, job_title  # Use global declaration
     text = "CANCER IMMUNOLOGY v1.7"
     font = "banner3-D"
     terminal_width = os.get_terminal_size().columns
@@ -189,9 +237,12 @@ def main():
             # Delete intermediate files to save disk space
             delete_intermediate_files(accession_number, chromosome)
 
-    send_email_command = f'sendemail -f sudoroot1775@outlook.com -t {user_email} -u "{job_title}_Analysis Done" -m "Ready to receive information for the next analysis." -s smtp-mail.outlook.com:587 -o tls=yes -xu sudoroot1775@outlook.com -xp ydAEwVVu2s7uENC'
-    os.system(send_email_command)
+    # Email sending with SendGrid instead of system command
+    from_email = 'sudoroot1775@outlook.com'  # Your "from" email address
+    hostname = socket.gethostname()  # Automatically detect the host computer name
     
+    content = "The analysis has completed. Ready to receive information for the next analysis."
+    send_email_via_sendgrid(from_email, user_email, job_title, hostname, content)
 
 if __name__ == "__main__":
     main()

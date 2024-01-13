@@ -83,7 +83,7 @@ def get_verified_path(prompt_message):
             print(colored("The provided path does not exist. Please try again.", "yellow"))
 
 def send_email_via_sendgrid(from_email, to_email, job_title, hostname, content):
-    api_key = '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'  # Your SendGrid API Key
+    api_key = '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'  # Your SendGrid API Key
     sg = sendgrid.SendGridAPIClient(api_key=api_key)
     
     subject = f"{job_title} on {hostname} Analysis Completed"
