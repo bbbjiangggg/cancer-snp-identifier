@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cell Concentration Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;700&display=swap" rel="stylesheet"> 
+    <style>
+        body {
+            background-color: #800080; 
+            font-family: 'Ubuntu', sans-serif;
+            color: white;
+        }
+
+        .container {
+            width: 300px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            text-align: center;
+            color: black;
+            border-radius: 8px;
+        }
+
+        .banner {
+            color: white;
+            text-shadow: 3px 3px #000000;
+            font-size: 58px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            border: 1px solid #cccccc;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px;
+            width: 100%;
+            background-color: #00008B;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="banner">CANCER IMMUNOLOGY</div>
+    <div class="container">
+        <h1>Cell Concentration Calculator</h1>
+        <label for="area">Area of Imaged Field (µm²):</label><br>
+        <input type="number" id="area" name="area"><br>
+
+        <label for="count">Number of Cells Counted:</label><br>
+        <input type="number" id="count" name="count"><br>
+
+        <button onclick="calculateCellsPerML()">Calculate</button>
+        &nbsp;
+        <button onclick="clearData()">Clear</button> <!-- Clear button added -->
+
+        <p id="result"></p>
+    </div>
+
+    <script>
+        function calculateCellsPerML() {
+            var area = document.getElementById('area').value;
+            var count = document.getElementById('count').value;
+            
+            var correctionFactor = 1.11;
+            var depth = 100;
+            var dilutionFactor = 2;
+            var conversionFactor = 1000;
+
+            var areaInMM2 = area / 1e6;
+
+            var cellsPerML = (count * correctionFactor * dilutionFactor * conversionFactor) / (areaInMM2 * depth);
+
+            // Convert the result to the specified scientific notation style
+            var scientificNotation = convertToScientificNotation(cellsPerML);
+
+            document.getElementById('result').innerHTML = "Cells per mL: " + scientificNotation + " cells/mL";
+        }
+
+        function clearData() {
+            document.getElementById('area').value = '';
+            document.getElementById('count').value = '';
+            document.getElementById('result').innerHTML = '';
+        }
+
+        function convertToScientificNotation(number) {
+            var exponent = Math.floor(Math.log10(number));
+            var mantissa = number / Math.pow(10, exponent);
+            return mantissa.toFixed(2) + " x 10^" + exponent;
+        }
+    </script>
+</body>
+</html>
