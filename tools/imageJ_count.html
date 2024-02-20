@@ -60,43 +60,67 @@
         <label for="area">Area of Imaged Field (µm²):</label><br>
         <input type="number" id="area" name="area"><br>
 
-        <label for="count">Number of Cells Counted:</label><br>
-        <input type="number" id="count" name="count"><br>
+        <label for="count1">Number of Cells Counted <br> (Count 1):</label><br>
+        <input type="number" id="count1" name="count1"><br>
+
+        <!-- Additional count input fields -->
+        <label for="count2">Number of Cells Counted <br> (Count 2, optional):</label><br>
+        <input type="number" id="count2" name="count2"><br>
+        
+        <label for="count3">Number of Cells Counted <br> (Count 3, optional):</label><br>
+        <input type="number" id="count3" name="count3"><br>
+        
+        <label for="count4">Number of Cells Counted <br> (Count 4, optional):</label><br>
+        <input type="number" id="count4" name="count4"><br>
 
         <button onclick="calculateCellsPerML()">Calculate</button>
         &nbsp;
-        <button onclick="clearData()">Clear</button> <!-- Clear button added -->
+        <button onclick="clearData()">Clear</button>
 
         <p id="result"></p>
     </div>
 
     <script>
         function calculateCellsPerML() {
-            var area = document.getElementById('area').value;
-            var count = document.getElementById('count').value;
+            var area = document.getElementById('area').value; // Area in µm²
             
-            var correctionFactor = 1.11;
-            var depth = 100;
-            var dilutionFactor = 2;
-            var conversionFactor = 1000;
+            // Retrieve the counts from the input fields
+            var counts = [
+                document.getElementById('count1').value,
+                document.getElementById('count2').value,
+                document.getElementById('count3').value,
+                document.getElementById('count4').value,
+            ].map(Number).filter(Boolean); // Convert to numbers and filter out empty or non-numeric inputs
+            
+            // Calculate the average count, ignoring empty fields
+            var averageCount = counts.reduce((acc, val) => acc + val, 0) / counts.length;
+            
+            var depthOfField = 30; // Depth of field in micrometers (µm)
+            var dilutionFactor = 2; // Dilution factor
+            var volumeImagedML = (area * depthOfField) / 1e15; // Convert volume imaged from µm³ to mL
+            
+            // Calculate cells per mL using the average count
+            var cellsPerML = (averageCount / volumeImagedML) * dilutionFactor; 
 
-            var areaInMM2 = area / 1e6;
-
-            var cellsPerML = (count * correctionFactor * dilutionFactor * conversionFactor) / (areaInMM2 * depth);
-
-            // Convert the result to the specified scientific notation style
+            // Convert the result to scientific notation for readability
             var scientificNotation = convertToScientificNotation(cellsPerML);
 
-            document.getElementById('result').innerHTML = "Cells per mL: " + scientificNotation + " cells/mL";
+            document.getElementById('result').innerHTML = "Live Cell Count: " + scientificNotation + " cells/mL";
         }
 
         function clearData() {
             document.getElementById('area').value = '';
-            document.getElementById('count').value = '';
+            document.getElementById('count1').value = '';
+            document.getElementById('count2').value = '';
+            document.getElementById('count3').value = '';
+            document.getElementById('count4').value = '';
             document.getElementById('result').innerHTML = '';
         }
 
         function convertToScientificNotation(number) {
+            if (number < 1) {
+                return number.toFixed(2); // Handle numbers less than 1 without converting to scientific notation
+            }
             var exponent = Math.floor(Math.log10(number));
             var mantissa = number / Math.pow(10, exponent);
             return mantissa.toFixed(2) + " x 10^" + exponent;
