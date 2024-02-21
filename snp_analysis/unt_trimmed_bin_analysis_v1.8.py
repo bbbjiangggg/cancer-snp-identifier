@@ -5,10 +5,8 @@ sys.path.append('/usr/local/bin')
 import shutil
 import pyfiglet
 import socket
-import sendgrid
-from sendgrid.helpers.mail import Mail, Email, To, Content
 from termcolor import colored
-from config import SENDGRID_API_KEY  # Now Python knows where to find config.py
+
 
 # Declare these variables as global so they can be accessed in functions
 global user_email, job_title
@@ -84,28 +82,6 @@ def get_verified_path(prompt_message):
         else:
             print(colored("The provided path does not exist. Please try again.", "yellow"))
 
-def send_email_via_sendgrid(from_email, to_email, job_title, hostname, content):
-    sg = sendgrid.SendGridAPIClient(api_key=SENDGRID_API_KEY)  # Using the imported API key
-    
-    subject = f"{job_title} on {hostname} Analysis Completed"
-    from_email = Email(from_email)
-    to_email = To(to_email)
-    content = Content("text/plain", content)
-
-    mail = Mail(from_email, to_email, subject, content)
-
-    response = sg.client.mail.send.post(request_body=mail.get())
-
-    # Simplified user-friendly output based on the response
-    if response.status_code == 202:
-        print("Email sent successfully! Please check your inbox.")
-    elif 400 <= response.status_code < 500:
-        print("Failed to send email: There was a problem with the request. Please check the details and try again.")
-    elif 500 <= response.status_code < 600:
-        print("Failed to send email: Server error occurred. Please try again later.")
-    else:
-        print(f"Failed to send email: Unexpected status code received: {response.status_code}")
-
 def send_interruption_email(to_email, job_title, reason):
     from_email = 'sudoroot1775@outlook.com'  # Your "from" email address
     hostname = socket.gethostname()  # Automatically detect the host computer name
@@ -114,7 +90,7 @@ def send_interruption_email(to_email, job_title, reason):
 
 def main():
     global user_email, job_title  # Use global declaration
-    text = "CANCER IMMUNOLOGY v1.7"
+    text = "CANCER IMMUNOLOGY v1.8"
     font = "banner3-D"
     terminal_width = os.get_terminal_size().columns
     f = pyfiglet.Figlet(font=font, width=terminal_width)
@@ -238,12 +214,7 @@ def main():
             # Delete intermediate files to save disk space
             delete_intermediate_files(accession_number, chromosome)
 
-    # Email sending with SendGrid instead of system command
-    from_email = 'sudoroot1775@outlook.com'  # Your "from" email address
-    hostname = socket.gethostname()  # Automatically detect the host computer name
     
-    content = "The analysis has completed. Ready to receive information for the next analysis."
-    send_email_via_sendgrid(from_email, user_email, job_title, hostname, content)
 
 if __name__ == "__main__":
     main()
