@@ -26,28 +26,28 @@
         .container {
             width: 33%;
             margin: 0 auto;
-            padding: 40px; /* Increased padding for more space inside the container */
+            padding: 40px;
             background-color: #4f0f59;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             text-align: center;
             color: white;
             border-radius: 8px;
-            overflow: hidden; /* Ensure no overflow from the container */
+            overflow: hidden;
         }
 
         input[type="number"], input[type="text"], input[type="file"], label, legend {
-            display: block; /* Make elements block to occupy full width */
-            width: calc(100% - 20px); /* Adjust width to account for padding */
-            padding: 10px; /* Increased padding for more space around text */
-            margin: 15px auto; /* Increased margin for more space between elements */
+            display: block;
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin: 15px auto;
             border: 1px solid #cccccc;
             border-radius: 4px;
             font-weight: bold;
-            box-sizing: border-box; /* Ensure padding does not add to the width */
+            box-sizing: border-box;
         }
 
         input[type="submit"], button {
-            margin-top: 20px; /* Additional margin for spacing between buttons and fields */
+            margin-top: 20px;
             background-color: #00008B;
             color: white;
             padding: 10px 20px;
@@ -72,17 +72,17 @@
             background-color: black;
             padding: 10px;
             border-radius: 5px;
-            display: none; /* Initially hide the error box */
+            display: none;
         }
         
         fieldset {
-            border: none; /* Remove fieldset border for cleaner appearance */
-            margin: 20px 0; /* Added margin around fieldsets for better spacing */
+            border: none;
+            margin: 20px 0;
         }
 
         legend {
-            font-size: 1.2em; /* Increase legend font size for better visibility */
-            margin-bottom: 15px; /* Space below legend */
+            font-size: 1.2em;
+            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -116,10 +116,8 @@
             <button onclick="calculateCellsPerML()">Calculate</button>
             &nbsp;
             <button onclick="clearData()">Clear</button>
-            <!-- Display results here -->
             <div id="calculationResult" style="margin-top: 20px;"></div>
         </fieldset>
-        
 
         <!-- Cell Count and Concentration Calculator -->
         <fieldset>
@@ -128,19 +126,16 @@
                 <label for="liveCount">Live count:</label>
                 <input type="text" id="liveCount" name="liveCount">
         
-                <label for="desiredConcentration">Desired cell concentration in cells/mL <br> (e.g., 3e6 or 3 x 10^6):</label>
+                <label for="desiredConcentration">Desired cell concentration in cells/mL (e.g., 3e6 or 3 x 10^6):</label>
                 <input type="text" id="desiredConcentration" name="desiredConcentration" placeholder="e.g., 3e6, 3 x 10^6">
 
-        
                 <label for="volume">Desired volume (ml):</label>
                 <input type="text" id="volume" name="volume">
         
                 <input type="submit" value="Calculate">
-                <!-- "Clear" button added here for the second section -->
                 <button type="button" onclick="clearSecondForm()">Clear</button>
             </form>
         </fieldset>
-        
 
         <div id="results"></div>
         <div id="error"></div>
@@ -182,8 +177,67 @@
             document.getElementById('results').innerHTML = '';
             document.getElementById('error').style.display = 'none';
         }
+    
+    function parseScientificNotation(str) {
+    // Normalize the input: remove spaces and standardize to 'e' notation
+    let normalizedStr = str.replace(/\s+/g, '').replace(/(\d)[x\*](10\^)(\d+)/i, '$1e$3');
 
-        document.getElementById('fileInput').addEventListener('change', function(event) {
+    // Validate the normalized string against a more inclusive pattern
+    if (!/^(\d+(\.\d+)?)(e[+-]?\d+)?$/i.test(normalizedStr)) {
+        throw new Error('Please enter the desired cell concentration in a correct format (e.g., 3e6, 3 x 10^6, 3x10^6, 3*10^6, or 3 * 10^6).');
+    }
+
+    // Parse the normalized string as a float
+    let value = parseFloat(normalizedStr);
+    if (!isNaN(value)) {
+        return value;
+    } else {
+        // For any case not covered by parseFloat, manually parse
+        const parts = normalizedStr.split('e');
+        const base = parseFloat(parts[0]);
+        const exponent = parseFloat(parts[1]);
+        return base * Math.pow(10, exponent);
+    }
+}
+
+document.getElementById('calculatorForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const liveCountStr = document.getElementById('liveCount').value;
+    const desiredConcentrationStr = document.getElementById('desiredConcentration').value;
+    const volumeStr = document.getElementById('volume').value;
+
+    try {
+        const liveCount = parseScientificNotation(liveCountStr);
+        const desiredConcentration = parseScientificNotation(desiredConcentrationStr);
+        const volume = parseFloat(volumeStr);
+
+        if (isNaN(liveCount) || isNaN(desiredConcentration) || isNaN(volume)) {
+            throw new Error('Please enter valid numbers.');
+        }
+
+        // Calculation logic
+        const liveCellsNeededMl = desiredConcentration * volume / liveCount;
+        const liveCellsNeededUl = liveCellsNeededMl * 1000;
+        const mediumVolMl = volume - liveCellsNeededMl;
+        const mediumVolUl = mediumVolMl * 1000;
+
+        // Corrected target for displaying results
+        document.getElementById('results').innerHTML = `
+            <div style="text-align: left;">
+                For a volume of ${volume.toFixed(3)} ml, mix ${liveCellsNeededMl.toFixed(3)} ml (${liveCellsNeededUl.toFixed(2)} µl) of your cells with
+                ${mediumVolMl.toFixed(3)} ml (${mediumVolUl.toFixed(2)} µl) of complete medium for well-plates.<br>
+                <br>Make sure you pipette up and down to mix the cells!
+            </div>
+        `;
+    } catch (error) {
+        document.getElementById('error').textContent = error.message;
+        document.getElementById('error').style.display = 'block';
+    }
+});
+    
+        
+// Add the CSV file processing code here
+document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) {
                 return;
@@ -193,14 +247,19 @@
             reader.onload = function(e) {
                 const contents = e.target.result;
                 const lines = contents.split('\n').filter(Boolean);
-                // Assuming the first line contains headers and subsequent lines contain data
-                for (let i = 1; i < lines.length && i <= 5; i++) {
-                    const line = lines[i].split('\t');
-                    // Assuming CSV format: Area Mean Min Max Count
-                    document.getElementById(`count${i}`).value = line[4].trim(); // Set count value
+                document.getElementById('area').value = lines[1].split(',')[1].trim();
+                
+                for (let i = 2; i <= 5; i++) {
+                    const line = lines[i].split(',');
+                    const cellValue = line[5].trim();
+                    const countValue = parseInt(cellValue, 10);
+                    
+                    if(countValue !== 0) {
+                        document.getElementById(`count${i-1}`).value = cellValue;
+                    } else {
+                        document.getElementById(`count${i-1}`).value = '';
+                    }
                 }
-                // Optionally set the area field if needed
-                document.getElementById('area').value = lines[1].split('\t')[0].trim(); // Set area value from the first data row
             };
             reader.readAsText(file);
         });
@@ -210,4 +269,4 @@
         };
     </script>
 </body>
-</html>
+</html>          
