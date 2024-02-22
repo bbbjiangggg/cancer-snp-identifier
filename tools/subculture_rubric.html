@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancer Cell Subculture Rubric</title>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Ubuntu', sans-serif;
+        }
+        h2 {
+            color: #007bff;
+            font-size: 30px;
+            text-align: center;
+        }
+        .rubric-item, .notes-section {
+            margin-bottom: 10px;
+        }
+        label {
+            margin-left: 5px;
+        }
+        .notes-section textarea {
+            width: 100%;
+            height: 150px;
+        }
+    </style>
+</head>
+<body>
+    <h2>CANCER IMMUNOLOGY</h2>
+    <form id="rubricForm">
+        <div class="rubric-item">
+            <label for="studentName">Student(s) Name(s):</label>
+            <input type="text" id="studentName" name="studentName">
+        </div>
+        
+        <!-- Rubric Items -->
+        <div class="rubric-item"><input type="checkbox" id="mediaHeated" name="rubric"><label for="mediaHeated">Media heated and TE thawed</label></div>
+        <div class="rubric-item"><input type="checkbox" id="sterilizedFloorHood" name="rubric"><label for="sterilizedFloorHood">Sterilized floor of hood</label></div>
+        <div class="rubric-item"><input type="checkbox" id="sterilizedGloves" name="rubric"><label for="sterilizedGloves">Sterilized gloves</label></div>
+        <div class="rubric-item"><input type="checkbox" id="viewedCells" name="rubric"><label for="viewedCells">Viewed cells under microscope</label></div>
+        <div class="rubric-item"><input type="checkbox" id="estimatedConfluence" name="rubric"><label for="estimatedConfluence">Estimated correct confluence</label></div>
+        <div class="rubric-item"><input type="checkbox" id="keptFlaskOffCounter" name="rubric"><label for="keptFlaskOffCounter">Kept flask off counter</label></div>
+        <div class="rubric-item"><input type="checkbox" id="labeledTube" name="rubric"><label for="labeledTube">Labeled 50 ml tube SUB & station #</label></div>
+        <div class="rubric-item"><input type="checkbox" id="labeledPipettes" name="rubric"><label for="labeledPipettes">Labeled serological pipettes D & C</label></div>
+        <div class="rubric-item"><input type="checkbox" id="tubeCapOpen" name="rubric"><label for="tubeCapOpen">Tube cap open end up</label></div>
+        <div class="rubric-item"><input type="checkbox" id="rinsedFlaskFirst" name="rubric"><label for="rinsedFlaskFirst">Rinsed culture flask</label></div>
+        <div class="rubric-item"><input type="checkbox" id="loosenedCells" name="rubric"><label for="loosenedCells">Loosened cells in SUB tube</label></div>
+        <div class="rubric-item"><input type="checkbox" id="subTubeOnIce" name="rubric"><label for="subTubeOnIce">SUB tube placed on ice</label></div>
+        <div class="rubric-item"><input type="checkbox" id="sterilizedTETube" name="rubric"><label for="sterilizedTETube">Sterilized TE tube</label></div>
+        <div class="rubric-item"><input type="checkbox" id="flaskInIncubator" name="rubric"><label for="flaskInIncubator">Flask placed in CO2 incubator</label></div>
+        <div class="rubric-item"><input type="checkbox" id="rinsedFlaskSecond" name="rubric"><label for="rinsedFlaskSecond">Rinsed culture flask</label></div>
+        <div class="rubric-item"><input type="checkbox" id="centrifugation" name="rubric"><label for="centrifugation">@ 1,500 rpm, 4°C, for 5 minutes</label></div>
+        <div class="rubric-item"><input type="checkbox" id="labeledCultureFlask" name="rubric"><label for="labeledCultureFlask">Labeled culture flask</label></div>
+        <div class="rubric-item"><input type="checkbox" id="sterilizedSubTube" name="rubric"><label for="sterilizedSubTube">Sterilized SUB tube">Sterilized SUB tube</label></div>
+        <div class="rubric-item"><input type="checkbox" id="aspiratedSupernatant" name="rubric"><label for="aspiratedSupernatant">Aspirated supernatant</label></div>
+        <div class="rubric-item"><input type="checkbox" id="gentlyTappedTube" name="rubric"><label for="gentlyTappedTube">Gently tapped tube</label></div>
+        <div class="rubric-item"><input type="checkbox" id="pipettedMedia" name="rubric"><label for="pipettedMedia">Pipetted 10 ml media</label></div>
+        <div class="rubric-item"><input type="checkbox" id="singleCellSuspension" name="rubric"><label for="singleCellSuspension">Single cell suspension</label></div>
+        <div class="rubric-item"><input type="checkbox" id="pipettedIntoFlask" name="rubric"><label for="pipettedIntoFlask">Pipetted 5 ml into each culture flask</label></div>
+        <div class="rubric-item"><input type="checkbox" id="addedNewMedia" name="rubric"><label for="addedNewMedia">Added 9 ml of new media to each flask</label></div>
+        <div class="rubric-item"><input type="checkbox" id="noCrossContamination" name="rubric"><label for="noCrossContamination">Did not cross-contaminate</label></div>
+        <div class="rubric-item"><input type="checkbox" id="viewedFlasksUnderMicroscope" name="rubric"><label for="viewedFlasksUnderMicroscope">Viewed both culture flasks under microscope</label></div>
+        <div class="rubric-item"><input type="checkbox" id="placedFlasksInIncubator" name="rubric"><label for="placedFlasksInIncubator">Placed flasks in CO2 incubator</label></div>
+        <div class="rubric-item"><input type="checkbox" id="disposedOfUsedItems" name="rubric"><label for="disposedOfUsedItems">Disposed of any used tubes, pipettes or flasks</label></div>
+        <div class="rubric-item"><input type="checkbox" id="aspiratedBleach" name="rubric"><label for="aspiratedBleach">Aspirated 3 seconds’ worth of 10% bleach</label></div>
+        <div class="rubric-item"><input type="checkbox" id="clearedHose" name="rubric"><label for="clearedHose">Cleared the hose for 7 seconds</label></div>
+        <div class="rubric-item"><input type="checkbox" id="sterilizedFloorAgain" name="rubric"><label for="sterilizedFloorAgain">Sterilized floor of cell culture hood</label></div>
+        <div class="rubric-item"><input type="checkbox" id="turnedOnUVLight" name="rubric"><label for="turnedOnUVLight">Closed hatch and turned on UV light</label></div>
+        <div class="notes-section">
+            <label for="notes">Notes:</label>
+            <textarea id="notes" name="notes"></textarea>
+        </div>
+        <button type="button" onclick="window.print()">Print</button>
+        <button type="button" onclick="resetForm()">Reset</button>
+    </form>
+
+    <script>
+        function resetForm() {
+            document.getElementById("rubricForm").reset();
+        }
+    </script>
+</body>
+</html>
