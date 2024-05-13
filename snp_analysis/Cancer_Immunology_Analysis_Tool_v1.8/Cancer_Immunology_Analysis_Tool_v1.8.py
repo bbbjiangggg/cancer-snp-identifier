@@ -205,11 +205,11 @@ def main():
             print(colored("\nSorting using Samtools...", "magenta"))
             run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam > {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam")
 
-            #print(colored("\nSummarizing the base calls (mpileup)...", "magenta"))
-            #run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
+            print(colored("\nSummarizing the base calls (mpileup)...", "magenta"))
+            run_command(f"bcftools mpileup -f {bwa_chrom_path} {accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam | bcftools call -mv -Ob -o {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf")
 
-            #print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
-            #run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
+            print(colored("\n\033[1;35mFinalizing VCF...\033[0m ", "magenta"))
+            run_command(f"bcftools view {accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf | vcfutils.pl varFilter - > {final_vcf_file}")
 
             # Delete intermediate files to save disk space
             delete_intermediate_files(accession_number, chromosome)
