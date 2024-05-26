@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Define colors for better readability
+Magenta='\033[0;35m'
+Color_Off='\033[0m'
+
+# Print message for number analysis initiation
+echo -e "${Magenta}\nnumber trimmed analysis now initiated...\n${Color_Off}"
+
+
+# Print message mapping reads
+echo -e "${Magenta}Mapping reads using Bowtie2...${Color_Off}"
+# Map reads using Bowtie2
+bowtie2 --very-fast-local -x bowtie2_path now/now_trimmed.fq.gz -S now/now_mapped.sam
+samtools view -S -b now/now_mapped.sam > now/now_mapped.bam
+
+
+# Print message sorting BAM files
+echo -e "${Magenta}\nSorting BAM files using Samtools...\n${Color_Off}"
+# Sort the BAM file using Samtools
+samtools sort now/now_mapped.bam > now/now_mapped.sorted.bam
+
+
+# Print message summarizing base calls
+echo -e "${Magenta}Summarizing base calls (mpileup)...${Color_Off}"
+# Summarize the base calls of aligned reads to the reference sequence (mpileup)
+bcftools mpileup -f ref_chrom now/now_mapped.sorted.bam | bcftools call -mv -Ob -o now/now_mapped.raw.bcf
+
+
+# Print message finalizing VCF
+echo -e "${Magenta}\nFinalizing VCF file...\n${Color_Off}"
+# Finalize VCF file
+bcftools view now/now_mapped.raw.bcf | vcfutils.pl varFilter - > now/now_mapped.var-final.vcf
+
+# Remove unnecessary files
+rm now/now_mapped.sam now/now_mapped.bam now/now_mapped.sorted.bam now/now_mapped.raw.bcf
+
+# Print end message
+echo -e "${Magenta}number trimmed analysis completed\n${Color_Off}"
+
+
