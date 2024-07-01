@@ -90,7 +90,7 @@ for item in listdir(homedir):
     if 'RR' in item:
         subdir = os.path.join(homedir, item)
         for content in listdir(subdir):
-            match = re.match(r".*chr_([0-9XY]+)\.mapped\.var.-final.vcf", content)
+            match = re.match(r"mapped_([0-9XY]+)\.var\.-final\.vcf", content)
             if match:
                 file_chr = match.group(1)
                 print(f"Found file: {content}, Chromosome in file: {file_chr}")
