@@ -199,55 +199,54 @@ def main():
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
 
     for accession_number in accession_numbers_to_analyze:
-    for accession_number in accession_numbers_to_analyze:
-    # Ensure the output directory exists, or create it
-    ensure_directory(accession_number)
+        # Ensure the output directory exists, or create it
+        ensure_directory(accession_number)
 
-    # Check if trimmed files exist before attempting any downloads or trimming
-    trimmed_file_single = f"{accession_number}/{accession_number}_trimmed.fq"
-    trimmed_file_paired_1 = f"{accession_number}/{accession_number}_1_trimmed.fq"
-    trimmed_file_paired_2 = f"{accession_number}/{accession_number}_2_trimmed.fq"
+        # Check if trimmed files exist before attempting any downloads or trimming
+        trimmed_file_single = f"{accession_number}/{accession_number}_trimmed.fq"
+        trimmed_file_paired_1 = f"{accession_number}/{accession_number}_1_trimmed.fq"
+        trimmed_file_paired_2 = f"{accession_number}/{accession_number}_2_trimmed.fq"
 
-    if (read_type == '1' and os.path.isfile(trimmed_file_single)) or \
-       (read_type == '2' and os.path.isfile(trimmed_file_paired_1) and os.path.isfile(trimmed_file_paired_2)):
-        log_message(f"Trimmed files for {accession_number} found. Skipping download and trimming.", level="warning")
-    else:
-        # Attempt to download the data using prefetch and fasterq-dump
-        try:
-            log_message(f"\nDownloading sequence number {accession_number} with prefetch...", level="info")
-            run_command(f"prefetch {accession_number}")
+        if (read_type == '1' and os.path.isfile(trimmed_file_single)) or \
+           (read_type == '2' and os.path.isfile(trimmed_file_paired_1) and os.path.isfile(trimmed_file_paired_2)):
+            log_message(f"Trimmed files for {accession_number} found. Skipping download and trimming.", level="warning")
+        else:
+            # Attempt to download the data using prefetch and fasterq-dump
+            try:
+                log_message(f"\nDownloading sequence number {accession_number} with prefetch...", level="info")
+                run_command(f"prefetch {accession_number}")
 
-            if read_type == '1' and not os.path.isfile(trimmed_file_single):
-                log_message(f"\nConverting single-end sequence number {accession_number} with fasterq-dump...", level="info")
-                run_command(f"fasterq-dump {accession_number} --split-files --threads {threads} --progress")
-                # Move the resulting file to the corresponding directory
-                shutil.move(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
-            elif read_type == '2' and not (os.path.isfile(trimmed_file_paired_1) and os.path.isfile(trimmed_file_paired_2)):
-                log_message(f"\nConverting paired-end sequence number {accession_number} with fasterq-dump...", level="info")
-                run_command(f"fasterq-dump {accession_number} --split-files --threads {threads} --progress")
-                # Move the resulting files to the corresponding directory
-                shutil.move(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
-                shutil.move(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
-            else:
-                log_message(f"Trimmed files for {accession_number} found or invalid read type. Skipping download and trimming.", level="warning")
+                if read_type == '1' and not os.path.isfile(trimmed_file_single):
+                    log_message(f"\nConverting single-end sequence number {accession_number} with fasterq-dump...", level="info")
+                    run_command(f"fasterq-dump {accession_number} --split-files --threads {threads} --progress")
+                    # Move the resulting file to the corresponding directory
+                    shutil.move(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
+                elif read_type == '2' and not (os.path.isfile(trimmed_file_paired_1) and os.path.isfile(trimmed_file_paired_2)):
+                    log_message(f"\nConverting paired-end sequence number {accession_number} with fasterq-dump...", level="info")
+                    run_command(f"fasterq-dump {accession_number} --split-files --threads {threads} --progress")
+                    # Move the resulting files to the corresponding directory
+                    shutil.move(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
+                    shutil.move(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
+                else:
+                    log_message(f"Trimmed files for {accession_number} found or invalid read type. Skipping download and trimming.", level="warning")
 
-            log_message(f"FASTQ files for {accession_number} have been moved to the directory {accession_number}.", level="success")
+                log_message(f"FASTQ files for {accession_number} have been moved to the directory {accession_number}.", level="success")
 
-            # Now, continue with trimming the files
-            if read_type == '1':
-                log_message(f"\nTrimming {accession_number} with fastp...", level="info")
-                trim_command = f"{fastp_path} -i {accession_number}/{accession_number}.fastq -o {trimmed_file_single} --thread=4"
-                run_command(trim_command)
-            elif read_type == '2':
-                log_message(f"Trimming {accession_number} with fastp...", level="info")
-                trim_command = f"{fastp_path} -i {accession_number}/{accession_number}_1.fastq -I {accession_number}/{accession_number}_2.fastq -o {trimmed_file_paired_1} -O {trimmed_file_paired_2} --thread=4"
-                run_command(trim_command)
+                # Now, continue with trimming the files
+                if read_type == '1':
+                    log_message(f"\nTrimming {accession_number} with fastp...", level="info")
+                    trim_command = f"{fastp_path} -i {accession_number}/{accession_number}.fastq -o {trimmed_file_single} --thread=4"
+                    run_command(trim_command)
+                elif read_type == '2':
+                    log_message(f"Trimming {accession_number} with fastp...", level="info")
+                    trim_command = f"{fastp_path} -i {accession_number}/{accession_number}_1.fastq -I {accession_number}/{accession_number}_2.fastq -o {trimmed_file_paired_1} -O {trimmed_file_paired_2} --thread=4"
+                    run_command(trim_command)
 
-            shutil.move("fastp.html", f"{accession_number}/fastp.html")
-            shutil.move("fastp.json", f"{accession_number}/fastp.json")
-        except subprocess.CalledProcessError as e:
-            log_message(f"An error occurred while processing {accession_number} with prefetch or fasterq-dump. Please check the log for details.", level="error")
-            sys.exit(1)
+                shutil.move("fastp.html", f"{accession_number}/fastp.html")
+                shutil.move("fastp.json", f"{accession_number}/fastp.json")
+            except subprocess.CalledProcessError as e:
+                log_message(f"An error occurred while processing {accession_number} with prefetch or fasterq-dump. Please check the log for details.", level="error")
+                sys.exit(1)
 
         for chromosome in chromosomes_list:
             # Start a timer for each chromosome analysis
