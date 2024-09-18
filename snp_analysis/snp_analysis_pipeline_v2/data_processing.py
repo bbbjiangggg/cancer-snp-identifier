@@ -1,6 +1,6 @@
 import os
 import shutil
-from snp_analysis_pipeline_v2.logging_module import log_message
+from snp_analysis.snp_analysis_pipeline_v2.logging_module import log_message
 from snp_analysis_pipeline_v2.command_execution import run_command
 
 def detect_read_type(accession_number):

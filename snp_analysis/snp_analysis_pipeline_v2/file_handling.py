@@ -1,5 +1,5 @@
 import os
-from snp_analysis.logging_module import log_message
+from snp_analysis.snp_analysis_pipeline_v2.logging_module import log_message
 
 def read_accession_numbers(file_path):
     """Read accession numbers from a provided text file."""
