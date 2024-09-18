@@ -3,10 +3,10 @@ import time
 import pyfiglet
 from termcolor import colored
 from .file_handling import read_accession_numbers, detect_accession_list_file
-from snp_analysis_pipeline_v2.data_processing import detect_read_type, prefetch_and_convert, trim_reads
-from snp_analysis_pipeline_v2.command_execution import run_command
-from snp_analysis_pipeline_v2.path_management import ensure_directory, print_chromosome_paths
-from snp_analysis_pipeline_v2.logging_module import log_message
+from .data_processing import detect_read_type, prefetch_and_convert, trim_reads
+from .command_execution import run_command
+from .path_management import ensure_directory, print_chromosome_paths
+from .logging_module import log_message
 
 # Function to delete intermediate files
 def delete_intermediate_files(accession_number, chromosome):
@@ -24,6 +24,7 @@ def delete_intermediate_files(accession_number, chromosome):
         else:
             log_message(f"File {file_path} not found. Skipping deletion.", level="warning")
 
+# Improved banner
 def print_banner():
     banner_text = pyfiglet.figlet_format("CANCER IMMUNOLOGY", font="slant")
     print(colored(banner_text, "white"))
@@ -41,8 +42,8 @@ def main():
     fastp_path = "/usr/bin/fastp"
 
     # Step 1: Detect and select the accession list file (.txt)
+    log_message("1. Detecting accession list file...", level="info")
     accession_list_file = detect_accession_list_file()  # This function already handles the print messages
-
     print()  # Line space after step 1
 
     # Automatically use the recommended number of threads
@@ -60,6 +61,7 @@ def main():
 
     print()  # Line space after chromosome input
 
+    # Read accession numbers
     accession_numbers = read_accession_numbers(accession_list_file)
 
     # Check which accession numbers require analysis
