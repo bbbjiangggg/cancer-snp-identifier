@@ -2,7 +2,7 @@ import os
 import time
 import pyfiglet
 from termcolor import colored
-from snp_analysis_pipeline_v2.file_handling import read_accession_numbers, detect_accession_list_file
+from .file_handling import read_accession_numbers, detect_accession_list_file
 from snp_analysis_pipeline_v2.data_processing import detect_read_type, prefetch_and_convert, trim_reads
 from snp_analysis_pipeline_v2.command_execution import run_command
 from snp_analysis_pipeline_v2.path_management import ensure_directory, print_chromosome_paths
