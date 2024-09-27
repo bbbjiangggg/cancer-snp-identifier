@@ -1,7 +1,7 @@
 # command_execution.py
 import subprocess
 import sys
-from snp_analysis_pipeline_v2.logging_module import log_message
+from snp_analysis_pipeline_v2_1.logging_module import log_message
 
 def run_command(command):
     try:
