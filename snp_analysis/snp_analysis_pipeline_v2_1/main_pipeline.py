@@ -29,7 +29,7 @@ def delete_intermediate_files(accession_number, chromosome):
 def print_banner():
     banner_text = pyfiglet.figlet_format("CANCER IMMUNOLOGY", font="slant")
     print(colored(banner_text, "white"))
-    sub_text = "SNP Analysis Pipeline v2.0"
+    sub_text = "SNP Analysis Pipeline v2.1"
     print(colored(f"{'='*len(sub_text)}", "yellow"))
     print(colored(sub_text.center(len(sub_text)), "green", attrs=["bold"]))
     print(colored(f"{'='*len(sub_text)}", "yellow"))
