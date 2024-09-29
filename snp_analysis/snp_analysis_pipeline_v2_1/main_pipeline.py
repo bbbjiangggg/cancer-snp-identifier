@@ -12,19 +12,26 @@ from snp_analysis_pipeline_v2_1.logging_module import log_message
 
 # Function to delete intermediate files
 def delete_intermediate_files(accession_number, chromosome):
-    """Delete intermediate files like SAM, BAM, and raw BCF files."""
-    intermediate_files = [
+    """
+    Deletes intermediate files generated during the pipeline for a given accession number and chromosome.
+    This includes .sam, .bam, .raw.bcf, .fastq, and .sra files.
+    """
+    files_to_delete = [
         f"{accession_number}/{accession_number}_mapped_{chromosome}.sam",
         f"{accession_number}/{accession_number}_mapped_{chromosome}.bam",
-        f"{accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf"
+        f"{accession_number}/{accession_number}_mapped_{chromosome}.raw.bcf",
+        f"{accession_number}/{accession_number}_1.fastq",  # Paired-end read
+        f"{accession_number}/{accession_number}_2.fastq",  # Paired-end read
+        f"{accession_number}/{accession_number}.fastq",  # Single-end read
+        f"{accession_number}/{accession_number}.sra"  # SRA file
     ]
     
-    for file_path in intermediate_files:
+    for file_path in files_to_delete:
         if os.path.isfile(file_path):
             os.remove(file_path)
-            log_message(f"Deleted {file_path}", level="success")
+            log_message(f"Deleted {file_path}", level="info")
         else:
-            log_message(f"File {file_path} not found. Skipping deletion.", level="warning")
+            log_message(f"File not found: {file_path}", level="warning")
 
 def print_banner():
     banner_text = pyfiglet.figlet_format("CANCER IMMUNOLOGY", font="slant")
