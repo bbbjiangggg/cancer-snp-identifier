@@ -309,10 +309,9 @@ def main():
             if read_type == '1':
                 trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq"
                 if os.path.isfile(trimmed_file):
-                    is_trimmed_compressed = False
+                    pass  # Uncompressed file exists
                 elif os.path.isfile(trimmed_file + ".gz"):
-                    trimmed_file += ".gz"
-                    is_trimmed_compressed = True
+                    trimmed_file += ".gz"  # Use compressed file
                 else:
                     log_message(f"Trimmed file for {accession_number} not found.", level="error")
                     continue
@@ -321,11 +320,10 @@ def main():
                 trimmed_file_1 = f"{accession_number}/{accession_number}_1_trimmed.fq"
                 trimmed_file_2 = f"{accession_number}/{accession_number}_2_trimmed.fq"
                 if os.path.isfile(trimmed_file_1) and os.path.isfile(trimmed_file_2):
-                    is_trimmed_compressed = False
+                    pass  # Uncompressed files exist
                 elif os.path.isfile(trimmed_file_1 + ".gz") and os.path.isfile(trimmed_file_2 + ".gz"):
-                    trimmed_file_1 += ".gz"
+                    trimmed_file_1 += ".gz"  # Use compressed files
                     trimmed_file_2 += ".gz"
-                    is_trimmed_compressed = True
                 else:
                     log_message(f"Trimmed files for {accession_number} not found.", level="error")
                     continue
@@ -334,11 +332,8 @@ def main():
                 log_message("Invalid read type specified. Exiting.", level="error")
                 sys.exit(1)
 
-            # Add '--gz' option if input files are compressed
-            if is_trimmed_compressed:
-                bowtie_command = f"bowtie2 --very-fast-local -x {bowtie_index_path} {bowtie_input_option} --threads {threads} --gzip -S {accession_number}/{accession_number}_mapped_{chromosome}.sam"
-            else:
-                bowtie_command = f"bowtie2 --very-fast-local -x {bowtie_index_path} {bowtie_input_option} --threads {threads} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam"
+            # Remove '--gzip' from the bowtie_command
+            bowtie_command = f"bowtie2 --very-fast-local -x {bowtie_index_path} {bowtie_input_option} --threads {threads} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam"
 
             log_message(f"\nMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...", level="info")
             run_command(bowtie_command)
