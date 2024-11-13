@@ -190,12 +190,28 @@ def main():
 
     chromosomes_list = all_chromosomes if chromosomes_input.lower() == 'all' else [chromosome.strip() for chromosome in chromosomes_input.split(',')]
 
-    # Step 5: How many accession numbers to analyze?
+    accession_numbers_to_analyze = []
+
+    for accession_number in accession_numbers:
+        analysis_needed = False
+        for chromosome in chromosomes_list:
+            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
+            if not os.path.isfile(final_vcf_file) or is_file_empty(final_vcf_file):
+                analysis_needed = True
+                log_message(f"Final VCF file for {accession_number}, chromosome {chromosome} is missing or empty.", level="info")
+                break
+            else:
+                log_message(f"VCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis for this chromosome...", level="warning")
+
+        if analysis_needed:
+            accession_numbers_to_analyze.append(accession_number)
+
+    # Step 5: How many accession numbers would you like to analyze?
     print(f"5. How many accession numbers would you like to analyze? (1-{total_accession_numbers}):", end=" ")
     num_to_analyze = int(input().strip())
     print()  # Line space after input
 
-    accession_numbers_to_analyze = accession_numbers[:num_to_analyze]
+    accession_numbers_to_analyze = accession_numbers_to_analyze[:num_to_analyze]
 
     log_message("List of chromosomes to be analyzed:", level="info", normal_part=str(chromosomes_list))
     print_chromosome_paths(chromosomes_list, bwa_base_path, bowtie_base_path)
@@ -205,94 +221,54 @@ def main():
         # Ensure the output directory exists, or create it
         ensure_directory(accession_number)
 
-        # Check if trimmed files exist before attempting any downloads or trimming
-        trimmed_file_single = f"{accession_number}/{accession_number}_trimmed.fq"
-        trimmed_file_single_gz = trimmed_file_single + ".gz"
-        trimmed_file_paired_1 = f"{accession_number}/{accession_number}_1_trimmed.fq"
-        trimmed_file_paired_1_gz = trimmed_file_paired_1 + ".gz"
-        trimmed_file_paired_2 = f"{accession_number}/{accession_number}_2_trimmed.fq"
-        trimmed_file_paired_2_gz = trimmed_file_paired_2 + ".gz"
+        # Attempt to download the data using prefetch and fasterq-dump
+        try:
+            log_message(f"\nDownloading sequence number {accession_number} with prefetch...", level="info")
+            run_command(f"prefetch {accession_number}")
 
-        # Check if trimming is already done
-        trimming_done = False
-        if read_type == '1':
-            if os.path.isfile(trimmed_file_single) or os.path.isfile(trimmed_file_single_gz):
-                log_message(f"Trimmed file for {accession_number} already exists. Skipping trimming.", level="info")
-                trimming_done = True
-        elif read_type == '2':
-            if (os.path.isfile(trimmed_file_paired_1) and os.path.isfile(trimmed_file_paired_2)) or \
-               (os.path.isfile(trimmed_file_paired_1_gz) and os.path.isfile(trimmed_file_paired_2_gz)):
-                log_message(f"Trimmed files for {accession_number} already exist. Skipping trimming.", level="info")
-                trimming_done = True
+            if read_type == '1':
+                log_message(f"\nConverting single-end sequence number {accession_number} with fasterq-dump...", level="info")
+                run_command(f"fasterq-dump {accession_number} --threads {threads} --progress")
+                # Move the resulting file to the corresponding directory
+                shutil.move(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
+            elif read_type == '2':
+                log_message(f"\nConverting paired-end sequence number {accession_number} with fasterq-dump...", level="info")
+                run_command(f"fasterq-dump {accession_number} --split-files --threads {threads} --progress")
+                # Move the resulting files to the corresponding directory
+                shutil.move(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
+                shutil.move(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
+            else:
+                log_message(f"Invalid read type. Skipping {accession_number}.", level="error")
+                continue
 
-        if not trimming_done:
-            # Attempt to download the data using prefetch and fasterq-dump
-            try:
-                # Check if raw FASTQ files already exist
-                raw_fastq_exists = False
-                if read_type == '1':
-                    raw_fastq = f"{accession_number}/{accession_number}.fastq"
-                    if os.path.isfile(raw_fastq):
-                        log_message(f"Raw FASTQ file for {accession_number} already exists. Skipping download.", level="info")
-                        raw_fastq_exists = True
-                elif read_type == '2':
-                    raw_fastq_1 = f"{accession_number}/{accession_number}_1.fastq"
-                    raw_fastq_2 = f"{accession_number}/{accession_number}_2.fastq"
-                    if os.path.isfile(raw_fastq_1) and os.path.isfile(raw_fastq_2):
-                        log_message(f"Raw FASTQ files for {accession_number} already exist. Skipping download.", level="info")
-                        raw_fastq_exists = True
+            log_message(f"FASTQ files for {accession_number} have been moved to the directory {accession_number}.", level="success")
 
-                if not raw_fastq_exists:
-                    log_message(f"\nDownloading sequence number {accession_number} with prefetch...", level="info")
-                    run_command(f"prefetch {accession_number}")
+            # Now, continue with trimming the files
+            if read_type == '1':
+                log_message(f"\nTrimming {accession_number} with fastp...", level="info")
+                trim_command = f"{fastp_path} -i {accession_number}/{accession_number}.fastq -o {accession_number}/{accession_number}_trimmed.fq --thread=4"
+                run_command(trim_command)
+            elif read_type == '2':
+                log_message(f"Trimming {accession_number} with fastp...", level="info")
+                trim_command = f"{fastp_path} -i {accession_number}/{accession_number}_1.fastq -I {accession_number}/{accession_number}_2.fastq -o {accession_number}/{accession_number}_1_trimmed.fq -O {accession_number}/{accession_number}_2_trimmed.fq --thread=4"
+                run_command(trim_command)
 
-                    if read_type == '1':
-                        log_message(f"\nConverting single-end sequence number {accession_number} with fasterq-dump...", level="info")
-                        run_command(f"fasterq-dump {accession_number} --threads {threads} --progress")
-                        # Move the resulting file to the corresponding directory
-                        shutil.move(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
-                    elif read_type == '2':
-                        log_message(f"\nConverting paired-end sequence number {accession_number} with fasterq-dump...", level="info")
-                        run_command(f"fasterq-dump {accession_number} --split-files --threads {threads} --progress")
-                        # Move the resulting files to the corresponding directory
-                        shutil.move(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
-                        shutil.move(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
-                    else:
-                        log_message(f"Invalid read type. Skipping {accession_number}.", level="error")
-                        continue
+            shutil.move("fastp.html", f"{accession_number}/fastp.html")
+            shutil.move("fastp.json", f"{accession_number}/fastp.json")
+        except subprocess.CalledProcessError as e:
+            log_message(f"An error occurred while processing {accession_number} with prefetch or fasterq-dump. Please check the log for details.", level="error")
+            sys.exit(1)
 
-                    log_message(f"FASTQ files for {accession_number} have been moved to the directory {accession_number}.", level="success")
-
-                # Now, continue with trimming the files
-                if read_type == '1':
-                    log_message(f"\nTrimming {accession_number} with fastp...", level="info")
-                    trim_command = f"{fastp_path} -i {accession_number}/{accession_number}.fastq -o {trimmed_file_single} --thread=4"
-                    run_command(trim_command)
-                elif read_type == '2':
-                    log_message(f"Trimming {accession_number} with fastp...", level="info")
-                    trim_command = f"{fastp_path} -i {accession_number}/{accession_number}_1.fastq -I {accession_number}/{accession_number}_2.fastq -o {trimmed_file_paired_1} -O {trimmed_file_paired_2} --thread=4"
-                    run_command(trim_command)
-
-                shutil.move("fastp.html", f"{accession_number}/fastp.html")
-                shutil.move("fastp.json", f"{accession_number}/fastp.json")
-            except subprocess.CalledProcessError as e:
-                log_message(f"An error occurred while processing {accession_number} with prefetch or fasterq-dump. Please check the log for details.", level="error")
-                sys.exit(1)
-        else:
-            log_message(f"Trimming already completed for {accession_number}.", level="info")
-
+        # Now process per chromosome
         for chromosome in chromosomes_list:
             # Start a timer for each chromosome analysis
             start_time = time.time()
 
-            final_vcf_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.var.-final.vcf"
-
-            if os.path.isfile(final_vcf_file) and not is_file_empty(final_vcf_file):
-                log_message(f"VCF file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...", level="warning")
+            # Check if the sorted BAM file exists
+            sorted_bam_file = f"{accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam"
+            if os.path.isfile(sorted_bam_file) and not is_file_empty(sorted_bam_file):
+                log_message(f"Sorted BAM file for {accession_number}, chromosome {chromosome} already exists. Skipping analysis...", level="warning")
                 continue
-            elif is_file_empty(final_vcf_file):
-                log_message(f"VCF file for {accession_number}, chromosome {chromosome} is empty. Deleting and adding to analysis...", level="warning")
-                os.remove(final_vcf_file)
 
             # Set paths for BWA and Bowtie2 indices dynamically based on the chromosome
             if chromosome != 'hg38':
@@ -302,59 +278,26 @@ def main():
                 bowtie_index_path = f"{bowtie_base_path}hg38/bowtie"
                 bwa_chrom_path = f"{bwa_base_path}hg38/GRCh38_reference.fa"
 
-            # Determine if the trimmed files are compressed
+            # Set the correct input file for mapping based on read type
             if read_type == '1':
-                trimmed_file = f"{accession_number}/{accession_number}_trimmed.fq"
-                if os.path.isfile(trimmed_file):
-                    pass  # Uncompressed file exists
-                elif os.path.isfile(trimmed_file + ".gz"):
-                    trimmed_file += ".gz"  # Use compressed file
-                else:
-                    log_message(f"Trimmed file for {accession_number} not found.", level="error")
-                    continue
-                bowtie_input_option = f"-U {trimmed_file}"
+                input_file_for_mapping = f"{accession_number}/{accession_number}_trimmed.fq"
+                bowtie_input_option = f"-U {input_file_for_mapping}"
             elif read_type == '2':
-                trimmed_file_1 = f"{accession_number}/{accession_number}_1_trimmed.fq"
-                trimmed_file_2 = f"{accession_number}/{accession_number}_2_trimmed.fq"
-                if os.path.isfile(trimmed_file_1) and os.path.isfile(trimmed_file_2):
-                    pass  # Uncompressed files exist
-                elif os.path.isfile(trimmed_file_1 + ".gz") and os.path.isfile(trimmed_file_2 + ".gz"):
-                    trimmed_file_1 += ".gz"  # Use compressed files
-                    trimmed_file_2 += ".gz"
-                else:
-                    log_message(f"Trimmed files for {accession_number} not found.", level="error")
-                    continue
-                bowtie_input_option = f"-1 {trimmed_file_1} -2 {trimmed_file_2}"
+                input_file_for_mapping_1 = f"{accession_number}/{accession_number}_1_trimmed.fq"
+                input_file_for_mapping_2 = f"{accession_number}/{accession_number}_2_trimmed.fq"
+                bowtie_input_option = f"-1 {input_file_for_mapping_1} -2 {input_file_for_mapping_2}"
             else:
                 log_message("Invalid read type specified. Exiting.", level="error")
                 sys.exit(1)
 
-            # Check if mapping is already done
-            mapped_sam = f"{accession_number}/{accession_number}_mapped_{chromosome}.sam"
-            if os.path.isfile(mapped_sam) and not is_file_empty(mapped_sam):
-                log_message(f"Mapping already completed for {accession_number}, chromosome {chromosome}. Skipping mapping.", level="info")
-            else:
-                log_message(f"\nMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...", level="info")
-                bowtie_command = f"bowtie2 --very-fast-local -x {bowtie_index_path} {bowtie_input_option} --threads {threads} -S {mapped_sam}"
-                run_command(bowtie_command)
+            log_message(f"\nMapping {accession_number} reads using Bowtie2 for chromosome {chromosome}...", level="info")
+            bowtie_command = f"bowtie2 --very-fast-local -x {bowtie_index_path} {bowtie_input_option} --threads {threads} -S {accession_number}/{accession_number}_mapped_{chromosome}.sam"
+            run_command(bowtie_command)
 
-            # Check if BAM file exists
-            mapped_bam = f"{accession_number}/{accession_number}_mapped_{chromosome}.bam"
-            if os.path.isfile(mapped_bam) and not is_file_empty(mapped_bam):
-                log_message(f"BAM file already exists for {accession_number}, chromosome {chromosome}. Skipping SAM to BAM conversion.", level="info")
-            else:
-                log_message("\nConverting SAM to BAM...", level="blue")
-                run_command(f"samtools view -S -b {mapped_sam} > {mapped_bam}")
+            run_command(f"samtools view -S -b {accession_number}/{accession_number}_mapped_{chromosome}.sam > {accession_number}/{accession_number}_mapped_{chromosome}.bam")
 
-            # Check if sorted BAM exists
-            sorted_bam = f"{accession_number}/{accession_number}_mapped_{chromosome}.sorted.bam"
-            if os.path.isfile(sorted_bam) and not is_file_empty(sorted_bam):
-                log_message(f"Sorted BAM file already exists for {accession_number}, chromosome {chromosome}. Skipping sorting.", level="info")
-            else:
-                log_message("\nSorting BAM file using Samtools...", level="blue")
-                run_command(f"samtools sort {mapped_bam} -o {sorted_bam}")
-
-            # Continue with the rest of your analysis pipeline...
+            log_message("\nSorting using Samtools...", level="blue")
+            run_command(f"samtools sort {accession_number}/{accession_number}_mapped_{chromosome}.bam -o {sorted_bam_file}")
 
             # Delete intermediate files to save disk space
             delete_intermediate_files(accession_number, chromosome)
