@@ -5,7 +5,7 @@ import subprocess  # Import subprocess for running shell commands
 from termcolor import colored
 from tqdm import tqdm  # Add tqdm for the progress bar
 from snp_analysis_pipeline_v2_1.file_handling import read_accession_numbers, detect_accession_list_file
-from snp_analysis_pipeline_v2_1.data_processing import detect_read_type, prefetch_and_convert, trim_reads
+from snp_analysis_pipeline_v2_1.data_processing import detect_read_type, download_and_convert, trim_reads
 from snp_analysis_pipeline_v2_1.command_execution import run_command
 from snp_analysis_pipeline_v2_1.path_management import ensure_directory, print_chromosome_paths
 from snp_analysis_pipeline_v2_1.logging_module import log_message
@@ -73,7 +73,8 @@ def main():
     # Step 2: Enter chromosomes to analyze
     print("2. Enter chromosomes to analyze (comma-separated) or 'all' for all chromosomes:", end=" ")
     chromosomes_input = input().strip()
-    chromosomes_list = [str(i) for i in range(1, 23)] + ['X', 'Y'] if chromosomes_input.lower() == 'all' else chromosomes_input.split(',')
+    chromosomes_list = [str(i) for i in range(1, 23)] + ['X', 'Y'] if chromosomes_input.lower() == 'all' else [c.strip() for c in chromosomes_input.split(',')]
+
 
     print()  # Line space after chromosome input
 
@@ -134,7 +135,7 @@ def main():
                     trimmed_files_found[accession_number] = True
                 else:
                     # If no trimmed files are found, download and trim the FASTQ files
-                    prefetch_and_convert(accession_number, threads)
+                    download_and_convert(accession_number, threads)
                     read_type = detect_read_type(accession_number)
                     trim_reads(accession_number, read_type, fastp_path)
             else:
