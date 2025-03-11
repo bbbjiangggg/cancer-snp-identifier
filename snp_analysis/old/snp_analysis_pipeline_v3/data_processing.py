@@ -5,22 +5,15 @@ from snp_analysis_pipeline_v3.command_execution import run_command
 
 def detect_read_type(accession_number):
     """Automatically detect if reads are single-end or paired-end."""
-    # Check if trimmed files exist and skip FASTQ detection
-    if os.path.isfile(f"{accession_number}/{accession_number}_trimmed.fq") or (
-        os.path.isfile(f"{accession_number}/{accession_number}_1_trimmed.fq") and os.path.isfile(f"{accession_number}/{accession_number}_2_trimmed.fq")):
-        log_message(f"Trimmed files detected for {accession_number}. Skipping FASTQ detection.", level="info")
-        if os.path.isfile(f"{accession_number}/{accession_number}_1_trimmed.fq") and os.path.isfile(f"{accession_number}/{accession_number}_2_trimmed.fq"):
-            return '2'  # Paired-end
-        else:
-            return '1'  # Single-end
-
-    # Check for uncompressed FASTQ files
+    # Check for paired-end reads
     if os.path.isfile(f"{accession_number}/{accession_number}_1.fastq") and os.path.isfile(f"{accession_number}/{accession_number}_2.fastq"):
         log_message(f"Detected paired-end reads for {accession_number}.", level="info")
-        return '2'  # Paired-end
+        return '2'
+    # Check for single-end reads
     elif os.path.isfile(f"{accession_number}/{accession_number}.fastq"):
-        log_message(f"Detected single-end read for {accession_number}.", level="info")
-        return '1'  # Single-end
+        log_message(f"Detected single-end reads for {accession_number}.", level="info")
+        return '1'
+    # If no valid files are found, raise an error
     else:
         log_message(f"No valid FASTQ files found for {accession_number}.", level="error")
         raise FileNotFoundError(f"No FASTQ files found for {accession_number}.")
