@@ -1,9 +1,9 @@
 import os
 import time
 import pyfiglet
-import subprocess  # Import subprocess for running shell commands
+import subprocess
 from termcolor import colored
-from tqdm import tqdm  # Add tqdm for the progress bar
+from tqdm import tqdm
 from snp_analysis_pipeline_v3.file_handling import read_accession_numbers, detect_accession_list_file
 from snp_analysis_pipeline_v3.data_processing import detect_read_type, prefetch_and_convert, trim_reads
 from snp_analysis_pipeline_v3.command_execution import run_command
