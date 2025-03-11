@@ -1,7 +1,7 @@
 # path_management.py
 import os
 from typing import List
-from snp_analysis_pipeline_v2_1.logging_module import log_message
+from snp_analysis_pipeline_v2_2.logging_module import log_message
 
 def ensure_directory(path: str) -> None:
     """

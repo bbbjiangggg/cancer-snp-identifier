@@ -2,8 +2,8 @@
 import os
 import shutil
 from typing import Optional
-from snp_analysis_pipeline_v2_1.logging_module import log_message
-from snp_analysis_pipeline_v2_1.command_execution import run_command
+from snp_analysis_pipeline_v2_2.logging_module import log_message
+from snp_analysis_pipeline_v2_2.command_execution import run_command
 
 def detect_read_type(accession_number: str) -> str:
     """

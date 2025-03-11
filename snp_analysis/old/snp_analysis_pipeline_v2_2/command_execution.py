@@ -2,7 +2,7 @@
 import subprocess
 import sys
 from typing import Optional
-from snp_analysis_pipeline_v2_1.logging_module import log_message
+from snp_analysis_pipeline_v2_2.logging_module import log_message
 
 def run_command(command: str, timeout: Optional[int] = None) -> None:
     """
