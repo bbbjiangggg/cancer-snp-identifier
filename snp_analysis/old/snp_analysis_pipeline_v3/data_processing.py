@@ -36,7 +36,7 @@ def prefetch_and_convert(accession_number, threads):
     log_message(f"\nDownloading and converting {accession_number} using fastq-dump...", level="info")
     
     # Run fastq-dump without compression
-    fastq_dump_command = f"fastq-dump {accession_number}"
+    fastq_dump_command = f"fastq-dump --split-files {accession_number}"
     run_command(fastq_dump_command)
 
     # Move output FASTQ files to the designated directory
@@ -47,7 +47,7 @@ def prefetch_and_convert(accession_number, threads):
     if os.path.isfile(f"{accession_number}_2.fastq"):
         shutil.move(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
 
-    # If the data is single-end, ensure the file is named SRR25385865.fastq
+    # If the data is single-end, rename _1.fastq to SRR25385865.fastq
     if os.path.isfile(f"{accession_number}/{accession_number}_1.fastq") and not os.path.isfile(f"{accession_number}/{accession_number}_2.fastq"):
         os.rename(f"{accession_number}/{accession_number}_1.fastq", f"{accession_number}/{accession_number}.fastq")
         log_message(f"Renamed {accession_number}_1.fastq to {accession_number}.fastq for single-end reads.", level="info")
