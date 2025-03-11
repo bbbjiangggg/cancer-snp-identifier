@@ -35,8 +35,8 @@ def prefetch_and_convert(accession_number, threads):
 
     log_message(f"\nDownloading and converting {accession_number} using fastq-dump...", level="info")
     
-    # Run fastq-dump with multi-threading and compression
-    fastq_dump_command = f"fastq-dump --split-files --gzip --threads {threads} {accession_number}"
+    # Run fastq-dump without the unsupported --threads option
+    fastq_dump_command = f"fastq-dump --split-files --gzip {accession_number}"
     run_command(fastq_dump_command)
 
     # Move output FASTQ files to the designated directory
