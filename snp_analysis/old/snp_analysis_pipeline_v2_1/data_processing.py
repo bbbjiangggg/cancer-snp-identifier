@@ -34,18 +34,32 @@ def prefetch_and_convert(accession_number, threads):
         return
 
     log_message(f"\nDownloading and converting {accession_number} using fastq-dump...", level="info")
-    
-    # Run fastq-dump without the unsupported --threads option
+
+    # Run fastq-dump to download reads
     fastq_dump_command = f"fastq-dump --split-files --gzip {accession_number}"
     run_command(fastq_dump_command)
 
-    # Move output FASTQ files to the designated directory
-    if os.path.isfile(f"{accession_number}.fastq.gz"):
-        shutil.move(f"{accession_number}.fastq.gz", f"{accession_number}/{accession_number}.fastq.gz")
-    if os.path.isfile(f"{accession_number}_1.fastq.gz"):
-        shutil.move(f"{accession_number}_1.fastq.gz", f"{accession_number}/{accession_number}_1.fastq.gz")
-    if os.path.isfile(f"{accession_number}_2.fastq.gz"):
-        shutil.move(f"{accession_number}_2.fastq.gz", f"{accession_number}/{accession_number}_2.fastq.gz")
+    # Check if output files exist and rename them to match the expected format
+    single_end_file = f"{accession_number}.fastq.gz"
+    paired_end_file_1 = f"{accession_number}_1.fastq.gz"
+    paired_end_file_2 = f"{accession_number}_2.fastq.gz"
+
+    # If paired-end files exist, keep them as they are
+    if os.path.isfile(paired_end_file_1) and os.path.isfile(paired_end_file_2):
+        log_message(f"Paired-end reads detected for {accession_number}.", level="info")
+        shutil.move(paired_end_file_1, f"{accession_number}/{accession_number}_1.fastq.gz")
+        shutil.move(paired_end_file_2, f"{accession_number}/{accession_number}_2.fastq.gz")
+    
+    # If only _1.fastq.gz exists, assume it's a single-end read and rename it
+    elif os.path.isfile(paired_end_file_1) and not os.path.isfile(paired_end_file_2):
+        log_message(f"Single-end read detected for {accession_number}. Renaming file.", level="info")
+        shutil.move(paired_end_file_1, f"{accession_number}/{accession_number}.fastq.gz")
+
+    # If the expected files are missing, log an error
+    else:
+        log_message(f"❌ FASTQ file(s) missing for {accession_number}. Check fastq-dump output.", level="error")
+        raise FileNotFoundError(f"FASTQ file(s) missing for {accession_number}.")
+
 
 def trim_reads(accession_number, read_type, fastp_path):
     """Trim reads using fastp."""
