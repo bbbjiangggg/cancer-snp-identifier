@@ -30,12 +30,21 @@ def delete_intermediate_files(accession_number, chromosome):
             log_message(f"File not found: {file_path}", level="warning")
 
 def print_banner():
+    # Generate ASCII banner using pyfiglet
     banner_text = pyfiglet.figlet_format("CANCER IMMUNOLOGY", font="slant")
+    
+    # Add a styled emoji banner
+    emoji_banner = "🧬🔬🧪 CANCER RESEARCH - SNP PIPELINE 🧪🔬🧬"
+    
+    # Define the subtext with color highlights
+    sub_text = "🔥 SNP Analysis Pipeline v3.0 🔥"
+
+    # Print the enhanced banner
     print(colored(banner_text, "white"))
-    sub_text = "SNP Analysis Pipeline v2.1"
-    print(colored(f"{'='*len(sub_text)}", "yellow"))
+    print(colored(emoji_banner, "cyan", attrs=["bold"]))
+    print(colored("=" * len(sub_text), "yellow"))
     print(colored(sub_text.center(len(sub_text)), "green", attrs=["bold"]))
-    print(colored(f"{'='*len(sub_text)}", "yellow"))
+    print(colored("=" * len(sub_text), "yellow"))
 
 def run_command_with_progress(command, description="Processing", duration_estimate=100):
     with tqdm(total=duration_estimate, desc=description, unit="s", ncols=100) as pbar:
