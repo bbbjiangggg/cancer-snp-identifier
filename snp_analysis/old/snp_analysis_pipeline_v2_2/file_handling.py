@@ -1,4 +1,3 @@
-# file_handling.py
 import os
 from typing import List
 from snp_analysis_pipeline_v2_2.logging_module import log_message
@@ -59,7 +58,7 @@ def delete_intermediate_files(accession_number: str, chromosome: str) -> None:
 
 def detect_accession_list_file() -> str:
     """
-    Detect a .txt file in the current directory and ask the user if it's the correct one.
+    Detects a .txt file in the current directory and asks the user to select the correct one.
 
     Returns:
         str: Path to the selected accession list file.
@@ -68,16 +67,20 @@ def detect_accession_list_file() -> str:
         FileNotFoundError: If no valid file is selected.
     """
     txt_files = [f for f in os.listdir() if f.endswith(".txt")]
+
     if not txt_files:
-        raise FileNotFoundError("No .txt files found in the current directory.")
-    
+        log_message("No .txt files found in the current directory. Please create an accession list file.", level="error")
+        raise FileNotFoundError("No .txt files found. Please create an accession list file (one accession per line).")
+
     for txt_file in txt_files:
-        log_message(f"Detected accession list file: {txt_file}. Is this correct? (yes/y or no/n)", level="info")
+        log_message(f"Detected accession list file: {txt_file}. Would you like to use this file? (yes/y or no/n)", level="info")
         user_input = input().strip().lower()
+
         if user_input in ["yes", "y"]:
             return txt_file
         else:
-            log_message(f"{txt_file} is not the correct file. Moving to the next one if available.", level="warning")
+            log_message(f"{txt_file} is not the correct file. Checking for another file...", level="warning")
 
-    # If no valid file was selected, raise an error
+    # If the loop completes without finding a valid file
+    log_message("No valid accession list file was selected. Please ensure you have a correct file.", level="error")
     raise FileNotFoundError("No valid accession list file selected.")
