@@ -26,26 +26,31 @@ def detect_read_type(accession_number):
         raise FileNotFoundError(f"No FASTQ files found for {accession_number}.")
 
 def prefetch_and_convert(accession_number, threads):
-    """Download and convert SRA files using fastq-dump instead of prefetch + fasterq-dump."""
+    """Download and convert SRA files using fastq-dump without compression."""
     # Skip downloading if trimmed files are already present
-    if os.path.isfile(f"{accession_number}/{accession_number}_trimmed.fq.gz") or (
-        os.path.isfile(f"{accession_number}/{accession_number}_1_trimmed.fq.gz") and os.path.isfile(f"{accession_number}/{accession_number}_2_trimmed.fq.gz")):
+    if os.path.isfile(f"{accession_number}/{accession_number}_trimmed.fq") or (
+        os.path.isfile(f"{accession_number}/{accession_number}_1_trimmed.fq") and os.path.isfile(f"{accession_number}/{accession_number}_2_trimmed.fq")):
         log_message(f"Trimmed files already exist for {accession_number}. Skipping download and conversion.", level="info")
         return
 
     log_message(f"\nDownloading and converting {accession_number} using fastq-dump...", level="info")
     
-    # Run fastq-dump without the unsupported --threads option
-    fastq_dump_command = f"fastq-dump --split-files --gzip {accession_number}"
+    # Run fastq-dump without compression
+    fastq_dump_command = f"fastq-dump {accession_number}"
     run_command(fastq_dump_command)
 
     # Move output FASTQ files to the designated directory
-    if os.path.isfile(f"{accession_number}.fastq.gz"):
-        shutil.move(f"{accession_number}.fastq.gz", f"{accession_number}/{accession_number}.fastq.gz")
-    if os.path.isfile(f"{accession_number}_1.fastq.gz"):
-        shutil.move(f"{accession_number}_1.fastq.gz", f"{accession_number}/{accession_number}_1.fastq.gz")
-    if os.path.isfile(f"{accession_number}_2.fastq.gz"):
-        shutil.move(f"{accession_number}_2.fastq.gz", f"{accession_number}/{accession_number}_2.fastq.gz")
+    if os.path.isfile(f"{accession_number}.fastq"):
+        shutil.move(f"{accession_number}.fastq", f"{accession_number}/{accession_number}.fastq")
+    if os.path.isfile(f"{accession_number}_1.fastq"):
+        shutil.move(f"{accession_number}_1.fastq", f"{accession_number}/{accession_number}_1.fastq")
+    if os.path.isfile(f"{accession_number}_2.fastq"):
+        shutil.move(f"{accession_number}_2.fastq", f"{accession_number}/{accession_number}_2.fastq")
+
+    # If the data is single-end, ensure the file is named SRR25385865.fastq
+    if os.path.isfile(f"{accession_number}/{accession_number}_1.fastq") and not os.path.isfile(f"{accession_number}/{accession_number}_2.fastq"):
+        os.rename(f"{accession_number}/{accession_number}_1.fastq", f"{accession_number}/{accession_number}.fastq")
+        log_message(f"Renamed {accession_number}_1.fastq to {accession_number}.fastq for single-end reads.", level="info")
 
 def trim_reads(accession_number, read_type, fastp_path):
     """Trim reads using fastp."""
