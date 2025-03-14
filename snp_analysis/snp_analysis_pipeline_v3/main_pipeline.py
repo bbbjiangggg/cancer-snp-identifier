@@ -22,12 +22,17 @@ def delete_intermediate_files(accession_number, chromosome):
         f"{accession_number}/{accession_number}.sra"
     ]
     
-    for file_path in files_to_delete:
-        if os.path.isfile(file_path):
-            os.remove(file_path)
-            log_message(f"Deleted {file_path}", level="info")
-        else:
-            log_message(f"File not found: {file_path}", level="warning")
+    deleted_files = [file for file in files_to_delete if os.path.isfile(file)]
+
+    # Delete files silently
+    for file_path in deleted_files:
+        os.remove(file_path)
+
+    # Only show a summary if deletions happened
+    if deleted_files:
+        log_message(f"✅ Cleaned up {len(deleted_files)} intermediate files for {accession_number}, chromosome {chromosome}.", level="success")
+
+
 
 def print_banner():
     banner_lines = [
